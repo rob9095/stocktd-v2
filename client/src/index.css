@@ -1,0 +1,221 @@
+@import url('https://fonts.googleapis.com/css?family=Work+Sans:400,700');
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Work Sans', sans-serif !important;
+}
+
+body #root,
+body #root .ant-layout.ant-layout-has-sider {
+  height: 100%;
+}
+
+.ant-menu {
+  font-family: 'Work Sans', sans-serif !important;
+  font-weight: 500;
+}
+
+.x-reverse {
+  transform: scaleX(-1);
+}
+
+.primary-bg {
+  background: #716aca;
+}
+
+.primary-hover:hover {
+  color: #716aca;
+  cursor: pointer;
+}
+
+
+/* Search Dropdown */
+.drop-search {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.drop-search i svg {
+  font-size: 1rem;
+  color: #cfcedb;
+  cursor: pointer;
+}
+
+.drop-search input::placeholder {
+  color: #6f727d;
+}
+
+/* Inputs */
+
+input.ant-input.no-border {
+  border: 1px solid transparent !important;
+  box-shadow: 0 0 0 2px transparent !important;
+}
+
+
+
+/* Navbar */
+.stkd-navbar.ant-layout-header {
+  background: #fff;
+  padding: 0px 24px;
+  box-shadow: 0px 1px 15px 1px rgba(69,65,78,0.1);
+  height: 70px;
+  line-height: 70px;
+  position: fixed;
+  z-index: 1;
+  width: 100%;
+}
+
+/** navbar menu items **/
+
+.icon-nav svg {
+  font-size: 1rem;
+}
+
+.icon-nav {
+  padding: 0 12px;
+}
+
+.ant-menu-horizontal > .ant-menu-item.no-border:hover {
+  border-bottom: 2px solid transparent;
+}
+
+.ant-menu-horizontal > .ant-menu-item-selected.no-border {
+  border-bottom: 2px solid transparent;
+}
+
+.stkd-navbar .nav-icon svg {
+  color: linear-gradient(180deg, #ad5beb 25%, #c678db 50%, #da6ea9 75%, #e76e92 100%);
+}
+
+ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
+  border: none;
+  display: flex;
+  align-items: center;
+  height: 70px;
+}
+
+/* Sidebar */
+
+.stkd-sidebar .logo {
+  background: #282a3c;
+  height: 70px;
+  padding: 0px 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sidebar-trigger {
+  font-size: 18px;
+  line-height: 64px;
+  cursor: pointer;
+  transition: color .3s;
+}
+
+.sidebar-trigger:hover {
+  color: #1890ff;
+}
+
+.stkd-sidebar {
+  background: #2c2e3e;
+}
+
+.stkd-sidebar.ant-layout-sider.ant-layout-sider-dark {
+  background: #2c2e3e;
+}
+
+.stkd-sidebar .ant-menu-dark {
+  background: #2c2e3e;
+  padding: 30px 0 30px 0;
+}
+
+.ant-menu-dark .ant-menu-inline.ant-menu-sub {
+  background: #292b3a !important;
+  box-shadow: none !important;
+}
+
+.ant-menu-inline .ant-menu-submenu-title {
+  margin: 0px !important;
+}
+
+.stkd-sidebar .ant-menu.ant-menu-dark .ant-menu-item-selected {
+  color: #716aca;
+}
+
+.stkd-sidebar .ant-menu.ant-menu-dark .ant-menu-item-selected i svg {
+  color: #716aca;
+}
+
+li.ant-menu-submenu.ant-menu-submenu-inline.stkd-dark.menu-item {
+  color: #868aa8;
+}
+li.ant-menu-submenu.ant-menu-submenu-inline.stkd-dark.menu-item span i {
+  color: #525672;
+}
+
+.ant-menu-dark .ant-menu-submenu-title:hover {
+  color: #868aa8 !important;
+  background-color: #292b3a !important;
+}
+
+.ant-menu-dark .ant-menu-submenu-title:hover span i svg {
+  color: #8c8ea4;
+}
+
+.ant-menu-submenu-title .ant-menu-submenu-arrow:before, .ant-menu-submenu-inline > .ant-menu-submenu-title .ant-menu-submenu-arrow:before {
+  background: linear-gradient(to right, #686c89, #686c89) !important;
+}
+
+.ant-menu-submenu-title .ant-menu-submenu-arrow:after, .ant-menu-submenu-inline > .ant-menu-submenu-title .ant-menu-submenu-arrow:after {
+  background: linear-gradient(to right, #686c89, #686c89) !important;
+}
+
+.ant-menu-submenu-title:hover .ant-menu-submenu-arrow:before, .ant-menu-submenu-inline > .ant-menu-submenu-title:hover .ant-menu-submenu-arrow:before {
+  background: linear-gradient(to right, #8c8ea4, #8c8ea4) !important;
+}
+
+.ant-menu-submenu-title:hover .ant-menu-submenu-arrow:after, .ant-menu-submenu-inline > .ant-menu-submenu-title:hover .ant-menu-submenu-arrow:after {
+  background: linear-gradient(to right, #8c8ea4, #8c8ea4) !important;
+}
+
+li.ant-menu-item.stkd-dark.sub-menu-item {
+  color: #686c89;
+}
+
+li.ant-menu-item.stkd-dark.sub-menu-item:hover {
+  color: #868aa8;
+}
+
+li.ant-menu-item.stkd-dark.menu-item {
+  margin: 0px;
+  height: 44px;
+}
+
+.ant-menu-dark .ant-menu-item.stkd-dark.menu-item:hover {
+  color: #868aa8 !important;
+  background-color: #292b3a !important;
+}
+
+.stkd-sidebar .ant-menu-dark .ant-menu-item:hover i {
+  color: #8c8ea4;
+}
+
+.stkd-sidebar .ant-menu.ant-menu-dark .ant-menu-item-selected {
+  background: #292b3a;
+}
+
+.stkd-sidebar .ant-menu-dark .ant-menu-item {
+  color: #868aa8;
+}
+
+.stkd-sidebar .ant-menu-dark .ant-menu-item i {
+  color: #525672;
+}
+
+.ant-menu-dark .ant-menu-sub {
+    color: #868aa8 !important;
+    background: #2c2e3e !important;
+}
