@@ -92,15 +92,29 @@ class App extends Component {
               clientWidth={this.state.clientWidth}
             />
           }
-          <Content style={{padding: '100px 30px 0 30px'}}>
-            <Breadcrumb style={{ margin: '16px 0' }}>
-              <Breadcrumb.Item>User</Breadcrumb.Item>
-              <Breadcrumb.Item>Bill</Breadcrumb.Item>
-            </Breadcrumb>
-            <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
-              Bill is a cat.
-            </div>
-          </Content>
+              <Content className="container" style={{padding: '100px 30px 0 30px'}}>
+                <Breadcrumb style={{ margin: '16px 0' }}>
+                  <Breadcrumb.Item>User</Breadcrumb.Item>
+                  <Breadcrumb.Item>Bill</Breadcrumb.Item>
+                </Breadcrumb>
+                <Row>
+                  <Col md={8} xs={24}>
+                    <div className="stkd-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+                      Bill is a cat.
+                    </div>
+                  </Col>
+                  <Col md={8} xs={24}>
+                    <div className="stkd-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+                      Bill is a cat.
+                    </div>
+                  </Col>
+                  <Col md={8} xs={24}>
+                    <div className="stkd-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+                      Bill is a cat.
+                    </div>
+                  </Col>
+                </Row>
+              </Content>
           <Footer style={{ textAlign: 'center' }}>
             Ant Design ©2018 Created by Ant UED
           </Footer>

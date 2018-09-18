@@ -87,7 +87,7 @@ class NavbarMobile extends Component {
           </Row>
         </Header>
         {this.state.showMore && (
-          <Row className="mobile show-more center-a">
+          <Row className={this.state.collapsed ? "mobile show-more center-a" : "mobile show-more center-a sider-open"}>
             <Col span={24}>
               <Popover trigger="click" arrowPointAtLeft placement="bottomLeft" content={(
                 <div className="drop-search mobile">
