@@ -16,6 +16,18 @@ body #root .ant-layout.ant-layout-has-sider {
   font-weight: 500;
 }
 
+.right-a {
+  text-align: right;
+}
+
+.center-a {
+  text-align: center;
+}
+
+.rotate-90 {
+  transform: rotate(90deg);
+}
+
 .x-reverse {
   transform: scaleX(-1);
 }
@@ -70,12 +82,16 @@ input.ant-input.no-border {
 
 /** navbar menu items **/
 
-.icon-nav svg {
+/* .icon-nav svg {
   font-size: 1rem;
-}
+} */
 
 .icon-nav {
-  padding: 0 12px;
+  padding: 0px 0px 0px 12px;
+  font-size: 18px;
+  line-height: 64px;
+  cursor: pointer;
+  transition: color .3s;
 }
 
 .ant-menu-horizontal > .ant-menu-item.no-border:hover {
@@ -95,6 +111,59 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
   display: flex;
   align-items: center;
   height: 70px;
+}
+
+.dash-menu-container {
+  display: flex !important;
+  justify-content: space-between;
+  margin-left: -40px;
+}
+
+/* Navbar -- mobile only styles */
+
+.ant-row.mobile.show-more {
+  padding: 0px 24px;
+  height: 50px;
+  background: white;
+  margin-top: 56px;
+  z-index: 1000;
+  position: fixed;
+  width: 100%;
+  box-shadow: 0px 1px 15px 0px rgba(69,65,78,0.1);
+  line-height: 48px;
+  display: flex;
+  align-items: center;
+}
+
+.ant-row.mobile.show-more div {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media screen and (max-width:400px) {
+  .ant-row.mobile.show-more div {
+    display: flex;
+    justify-content: space-evenly;
+  }
+}
+
+
+/* Right Menu Drawer */
+.right-drawer .ant-drawer-wrapper-body {
+  background: #2c2e3e;
+}
+
+.right-drawer i.anticon.anticon-close {
+  color: #868aa8;
+}
+
+.right-drawer .ant-drawer-body {
+  margin-top: 50px;
+  padding: 0px;
+}
+
+.right-drawer .ant-drawer-body ul.ant-menu.ant-menu-dark.ant-menu-root.ant-menu-inline {
+  background: #2c2e3e;
 }
 
 /* Sidebar */

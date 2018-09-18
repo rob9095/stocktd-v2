@@ -1,14 +1,21 @@
 import React, { Component } from 'react';
 import { Button, Layout, Menu, Icon, Breadcrumb, Row, Col, Popover, Input, Timeline } from 'antd';
-import NavMenu from './NavMenu';
-import RightDrawer from './RightDrawer';
+import Navbar from './Navbar';
+import NavbarMobile from './NavbarMobile';
 const { Header, Sider, Content, Footer } = Layout;
 const SubMenu = Menu.SubMenu;
 
 class App extends Component {
   state = {
-    collapsed: false,
+    collapsed: true,
+    clientWidth: 0,
   };
+
+  componentDidMount() {
+    this.setState({
+      clientWidth: document.documentElement.clientWidth,
+    })
+  }
 
   toggle = () => {
     this.setState({
@@ -16,19 +23,27 @@ class App extends Component {
     });
   }
 
+  handleWindowResize = () => {
+    this.setState({
+      clientWidth: document.documentElement.clientWidth,
+    })
+  }
+
   render() {
-    let width = document.documentElement.clientWidth;
+    window.onresize = (e) => {
+      this.handleWindowResize();
+    }
     return (
       <Layout>
         <Sider
           width="255"
-          collapsedWidth={width >= 1000 ? '80' : '0'}
+          collapsedWidth={this.state.clientWidth >= 1000 ? '80' : '0'}
           className="stkd-sidebar"
           trigger={null}
           collapsible
           collapsed={this.state.collapsed}
         >
-          {width >= 1000 ? <div className="logo" /> : null}
+          {this.state.clientWidth >= 1000 ? <div className="logo" /> : null}
           <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
             <Menu.Item className="stkd-dark menu-item" key="1">
               <Icon type="pie-chart" />
@@ -62,63 +77,24 @@ class App extends Component {
           </Menu>
         </Sider>
         <Layout>
-          <Header className="stkd-navbar">
-            <Row>
-              <Col span={1}>
-                <Icon
-                  className="sidebar-trigger"
-                  type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
-                  onClick={this.toggle}
-                />
-              </Col>
-              <Col span={15}>
-                <NavMenu />
-              </Col>
-              <Col span={8}>
-                <Popover trigger="click" placement="bottom" content={(
-                  <div className="drop-search">
-                    <Input
-                      placeholder="Search..."
-                      className="no-border"
-                    />
-                    <Icon type="close" />
-                  </div>
-                )}
-                >
-                  <span className="icon-nav primary-hover">
-                    <Icon type="search" className="x-reverse"/>
-                  </span>
-                </Popover>
-                <Popover className="notifications-popover" trigger="click" placement="bottom" content={(
-                  <div className="drop-notifications">
-                    <div className="notifications-header">
-                      User Notifications
-                    </div>
-                    <Timeline>
-                      <Timeline.Item color="green">Create a services site 2015-09-01</Timeline.Item>
-                      <Timeline.Item color="green">Create a services site 2015-09-01</Timeline.Item>
-                      <Timeline.Item color="red">Solve initial network problems 1</Timeline.Item>
-                      <Timeline.Item>Technical testing 3 2015-09-01</Timeline.Item>
-                    </Timeline>
-                  </div>
-                )}
-                >
-                  <span className="icon-nav primary-hover">
-                    <Icon type="bell" />
-                  </span>
-                </Popover>
-                <span className="icon-nav primary-hover">
-                  <Icon type="user" />
-                </span>
-              </Col>
-            </Row>
-          </Header>
+          {this.state.clientWidth >= 1000 ?
+            <Navbar
+              onSiderToggle={this.toggle}
+              collapsed={this.state.collapsed}
+              clientWidth={this.state.clientWidth}
+            />
+            :
+            <NavbarMobile
+              onSiderToggle={this.toggle}
+              collapsed={this.state.collapsed}
+              clientWidth={this.state.clientWidth}
+            />
+          }
           <Content style={{padding: '100px 30px 0 30px'}}>
             <Breadcrumb style={{ margin: '16px 0' }}>
               <Breadcrumb.Item>User</Breadcrumb.Item>
               <Breadcrumb.Item>Bill</Breadcrumb.Item>
             </Breadcrumb>
-            <RightDrawer />
             <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
               Bill is a cat.
             </div>

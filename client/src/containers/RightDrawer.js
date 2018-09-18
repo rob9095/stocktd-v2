@@ -15,13 +15,15 @@ class RightDrawer extends Component {
     this.setState({
       visible: false,
     });
+    this.props.onClose();
   };
 
   render() {
     return (
       <div>
         <Drawer
-          title="Basic Drawer"
+          className="right-drawer"
+          title={null}
           placement="right"
           closable={true}
           onClose={this.onClose}
