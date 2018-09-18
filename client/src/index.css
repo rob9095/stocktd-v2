@@ -12,7 +12,7 @@ body #root .ant-layout.ant-layout-has-sider {
 }
 
 .stkd-content {
-  margin: 0px 7px;
+  margin: 7px;
   box-shadow: 0px 1px 15px 1px rgba(69,65,78,0.08);
   background: #fff;
   padding: 24px;
@@ -80,9 +80,17 @@ input.ant-input.no-border {
 
 
 /* Navbar */
+.nav-popover {
+  top: 70px !important;
+}
+
+.nav-popover.mobile {
+  top: 95px !important;
+}
+
 .stkd-navbar.ant-layout-header {
   background: #fff;
-  padding: 0px 24px;
+  padding: 0px 31px;
   box-shadow: 0px 1px 15px 1px rgba(69,65,78,0.1);
   height: 70px;
   line-height: 70px;
@@ -91,10 +99,9 @@ input.ant-input.no-border {
   width: 100%;
 }
 
-/** navbar menu items **/
-
 .icon-nav {
-  padding: 0px 0px 0px 12px;
+  text-align: center;
+  margin: 0px 0px 0px 12px;
   font-size: 18px;
   width: 56px;
   height: 56px;
@@ -143,18 +150,15 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
 @media screen and (min-width: 550px) {
   .dash-menu-container-mobile.open div {
     width: calc(33% - 85px);
-    transition: width .3s;
   }
-}
-
-.ant-row.mobile.show-more.sider-open {
-  width: calc(100% - 255px);
-  transition: width .3;
+  .ant-row.mobile.show-more.sider-open {
+    width: calc(100% - 255px);
+  }
 }
 
 .ant-row.mobile.show-more {
   padding: 0px 24px;
-  height: 50px;
+  height: 37px;
   background: white;
   margin-top: 56px;
   z-index: 1000;
@@ -253,6 +257,10 @@ li.ant-menu-submenu.ant-menu-submenu-inline.stkd-dark.menu-item {
   color: #868aa8;
 }
 li.ant-menu-submenu.ant-menu-submenu-inline.stkd-dark.menu-item span i {
+  color: #525672;
+}
+
+li.ant-menu-submenu.ant-menu-submenu-vertical.stkd-dark.menu-item span i {
   color: #525672;
 }
 

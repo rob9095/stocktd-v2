@@ -40,7 +40,7 @@ class Navbar extends Component {
           <Col span={21} className={this.state.collapsed ? 'dash-menu-container' : 'dash-menu-container open'}>
             <NavMenu />
             <div className="right-menu-container">
-              <Popover trigger="click" arrowPointAtRight placement="bottomRight" content={(
+              <Popover overlayClassName="nav-popover" trigger="click" placement="bottomRight" content={(
                 <div className="drop-search">
                   <Input
                     placeholder="Search..."
@@ -54,7 +54,7 @@ class Navbar extends Component {
                   <Icon type="search" className="x-reverse"/>
                 </span>
               </Popover>
-              <Popover className="notifications-popover" arrowPointAtRight trigger="click" placement="bottomRight" content={(
+              <Popover overlayClassName="nav-popover" trigger="click" placement="bottomRight" content={(
                 <div className="drop-notifications">
                   <div className="notifications-header">
                     User Notifications

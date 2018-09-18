@@ -6,10 +6,17 @@ const SubMenu = Menu.SubMenu;
 const { Header } = Layout;
 
 const menuSvg = () => (
-  <svg viewBox="0 0 50 50" width="1em" height="1em">
-  <g id="surface1">
-  <path d="M 0 9 L 0 11 L 50 11 L 50 9 Z M 0 24 L 0 26 L 50 26 L 50 24 Z M 0 39 L 0 41 L 50 41 L 50 39 Z "/>
-  </g>
+  <svg viewBox="0 0 384.97 384.97" fill="currentColor" width="1em" height="1em">
+    <g>
+    	<g id="Menu">
+    		<path d="M12.03,84.212h360.909c6.641,0,12.03-5.39,12.03-12.03c0-6.641-5.39-12.03-12.03-12.03H12.03
+    			C5.39,60.152,0,65.541,0,72.182C0,78.823,5.39,84.212,12.03,84.212z"/>
+    		<path d="M372.939,180.455H12.03c-6.641,0-12.03,5.39-12.03,12.03s5.39,12.03,12.03,12.03h360.909c6.641,0,12.03-5.39,12.03-12.03
+    			S379.58,180.455,372.939,180.455z"/>
+    		<path d="M372.939,300.758H12.03c-6.641,0-12.03,5.39-12.03,12.03c0,6.641,5.39,12.03,12.03,12.03h360.909
+    			c6.641,0,12.03-5.39,12.03-12.03C384.97,306.147,379.58,300.758,372.939,300.758z"/>
+    	</g>
+    </g>
   </svg>
 )
 
@@ -89,7 +96,7 @@ class NavbarMobile extends Component {
         {this.state.showMore && (
           <Row className={this.state.collapsed ? "mobile show-more center-a" : "mobile show-more center-a sider-open"}>
             <Col span={24}>
-              <Popover trigger="click" arrowPointAtLeft placement="bottomLeft" content={(
+              <Popover overlayClassName="nav-popover mobile" trigger="click" arrowPointAtLeft placement="bottomLeft" content={(
                 <div className="drop-search mobile">
                   <Input
                     placeholder="Search..."
@@ -103,7 +110,7 @@ class NavbarMobile extends Component {
                   <Icon type="search" className="x-reverse"/>
                 </span>
               </Popover>
-              <Popover className="notifications-popover" placement={this.props.clientWidth <= 399 ? 'bottom' : 'bottomRight' } trigger="click" content={(
+              <Popover overlayClassName="nav-popover mobile" className="notifications-popover" placement={this.props.clientWidth <= 399 ? 'bottom' : 'bottomRight' } trigger="click" content={(
                 <div className="drop-notifications">
                   <div className="notifications-header">
                     User Notifications

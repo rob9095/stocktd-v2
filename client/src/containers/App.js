@@ -27,7 +27,7 @@ class App extends Component {
     const clientWidth = document.documentElement.clientWidth;
     this.setState({
       clientWidth,
-      collapsed: clientWidth <= 550 ? true : this.state.collapsed,
+      collapsed: clientWidth <= 600 ? true : this.state.collapsed,
     })
   }
 
@@ -46,35 +46,32 @@ class App extends Component {
           collapsed={this.state.collapsed}
         >
           {this.state.clientWidth >= 1000 ? <div className="logo" /> : null}
-          <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-            <Menu.Item className="stkd-dark menu-item" key="1">
-              <Icon type="pie-chart" />
-              <span>Option 1</span>
-            </Menu.Item>
-            <Menu.Item className="stkd-dark menu-item" key="2">
-              <Icon type="desktop" />
-              <span>Option 2</span>
+          <Menu theme="dark" mode="inline">
+            <Menu.Item className="stkd-dark menu-item" key="dashboard">
+              <Icon type="appstore" theme="outlined" />
+              <span>Dashboard</span>
             </Menu.Item>
             <SubMenu
               className="stkd-dark menu-item"
-              key="sub1"
-              title={<span><Icon type="user" /><span>User</span></span>}
+              key="orders"
+              title={<span><Icon type="shopping-cart" theme="outlined" /><span>Orders</span></span>}
             >
-              <Menu.Item className="stkd-dark sub-menu-item" key="3">Tom</Menu.Item>
-              <Menu.Item className="stkd-dark sub-menu-item" key="4">Bill</Menu.Item>
-              <Menu.Item className="stkd-dark sub-menu-item" key="5">Alex</Menu.Item>
+              <Menu.Item className="stkd-dark sub-menu-item" key="openOrders">Open Orders</Menu.Item>
+              <Menu.Item className="stkd-dark sub-menu-item" key="orderHistory">Order History</Menu.Item>
+              <Menu.Item className="stkd-dark sub-menu-item" key="addOrder">Add Order</Menu.Item>
             </SubMenu>
             <SubMenu
               className="stkd-dark menu-item"
-              key="sub2"
-              title={<span><Icon type="team" /><span>Team</span></span>}
+              key="products"
+              title={<span><Icon type="tags" theme="outlined" /><span>Inventory</span></span>}
             >
-              <Menu.Item className="stkd-dark sub-menu-item" key="6">Team 1</Menu.Item>
-              <Menu.Item className="stkd-dark sub-menu-item" key="8">Team 2</Menu.Item>
+              <Menu.Item className="stkd-dark sub-menu-item" key="manageProducts">Manage Products</Menu.Item>
+              <Menu.Item className="stkd-dark sub-menu-item" key="updateQuantity">Update Quantity</Menu.Item>
+              <Menu.Item className="stkd-dark sub-menu-item" key="scanner">Scanner</Menu.Item>
             </SubMenu>
-            <Menu.Item className="stkd-dark menu-item" key="9">
-              <Icon type="file" />
-              <span>File</span>
+            <Menu.Item className="stkd-dark menu-item" key="purchaseOrders">
+              <Icon type="file-done" theme="outlined" />
+              <span>Purhcase Orders</span>
             </Menu.Item>
           </Menu>
         </Sider>
@@ -98,17 +95,17 @@ class App extends Component {
                   <Breadcrumb.Item>Bill</Breadcrumb.Item>
                 </Breadcrumb>
                 <Row>
-                  <Col md={8} xs={24}>
+                  <Col lg={24} xl={8}>
                     <div className="stkd-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
                       Bill is a cat.
                     </div>
                   </Col>
-                  <Col md={8} xs={24}>
+                  <Col lg={24} xl={8}>
                     <div className="stkd-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
                       Bill is a cat.
                     </div>
                   </Col>
-                  <Col md={8} xs={24}>
+                  <Col lg={24} xl={8}>
                     <div className="stkd-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
                       Bill is a cat.
                     </div>
