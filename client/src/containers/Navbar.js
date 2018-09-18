@@ -8,7 +8,16 @@ class Navbar extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      collapsed: this.props.collapsed || true,
+      collapsed: this.props.collapsed,
+    }
+  }
+  static getDerivedStateFromProps(props,state) {
+    if (props.collapsed !== state.collapsed) {
+      return {
+        collapsed: !state.collapsed,
+      }
+    } else {
+      return null;
     }
   }
   toggle = () => {
@@ -28,7 +37,7 @@ class Navbar extends Component {
               onClick={this.toggle}
             />
           </Col>
-          <Col span={21} className="dash-menu-container">
+          <Col span={21} className={this.state.collapsed ? 'dash-menu-container' : 'dash-menu-container open'}>
             <NavMenu />
             <div className="right-menu-container">
               <Popover trigger="click" arrowPointAtRight placement="bottomRight" content={(

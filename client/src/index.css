@@ -82,14 +82,11 @@ input.ant-input.no-border {
 
 /** navbar menu items **/
 
-/* .icon-nav svg {
-  font-size: 1rem;
-} */
-
 .icon-nav {
   padding: 0px 0px 0px 12px;
   font-size: 18px;
-  line-height: 64px;
+  width: 56px;
+  height: 56px;
   cursor: pointer;
   transition: color .3s;
 }
@@ -119,7 +116,25 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
   margin-left: -40px;
 }
 
+.dash-menu-container.open {
+  width: calc(100% - 310px);
+  transition: width .3s;
+}
+
+.right-menu-container {
+  width: 150px;
+  display: flex;
+  justify-content: space-evenly;
+}
+
 /* Navbar -- mobile only styles */
+
+@media screen and (min-width: 550px) {
+  .dash-menu-container-mobile.open div {
+    width: calc(33% - 85px);
+    transition: width .3s;
+  }
+}
 
 .ant-row.mobile.show-more {
   padding: 0px 24px;
@@ -129,7 +144,7 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
   z-index: 1000;
   position: fixed;
   width: 100%;
-  box-shadow: 0px 1px 15px 0px rgba(69,65,78,0.1);
+  box-shadow: 0px 7px 15px 0px rgba(69,65,78,0.1);
   line-height: 48px;
   display: flex;
   align-items: center;

@@ -24,8 +24,10 @@ class App extends Component {
   }
 
   handleWindowResize = () => {
+    const clientWidth = document.documentElement.clientWidth;
     this.setState({
-      clientWidth: document.documentElement.clientWidth,
+      clientWidth,
+      collapsed: clientWidth <= 550 ? true : this.state.collapsed,
     })
   }
 

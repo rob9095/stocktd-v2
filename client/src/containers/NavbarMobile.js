@@ -24,9 +24,18 @@ class NavbarMobile extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      collapsed: this.props.collapsed || true,
+      collapsed: this.props.collapsed,
       drawerOpen: false,
       showMore: false,
+    }
+  }
+  static getDerivedStateFromProps(props,state) {
+    if (props.collapsed !== state.collapsed) {
+      return {
+        collapsed: !state.collapsed,
+      }
+    } else {
+      return null;
     }
   }
   toggle = () => {
@@ -49,7 +58,7 @@ class NavbarMobile extends Component {
     return(
       <span>
         <Header className="stkd-navbar">
-          <Row>
+          <Row className={this.state.collapsed ? 'dash-menu-container-mobile' : 'dash-menu-container-mobile open'}>
             {this.state.drawerOpen && (
               <RightDrawer
                 onClose={this.toggleDrawer}
