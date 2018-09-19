@@ -126,6 +126,12 @@ i.lg {
 }
 
 
+/* Alert */
+.ant-alert {
+  margin-bottom: 14px;
+}
+
+
 /* Search Dropdown */
 .drop-search {
     display: flex;

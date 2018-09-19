@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
 import { Button, Layout, Menu, Icon, Breadcrumb, Row, Col, Popover, Input, Timeline } from 'antd';
 import Navbar from './Navbar';
 import NavbarMobile from './NavbarMobile';
@@ -9,9 +10,16 @@ class Dashboard extends Component {
   state = {
     collapsed: true,
     clientWidth: 0,
+    loginRedirect: false,
   };
 
+
   componentDidMount() {
+    if(!this.props.currentUser.isAuthenticated) {
+      this.state({
+        loginRedirect: true,
+      })
+    }
     this.setState({
       clientWidth: document.documentElement.clientWidth,
     })
@@ -34,6 +42,9 @@ class Dashboard extends Component {
   render() {
     window.onresize = (e) => {
       this.handleWindowResize();
+    }
+    if (this.state.loginRedirect) {
+      <Redirect to="/signin" />
     }
     return (
       <Layout>

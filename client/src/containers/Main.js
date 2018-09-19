@@ -12,7 +12,7 @@ const Main = props => {
 	const { authUser, errors, removeError, currentUser } = props;
 	return(
 			<Switch>
-				<Route exact path="/" render={props => <Dashboard currentUser={currentUser} {...props} />} />
+				<Route exact path="/app" render={props => <Dashboard currentUser={currentUser} {...props} />} />
 				<Route
 					exact
 					path="/signin"
