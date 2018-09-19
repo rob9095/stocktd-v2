@@ -1,0 +1,28 @@
+{
+  "name": "stocktd-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "keywords": [],
+  "description": "",
+  "dependencies": {
+    "bcryptjs": "^1.1.0",
+    "body-parser": "^1.18.2",
+    "cors": "^2.8.4",
+    "csvtojson": "^2.0.8",
+    "dotenv": "^5.0.1",
+    "express": "^4.16.3",
+    "express-fileupload": "^0.4.0",
+    "jsonpack": "^1.1.5",
+    "jsonwebtoken": "^8.2.0",
+    "mongoose": "^5.0.10",
+    "nodemailer": "^4.6.8"
+  },
+  "devDependencies": {
+    "locus": "^2.0.1"
+  }
+}
