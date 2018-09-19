@@ -4,12 +4,14 @@ import { connect } from 'react-redux';
 import { authUser } from '../store/actions/auth';
 import { removeError } from '../store/actions/errors';
 import Dashboard from './Dashboard';
+import WrappedAuthForm from '../components/AuthForm';
 
 const Main = props => {
 	const { authUser, errors, removeError, currentUser } = props;
 	return(
 			<Switch>
-				<Route path="/" render={props => <Dashboard currentUser={currentUser} {...props} />} />
+				<Route exact path="/" render={props => <Dashboard currentUser={currentUser} {...props} />} />
+				<Route path="/signin" render={props => <WrappedAuthForm currentUser={currentUser} {...props} />} />
 			</Switch>
 	);
 };
