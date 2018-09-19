@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
-import { Form, Icon, Input, Button, Checkbox } from 'antd';
+import { connect } from 'react-redux';
+import { addError, removeError } from '../store/actions/errors';
+import { Link } from 'react-router-dom';
+import { Alert, Form, Icon, Input, Button, Checkbox } from 'antd';
 
 const FormItem = Form.Item;
 
@@ -7,7 +10,9 @@ class AuthForm extends Component {
   constructor(props) {
     super(props)
     this.state = {
-
+      email: '',
+      password: '',
+      company: '',
     }
   }
   handleSubmit = (e) => {
@@ -15,27 +20,60 @@ class AuthForm extends Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         console.log('Received values of form: ', values);
+        // const authType = this.props.signUp ? 'signup' : 'signin';
+        // this.props.onAuth(authType, values).then(() => {
+        //   this.props.history.push('/');
+        // })
+        // .catch(() => {
+        //   return;
+        // });
       }
     });
   }
 
+  clearErrors = () => {
+    this.props.removeError();
+  }
+
   render() {
     const { getFieldDecorator } = this.props.form;
+    const { signUp, heading, buttonText, errors, history, removeError } = this.props;
+    history.listen(() => {
+      removeError();
+    });
     return (
-      <div className="auth-form-container">
+      <div className="centered-container">
         <Form onSubmit={this.handleSubmit} className="auth-form">
+          <h1>{heading}</h1>
+          {errors.message && (
+            <Alert
+              message={errors.message}
+              type="error"
+              closable
+              afterClose={this.handleClose}
+            />
+          )}
           <FormItem>
-            {getFieldDecorator('userName', {
-              rules: [{ required: true, message: 'Please input your username!' }],
+            {getFieldDecorator('email', {
+              rules: [{ type: 'email', required: true, message: 'Email is required' }],
             })(
-              <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Username" />
+              <Input prefix={<Icon type="mail" theme="twoTone" twoToneColor="#716aca"/>} placeholder="Email" />
             )}
           </FormItem>
+          {signUp && (
+            <FormItem>
+              {getFieldDecorator('company', {
+                rules: [{ required: true, message: 'Company is required' }],
+              })(
+                <Input prefix={<Icon type="shop" theme="twoTone" twoToneColor="#716aca" />} placeholder="Company" />
+              )}
+            </FormItem>
+          )}
           <FormItem>
             {getFieldDecorator('password', {
-              rules: [{ required: true, message: 'Please input your Password!' }],
+              rules: [{ min: signUp ? 6 : 0, required: true, message: signUp ? 'Please choose a password longer than 6 characters' : 'Password is required' }],
             })(
-              <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="Password" />
+              <Input prefix={<Icon type="lock" theme="twoTone" twoToneColor="#716aca" />} type="password" placeholder="Password" />
             )}
           </FormItem>
           <FormItem className="form-actions">
@@ -45,12 +83,16 @@ class AuthForm extends Component {
             })(
               <Checkbox>Remember me</Checkbox>
             )}
-            <a className="auth-form-forgot" href="">Forgot password</a>
+            <Link className="auth-form-forgot" to="/reset-password">Forgot password</Link>
             <Button type="primary" htmlType="submit" className="auth-form-button">
-              Log in
+              {buttonText}
             </Button>
             <div className="auth-form-or">
-              Or <a href="">register now!</a>
+              {signUp ?
+                <span>Already have an account? <Link className="underline" to="/signin">Log in</Link></span>
+                :
+                <span>Don’t have an account yet? <Link className="underline" to="/signup">Sign up</Link></span>
+              }
             </div>
           </FormItem>
         </Form>
@@ -61,4 +103,10 @@ class AuthForm extends Component {
 
 const WrappedAuthForm = Form.create()(AuthForm);
 
-export default WrappedAuthForm;
+function mapStateToProps(state) {
+	return {
+		errors: state.errors,
+	};
+}
+
+export default connect(mapStateToProps, {addError, removeError})(WrappedAuthForm);

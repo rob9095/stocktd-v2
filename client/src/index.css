@@ -4,6 +4,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Work Sans', sans-serif !important;
+  background: #f0f2f5 !important;
 }
 
 body #root,
@@ -11,8 +12,80 @@ body #root .ant-layout.ant-layout-has-sider {
   height: 100%;
 }
 
-button, a, p {
+.bold {
+  font-weight: 700;
+}
+
+.semi-bold {
+  font-weight: 600;
+}
+
+.underline {
+  border-bottom: 2px solid #716aca;
+  padding-bottom: 2px;
+  transition: border .2s;
+}
+
+.underline:hover {
+  border-bottom: 2px solid #9992d6;
+}
+
+a.no-hover {
+  color: #716aca !important;
+}
+
+a:focus {
+  text-decoration: none !important;
+}
+
+.ant-form-item {
+  font-family: 'Work Sans', sans-serif !important;
+  margin-bottom: 1em !important;
+}
+
+.ant-input {
+  font-family: 'Work Sans', sans-serif !important;
+  min-height: 40px !important;
+}
+
+.ant-input::placeholder {
+  font-family: 'Work Sans', sans-serif !important;
+}
+
+button, a, p, h1, h2, h3, h4, h5 {
   font-family: 'Work Sans', sans-serif;
+}
+
+.no-pad {
+  padding: 0px;
+}
+
+i.lg {
+  font-size: 4em;
+}
+
+.warning-bg {
+  background: #faad14;
+}
+
+.warning-color {
+  color: #faad14;
+}
+
+.centered-container {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+.centered-container.col {
+  flex-direction: column;
+}
+
+.centered-container.row {
+  flex-direction: row;
 }
 
 .stkd-content {
@@ -20,10 +93,6 @@ button, a, p {
   box-shadow: 0px 1px 15px 1px rgba(69,65,78,0.08);
   background: #fff;
   padding: 24px;
-}
-
-.ant-col-xs-24 {
-  margin: 7px 0px;
 }
 
 .ant-menu {
@@ -81,7 +150,23 @@ input.ant-input.no-border {
   box-shadow: 0 0 0 2px transparent !important;
 }
 
+/* Not Found (404) page */
+.not-found h1 {
+  font-size: 3em;
+  margin-bottom: 0px;
+}
 
+.not-found i {
+  height: 70px;
+}
+
+.not-found .action-group {
+  height: 50px;
+}
+
+.not-found .action-group button {
+  margin: 10px;
+}
 
 /* Navbar */
 .nav-popover {
@@ -192,16 +277,23 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
 }
 
 
-/* Auth Form */
-.auth-form-container {
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* Reset Password Form */
+
+.reset-pass-form {
+  max-width: 300px;
 }
+
+.reset-pass-form button {
+  width: 100%;
+}
+
+/* Auth Form */
 
 .auth-form {
   max-width: 300px;
+}
+.auth-form h1 {
+  text-align: center;
 }
 .auth-form-forgot {
   float: right;
@@ -215,6 +307,7 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
   text-align: center;
   font-family: 'Work Sans', sans-serif;
 }
+
 
 /* Right Menu Drawer */
 .right-drawer .ant-drawer-wrapper-body {
