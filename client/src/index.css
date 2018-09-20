@@ -296,12 +296,12 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
   .dash-menu-container-mobile.open div {
     width: calc(33% - 85px);
   }
-  .ant-row.mobile.show-more.sider-open {
-    width: calc(100% - 255px);
+  .ant-col-24.slider-open {
+      width: calc(100% - 265px);
   }
 }
 
-.ant-row.mobile.show-more {
+.mobile.show-more {
   padding: 0px 24px;
   height: 37px;
   background: white;
