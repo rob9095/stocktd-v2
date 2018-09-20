@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Layout, Menu, Icon, Row, Col, Popover, Input, Timeline } from 'antd';
 import NavMenu from './NavMenu';
+import UserCard from '../components/UserCard';
 const SubMenu = Menu.SubMenu;
 const { Header } = Layout;
 
@@ -72,9 +73,16 @@ class Navbar extends Component {
                   <Icon type="bell" />
                 </span>
               </Popover>
-              <span className="icon-nav primary-hover">
-                <Icon type="user" />
-              </span>
+              <Popover overlayClassName="nav-popover" trigger="click" placement="bottomRight" content={(
+                <div className="drop-account">
+                  <UserCard currentUser={this.props.currentUser} />
+                </div>
+              )}
+              >
+                <span className="icon-nav primary-hover">
+                  <Icon type="user" />
+                </span>
+              </Popover>
             </div>
           </Col>
           {/* <Col span={8} className="center-a">

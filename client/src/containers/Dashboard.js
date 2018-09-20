@@ -7,12 +7,14 @@ const { Header, Sider, Content, Footer } = Layout;
 const SubMenu = Menu.SubMenu;
 
 class Dashboard extends Component {
-  state = {
-    collapsed: true,
-    clientWidth: 0,
-    loginRedirect: false,
-  };
-
+  constructor(props) {
+    super(props)
+    this.state = {
+      collapsed: true,
+      clientWidth: 0,
+      loginRedirect: false,
+    }
+  }
 
   componentDidMount() {
     if(!this.props.currentUser.isAuthenticated) {
@@ -92,12 +94,14 @@ class Dashboard extends Component {
               onSiderToggle={this.toggle}
               collapsed={this.state.collapsed}
               clientWidth={this.state.clientWidth}
+              currentUser={this.props.currentUser}
             />
             :
             <NavbarMobile
               onSiderToggle={this.toggle}
               collapsed={this.state.collapsed}
               clientWidth={this.state.clientWidth}
+              currentUser={this.props.currentUser}
             />
           }
               <Content className="container" style={{padding: '100px 30px 0 30px'}}>

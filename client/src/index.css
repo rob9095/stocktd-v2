@@ -116,6 +116,10 @@ i.lg {
   transform: scaleX(-1);
 }
 
+.grey-color {
+  color: #8c8c8c;
+}
+
 .primary-bg {
   background: #716aca;
 }
@@ -131,6 +135,17 @@ i.lg {
   margin-bottom: 14px;
 }
 
+
+/* User Card Dropdown */
+.user-card-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.user-card-details h2, h4 {
+  margin-bottom: 0px;
+}
 
 /* Search Dropdown */
 .drop-search {
