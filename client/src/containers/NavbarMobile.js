@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Layout, Menu, Icon, Row, Col, Popover, Input, Timeline } from 'antd';
 import RightDrawer from './RightDrawer';
 import NavMenu from './NavMenu';
+import UserCard from '../components/UserCard';
 const SubMenu = Menu.SubMenu;
 const { Header } = Layout;
 
@@ -128,9 +129,16 @@ class NavbarMobile extends Component {
                   <Icon type="bell" />
                 </span>
               </Popover>
-              <span className="icon-nav primary-hover">
-                <Icon type="user" />
-              </span>
+              <Popover overlayClassName="nav-popover mobile" trigger="click" placement="bottomRight" content={(
+                <div className="drop-account">
+                  <UserCard currentUser={this.props.currentUser} />
+                </div>
+              )}
+              >
+                <span className="icon-nav primary-hover">
+                  <Icon type="user" />
+                </span>
+              </Popover>
             </Col>
           </Row>
         )}

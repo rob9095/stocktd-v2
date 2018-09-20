@@ -156,6 +156,27 @@ i.lg {
   margin-bottom: 0px;
 }
 
+.user-card-header .avatar {
+  height: 50px;
+  width: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.ant-avatar {
+  font-family: 'Work Sans', sans-serif !important;
+  text-transform: uppercase;
+}
+
+.user-card-menu {
+  font-family: 'Work Sans', sans-serif !important;
+}
+
+.user-card-menu .ant-menu-item {
+  margin: 10px 0px;
+  padding-left: 10px;
+}
+
 /* Search Dropdown */
 .drop-search {
     display: flex;
@@ -222,7 +243,7 @@ input.ant-input.no-border {
   text-align: center;
   margin: 0px 0px 0px 12px;
   font-size: 18px;
-  width: 56px;
+  width: 35px;
   height: 56px;
   cursor: pointer;
   transition: color .3s;
