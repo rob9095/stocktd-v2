@@ -129,6 +129,15 @@ i.lg {
   cursor: pointer;
 }
 
+.app-container {
+  padding: 100px 15px;
+}
+
+@media screen and (max-width: 380px) {
+  .app-container {
+    width: 100vw;
+  }
+}
 
 /* Alert */
 .ant-alert {

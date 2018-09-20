@@ -104,7 +104,7 @@ class Dashboard extends Component {
               currentUser={this.props.currentUser}
             />
           }
-              <Content className="container" style={{padding: '100px 30px 0 30px'}}>
+              <Content className="app-container">
                 <Breadcrumb style={{ margin: '16px 0' }}>
                   <Breadcrumb.Item>User</Breadcrumb.Item>
                   <Breadcrumb.Item>Bill</Breadcrumb.Item>
