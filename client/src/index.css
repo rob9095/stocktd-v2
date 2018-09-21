@@ -248,6 +248,12 @@ input.ant-input.no-border {
   cursor: pointer;
   transition: color .3s;
 }
+.stkd-navbar .ant-menu-submenu:hover {
+  border-bottom: 2px solid transparent !important;
+}
+.stkd-navbar .ant-menu-submenu-open {
+  border-bottom: 2px solid transparent !important;
+}
 
 .ant-menu-horizontal > .ant-menu-item.no-border:hover {
   border-bottom: 2px solid transparent;
@@ -255,6 +261,11 @@ input.ant-input.no-border {
 
 .ant-menu-horizontal > .ant-menu-item-selected.no-border {
   border-bottom: 2px solid transparent;
+}
+
+.ant-menu-submenu-popup.ant-menu-dark .ant-menu-item-selected {
+  background-color: transparent !important;
+  color: #716aca !important;
 }
 
 .stkd-navbar .nav-icon svg {

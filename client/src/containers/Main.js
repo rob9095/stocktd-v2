@@ -12,10 +12,10 @@ const Main = props => {
 	const { authUser, errors, removeError, currentUser } = props;
 	return(
 			<Switch>
-				<Route exact path="/app" render={props => <Dashboard currentUser={currentUser} {...props} />} />
+				<Route path="/app" render={props => <Dashboard currentUser={currentUser} {...props} />} />
 				<Route
 					exact
-					path="/signin"
+					path="/(signin|login)/"
 					render={props => {
 						return (
 							<WrappedAuthForm
