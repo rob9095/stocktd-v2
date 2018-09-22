@@ -230,13 +230,14 @@ input.ant-input.no-border {
 
 .stkd-navbar.ant-layout-header {
   background: #fff;
-  padding: 0px 31px;
+  padding: 0px 25px;
   box-shadow: 0px 1px 15px 1px rgba(69,65,78,0.1);
   height: 70px;
   line-height: 70px;
   position: fixed;
   z-index: 1;
   width: 100%;
+  display: flex;
 }
 
 .icon-nav {
@@ -281,18 +282,14 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
 
 .dash-menu-container {
   display: flex !important;
+  width: 90vw;
+  flex-direction: row;
   justify-content: space-between;
-  margin-left: -40px;
+  padding: 0px 40px 0px 0px;
 }
 
 .dash-menu-container.open {
-  width: calc(100% - 325px);
-}
-
-@media screen and (min-width: 1500px) {
-  .dash-menu-container.open {
-    width: calc(100% - 375px);
-  }
+  width: calc(100% - 255px);
 }
 
 .right-menu-container {
@@ -302,6 +299,10 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
 }
 
 /* Navbar -- mobile only styles */
+
+.ant-row.dash-menu-container-mobile {
+  width: 100%;
+}
 
 @media screen and (min-width: 550px) {
   .dash-menu-container-mobile.open div {
@@ -431,6 +432,10 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
 
 .ant-menu-inline .ant-menu-submenu-title {
   margin: 0px !important;
+}
+
+.stkd-sidebar .ant-menu-dark .ant-menu-item > a {
+  color: #868aa8;
 }
 
 .stkd-sidebar .ant-menu.ant-menu-dark .ant-menu-item-selected {

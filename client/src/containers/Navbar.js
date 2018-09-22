@@ -30,64 +30,60 @@ class Navbar extends Component {
   render() {
     return(
       <Header className="stkd-navbar">
-        <Row>
-          <Col span={2}>
-            <Icon
-              className="sidebar-trigger"
-              type={this.state.collapsed ? 'double-right' : 'double-left'}
-              onClick={this.toggle}
-            />
-          </Col>
-          <Col span={21} className={this.state.collapsed ? 'dash-menu-container' : 'dash-menu-container open'}>
-            <NavMenu />
-            <div className="right-menu-container">
-              <Popover overlayClassName="nav-popover" trigger="click" placement="bottomRight" content={(
-                <div className="drop-search">
-                  <Input
-                    placeholder="Search..."
-                    className="no-border"
-                  />
-                  <Icon type="close" />
+        <div>
+          <Icon
+            className="sidebar-trigger"
+            type={this.state.collapsed ? 'double-right' : 'double-left'}
+            onClick={this.toggle}
+          />
+        </div>
+        <div className={this.state.collapsed ? 'dash-menu-container' : 'dash-menu-container open'}>
+          <NavMenu />
+          <div className="right-menu-container">
+            <Popover overlayClassName="nav-popover" trigger="click" placement="bottomRight" content={(
+              <div className="drop-search">
+                <Input
+                  placeholder="Search..."
+                  className="no-border"
+                />
+                <Icon type="close" />
+              </div>
+            )}
+            >
+              <span className="icon-nav primary-hover">
+                <Icon type="search" className="x-reverse"/>
+              </span>
+            </Popover>
+            <Popover overlayClassName="nav-popover" trigger="click" placement="bottomRight" content={(
+              <div className="drop-notifications">
+                <div className="notifications-header">
+                  User Notifications
                 </div>
-              )}
-              >
-                <span className="icon-nav primary-hover">
-                  <Icon type="search" className="x-reverse"/>
-                </span>
-              </Popover>
-              <Popover overlayClassName="nav-popover" trigger="click" placement="bottomRight" content={(
-                <div className="drop-notifications">
-                  <div className="notifications-header">
-                    User Notifications
-                  </div>
-                  <Timeline>
-                    <Timeline.Item color="green">Create a services site 2015-09-01</Timeline.Item>
-                    <Timeline.Item color="green">Create a services site 2015-09-01</Timeline.Item>
-                    <Timeline.Item color="red">Solve initial network problems 1</Timeline.Item>
-                    <Timeline.Item>Technical testing 3 2015-09-01</Timeline.Item>
-                  </Timeline>
-                </div>
-              )}
-              >
-                <span className="icon-nav primary-hover">
-                  <Icon type="bell" />
-                </span>
-              </Popover>
-              <Popover overlayClassName="nav-popover" trigger="click" placement="bottomRight" content={(
-                <div className="drop-account">
-                  <UserCard currentUser={this.props.currentUser} />
-                </div>
-              )}
-              >
-                <span className="icon-nav primary-hover">
-                  <Icon type="user" />
-                </span>
-              </Popover>
-            </div>
-          </Col>
-          {/* <Col span={8} className="center-a">
-          </Col> */}
-        </Row>
+                <Timeline>
+                  <Timeline.Item color="green">Create a services site 2015-09-01</Timeline.Item>
+                  <Timeline.Item color="green">Create a services site 2015-09-01</Timeline.Item>
+                  <Timeline.Item color="red">Solve initial network problems 1</Timeline.Item>
+                  <Timeline.Item>Technical testing 3 2015-09-01</Timeline.Item>
+                </Timeline>
+              </div>
+            )}
+            >
+              <span className="icon-nav primary-hover">
+                <Icon type="bell" />
+              </span>
+            </Popover>
+            <Popover overlayClassName="nav-popover" trigger="click" placement="bottomRight" content={(
+              <div className="drop-account">
+                <UserCard currentUser={this.props.currentUser} />
+              </div>
+            )}
+            >
+              <span className="icon-nav primary-hover">
+                <Icon type="user" />
+              </span>
+            </Popover>
+          </div>
+        </div>
       </Header>
     )
   }

@@ -72,12 +72,22 @@ class Dashboard extends Component {
     })
   }
 
+  handleMenuClick = ({ item, key, keyPath }) => {
+    if (key === 'appHome') {
+      this.props.history.push(`/app`)
+      return
+    }
+    this.props.history.push(`/app/${key}`)
+  }
+
   render() {
     window.onresize = (e) => {
       this.handleWindowResize();
     }
-    if (this.state.loginRedirect) {
-      <Redirect to="/signin" />
+    if (this.state.loginRedirect){
+      return (
+        <Redirect to={this.state.redirectPath} />
+      )
     }
     return (
       <Layout>
@@ -92,36 +102,32 @@ class Dashboard extends Component {
           <div className="logo">
             {/* {this.state.collapsed ? <img src={check} width='30px' /> : <img src={logo} width='130px' /> } */}
           </div>
-          <Menu theme="dark" mode="inline" defaultSelectedKeys={this.state.activeMenuItems}>
+          <Menu onClick={this.handleMenuClick} theme="dark" mode="inline" selectedKeys={this.state.activeMenuItems}>
             <Menu.Item className="stkd-dark menu-item" key="appHome">
-              <Link to="/app">
-                <Icon type="appstore" theme="outlined" />
-                <span>Dashboard</span>
-              </Link>
+              <Icon type="appstore" theme="outlined" />
+              <span>Dashboard</span>
             </Menu.Item>
             <SubMenu
               className="stkd-dark menu-item"
               key="orders"
               title={<span><Icon type="shopping-cart" theme="outlined" /><span>Orders</span></span>}
             >
-              <Menu.Item className="stkd-dark sub-menu-item" key="orders"><Link to="/app/orders">Open Orders</Link></Menu.Item>
-              <Menu.Item className="stkd-dark sub-menu-item" key="order-history"><Link to="/app/order-history">Order History</Link></Menu.Item>
-              <Menu.Item className="stkd-dark sub-menu-item" key="add-order"><Link to="/app/add-order">Add Order</Link></Menu.Item>
+              <Menu.Item className="stkd-dark sub-menu-item" key="orders">Open Orders</Menu.Item>
+              <Menu.Item className="stkd-dark sub-menu-item" key="order-history">Order History</Menu.Item>
+              <Menu.Item className="stkd-dark sub-menu-item" key="add-order">Add Order</Menu.Item>
             </SubMenu>
             <SubMenu
               className="stkd-dark menu-item"
               key="products"
               title={<span><Icon type="tags" theme="outlined" /><span>Inventory</span></span>}
             >
-              <Menu.Item className="stkd-dark sub-menu-item" key="products"><Link to="/app/products">Manage Products</Link></Menu.Item>
-              <Menu.Item className="stkd-dark sub-menu-item" key="purchase-orders"><Link to="/app/purchase-orders">Update Quantity</Link></Menu.Item>
-              <Menu.Item className="stkd-dark sub-menu-item" key="scanner"><Link to="/app/scanner">Scanner</Link></Menu.Item>
+              <Menu.Item className="stkd-dark sub-menu-item" key="products">Manage Products</Menu.Item>
+              <Menu.Item className="stkd-dark sub-menu-item" key="purchase-orders">Update Quantity</Menu.Item>
+              <Menu.Item className="stkd-dark sub-menu-item" key="scanner">Scanner</Menu.Item>
             </SubMenu>
             <Menu.Item className="stkd-dark menu-item" key="purchase-orders">
-              <Link to="/app/purchase-orders">
-                <Icon type="file-done" theme="outlined" />
-                <span>Purhcase Orders</span>
-              </Link>
+              <Icon type="file-done" theme="outlined" />
+              <span>Purchase Orders</span>
             </Menu.Item>
           </Menu>
         </Sider>
