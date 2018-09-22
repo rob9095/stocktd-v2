@@ -249,6 +249,10 @@ input.ant-input.no-border {
   cursor: pointer;
   transition: color .3s;
 }
+.stkd-navbar .ant-menu-horizontal > .ant-menu-submenu-selected {
+  border-bottom: 2px solid transparent;
+}
+
 .stkd-navbar .ant-menu-submenu:hover {
   border-bottom: 2px solid transparent !important;
 }
@@ -282,10 +286,10 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
 
 .dash-menu-container {
   display: flex !important;
-  width: 90vw;
+  width: calc(100% - 80px);
   flex-direction: row;
   justify-content: space-between;
-  padding: 0px 40px 0px 0px;
+  padding: 0px 25px 0px 0px;
 }
 
 .dash-menu-container.open {
