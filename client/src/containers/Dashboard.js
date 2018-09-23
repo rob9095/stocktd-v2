@@ -5,6 +5,9 @@ import { Button, Layout, Menu, Icon, Breadcrumb, Row, Col, Popover, Input, Timel
 import Navbar from './Navbar';
 import NavbarMobile from './NavbarMobile';
 import NotFound from '../components/NotFound';
+import ProductTable from '../components/ProductTable';
+import CustomTable from '../components/CustomTable';
+import ProductTableVirtual from '../components/ProductTableVirtual';
 const { Header, Sider, Content, Footer } = Layout;
 const SubMenu = Menu.SubMenu;
 
@@ -31,11 +34,6 @@ class Dashboard extends Component {
     await this.setState({
       activeMenuItems,
     })
-    console.log({
-      activeMenuItems,
-      pathname,
-    })
-    console.log(this.state)
   }
 
   componentDidMount() {
@@ -90,7 +88,7 @@ class Dashboard extends Component {
       )
     }
     return (
-      <Layout>
+      <Layout hasSider>
         <Sider
           width="255"
           collapsedWidth={this.state.clientWidth >= 1000 ? '80' : '0'}
@@ -131,7 +129,12 @@ class Dashboard extends Component {
             </Menu.Item>
           </Menu>
         </Sider>
-        <Layout>
+        <Layout className={
+          this.state.clientWidth >= 1000 ?
+            this.state.collapsed ? 'layout desktop' : 'layout desktop sider-open'
+            :
+            this.state.collapsed ? 'layout mobile' : 'layout mobile sider-open'
+        }>
           {this.state.clientWidth >= 1000 ?
             <Navbar
               onSiderToggle={this.toggle}
@@ -149,7 +152,12 @@ class Dashboard extends Component {
           }
               <Content className="app-container">
                 <Switch>
-                  <Route path="/app/products" render={props => (<p>products</p>)} />
+                  <Route path="/app/products/custom" render={props => (
+                    <CustomTable />
+                  )} />
+                  <Route path="/app/products" render={props => (
+                    <ProductTable />
+                  )} />
                   <Route exact path="/app" render={props => (
                     <div>
                       <Breadcrumb style={{ margin: '16px 0' }}>

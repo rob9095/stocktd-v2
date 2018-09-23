@@ -12,6 +12,22 @@ body #root .ant-layout.ant-layout-has-sider {
   height: 100%;
 }
 
+.ant-layout.ant-layout-has-sider > .ant-layout {
+  overflow-x: initial !important;
+}
+
+.layout.desktop {
+  margin-left: 80px;
+}
+
+.layout.mobile {
+  margin-left: 0px;
+}
+
+.layout.sider-open {
+  margin-left: 255px;
+}
+
 .bold {
   font-weight: 700;
 }
@@ -57,7 +73,7 @@ button, a, p, h1, h2, h3, h4, h5 {
 }
 
 .no-pad {
-  padding: 0px;
+  padding: 0px !important;
 }
 
 i.lg {
@@ -95,6 +111,10 @@ i.lg {
   padding: 24px;
 }
 
+.contain {
+  overflow-x: auto;
+}
+
 .ant-menu {
   font-family: 'Work Sans', sans-serif !important;
   font-weight: 500;
@@ -118,6 +138,10 @@ i.lg {
 
 .grey-color {
   color: #8c8c8c;
+}
+
+.primary-color {
+  color: #716aca !important;
 }
 
 .primary-bg {
@@ -235,9 +259,13 @@ input.ant-input.no-border {
   height: 70px;
   line-height: 70px;
   position: fixed;
-  z-index: 1;
+  z-index: 1000;
   width: 100%;
   display: flex;
+}
+
+.ant-menu-submenu-popup {
+  z-index: 1050 !important;
 }
 
 .icon-nav {
@@ -394,6 +422,47 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
   background: #2c2e3e;
 }
 
+
+/* Search Form */
+.number-input.pre-select {
+  width: 45px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+/* Tables */
+.stkd-table.header:hover {
+  cursor: pointer;
+  background: #f3f0ff;
+}
+.ant-table table th {
+  white-space: nowrap;
+}
+@media screen and (max-width: 1300px) {
+  .ant-table table tr td.lg-cell {
+    min-width: 200px;
+  }
+  .ant-table table tr td.md-cell {
+    min-width: 100px;
+  }
+}
+.ant-table table th span {
+  display: flex;
+}
+.ant-table table tr td.no-wrap {
+  white-space: nowrap;
+}
+
+i.sort-icon {
+  margin-left: 7px;
+  font-size: .6em;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
 /* Sidebar */
 
 .stkd-sidebar .logo {
@@ -420,8 +489,27 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
   background: #2c2e3e;
 }
 
+/* ul.ant-menu.ant-menu-dark.ant-menu-inline-collapsed.ant-menu-root.ant-menu-vertical {
+  height: 100%;
+  position: fixed;
+}
+
+.ant-menu-dark.ant-menu-vertical {
+  height: 100%;
+}
+
+.ant-layout-sider-children {
+  height: 100%;
+} */
+
+.ant-menu-dark .ant-menu-submenu-selected > .ant-menu-submenu-title > .ant-menu-submenu-arrow {
+  opacity: .5 !important;
+}
+
 .stkd-sidebar.ant-layout-sider.ant-layout-sider-dark {
   background: #2c2e3e;
+  height: 100%;
+  position: fixed;
 }
 
 .stkd-sidebar .ant-menu-dark {
@@ -521,6 +609,6 @@ li.ant-menu-item.stkd-dark.menu-item {
 }
 
 .ant-menu-dark .ant-menu-sub {
-    color: #868aa8 !important;
-    background: #2c2e3e !important;
+  color: #868aa8 !important;
+  background: #2c2e3e !important;
 }
