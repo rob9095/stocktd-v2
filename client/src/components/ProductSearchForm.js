@@ -13,6 +13,7 @@ class ProductSearchForm extends Component {
 
   handleReset = () => {
     this.props.form.resetFields();
+    this.props.onFilterSearch([]);
   }
 
   handleSelect = (value, select) => {
@@ -97,8 +98,8 @@ class ProductSearchForm extends Component {
         onSubmit={this.handleSubmit}
       >
         <Row gutter={24}>{inputs}</Row>
-        <Row>
-          <Col span={24} style={{ textAlign: 'right' }}>
+        <Row gutter={24}>
+          <Col span={24} className="center-a" style={{ margin: '20px 10px' }}>
             <Button type="primary" htmlType="submit">Search</Button>
             <Button style={{ marginLeft: 8 }} onClick={this.handleReset}>
               Clear

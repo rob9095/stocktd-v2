@@ -11,18 +11,21 @@ class ProductTable extends React.Component {
   constructor(props) {
     super(props);
     this.columns = [
-      // {
-      //   title: '',
-      //   key: 'select',
-      //   dataIndex: null,
-      //   width: 100,
-      //   render: (text, record) => ({
-      //     props: {
-      //
-      //     },
-      //     children: <input type="checkbox" onChange={event => this.handleRowCheck(event, record._id)} checked={this.isSelected(record._id)} />
-      //   })
-      // },
+      {
+        title: '',
+        key: 'select',
+        dataIndex: null,
+        width: 100,
+        render: (text, record) => ({
+          props: {
+
+          },
+          children: <Checkbox
+            onClick={event => this.handleRowCheck(event, record._id)}
+            checked={this.isSelected(record._id)}
+          />
+        })
+      },
       {
         title: 'SKU',
         dataIndex: 'sku',
@@ -278,7 +281,7 @@ class ProductTable extends React.Component {
               </Form>
             </div>
             <div className="stkd-content contain no-pad product-table">
-              <Table {...this.state} onChange={this.handleChange} columns={this.columns} dataSource={state.data} />
+              <Table rowSelection={rowSelection} {...this.state} onChange={this.handleChange} columns={this.columns} dataSource={state.data} />
             </div>
           </div>
         </Col>
