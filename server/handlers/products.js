@@ -29,7 +29,7 @@ exports.processProductImport = async (req, res, next) => {
 		let productUpdates = req.body.products.json.map(p => {
 			// find the related product and update interval
 			let foundProduct = companyProducts.find(product => product.sku === p.sku)
-			if (foundProduct) {
+			if (foundProduct && req.body.update) {
 				return {
 					updateOne: {
 						filter: { skuCompany: `${p.sku}-${req.body.company}`},

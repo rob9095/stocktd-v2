@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchAllProducts, updateProducts, deleteProducts } from '../store/actions/products';
+import { fetchAllProducts, updateProducts, deleteProducts, importProducts } from '../store/actions/products';
 import { Button, Pagination, Divider, Icon, Spin, Form, Switch, Dropdown, Menu, Modal, message } from 'antd';
 import WrappedProductSearchForm from './ProductSearchForm';
 import EditItemDrawer from './EditItemDrawer';
+import ImportModal from './ImportModal';
 
 const confirm = Modal.confirm;
 const FormItem = Form.Item;
@@ -25,7 +26,9 @@ class CustomTable extends Component {
       query: [],
       showFilters: false,
       showEditItemDrawer: false,
+      showCreateItemDrawer: false,
       itemDrawerProduct: {},
+      showImportModal: false,
       headers: [
         {id: 'select-all', text: '', width: 75, noSort: true},
         {id: 'sku', text: 'SKU', width: 175, span: 8, className: 'no-wrap'},
@@ -168,6 +171,23 @@ class CustomTable extends Component {
       }
     }
 
+    handleOptionsMenuClick = async ({ item, key, keyPath }) => {
+      switch(key) {
+        case 'add':
+        this.setState({
+          showCreateItemDrawer: true,
+        })
+          break;
+        case 'import':
+        this.setState({
+          showImportModal: true,
+        })
+          break;
+        default:
+          console.log('unknown menu option');
+      }
+    }
+
     toggle = (prop) => {
       return () => {
         this.setState({
@@ -237,12 +257,25 @@ class CustomTable extends Component {
           this.setState({
             data,
           })
-          this.handleMessage('success','Product Updated')
           resolve(res)
         })
         .catch(error=>{
-          this.handleMessage('error','Product Update Failed')
           reject(error)
+        })
+      })
+    }
+
+    handleProductImport = (json) => {
+      return new Promise((resolve,reject) => {
+        console.log(json)
+        this.props.importProducts({json}, this.props.currentUser)
+        .then(res=>{
+          console.log(res)
+          resolve(res)
+        })
+        .catch(err=>{
+          console.log(err)
+          reject(err)
         })
       })
     }
@@ -370,7 +403,6 @@ class CustomTable extends Component {
             <FormItem label="Search">
               <Switch checked={this.state.showFilters} onChange={this.toggle('showFilters')} />
             </FormItem>
-            {/* <Button style={{float: 'right', marginLeft: 10}} type="primary" icon="setting">Options</Button> */}
             <Dropdown overlay={optionsMenu}>
               <Button style={{float: 'right', marginLeft: 10}} type="primary" icon="setting">
                 Options <Icon type="down" />
@@ -389,6 +421,42 @@ class CustomTable extends Component {
               title={'Edit Product'}
               onClose={this.toggle('showEditItemDrawer')}
               onSave={this.handleProductUpdate}
+              create={false}
+            />
+          )}
+          {this.state.showCreateItemDrawer && (
+            <EditItemDrawer
+              product={{}}
+              title={'Create Product'}
+              onClose={this.toggle('showCreateItemDrawer')}
+              onSave={this.handleProductImport}
+              create={true}
+            />
+          )}
+          {this.state.showImportModal && (
+            <ImportModal
+              title="Import Products"
+              onClose={this.toggle('showImportModal')}
+              headers={[
+                {value:'sku', required: true},
+                {value:'title'},
+                {value: 'barcode'},
+                {value:'quantity'},
+                {value:'price'},
+                {value:'supplier'},
+                {value:'brand'},
+                {value:'weight'},
+              ]}
+              validInputs={[
+                {value:'sku', required: true},
+                {value:'title'},
+                {value: 'barcode'},
+                {value:'quantity', type: 'number'},
+                {value:'price', type: 'number'},
+                {value:'supplier'},
+                {value:'brand'},
+                {value:'weight', type: 'number'},
+              ]}
             />
           )}
           <div className="ant-table stkd-content no-pad contain">
@@ -425,4 +493,4 @@ class CustomTable extends Component {
    };
   }
 
-  export default connect(mapStateToProps, {fetchAllProducts, deleteProducts, updateProducts})(CustomTable);
+  export default connect(mapStateToProps, {fetchAllProducts, deleteProducts, updateProducts, importProducts})(CustomTable);

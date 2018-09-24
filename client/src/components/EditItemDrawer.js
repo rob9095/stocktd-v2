@@ -45,7 +45,7 @@ class DrawerForm extends Component {
         delete inputs.sku
       }
       // fitler out any empty entries or values that are the same
-      const values = Object.entries(inputs).filter(val=>val[1] !== undefined)
+      const values = Object.entries(inputs).filter(val=>val[1] !== undefined && val[1] !== this.props.product[val[0]])
       if (values.length === 0) {
         this.handleAlert('No Updates Found','warning');
         return
@@ -60,13 +60,13 @@ class DrawerForm extends Component {
         }
       }
       console.log(update)
-      this.props.onSave([update])
+      this.props.onSave(this.props.create ? [inputs] : [update])
       .then(res=>{
-        console.log(res)
-        console.log('product updated!')
+        this.handleAlert('Product Saved','success')
       })
       .catch(err=>{
         console.log(err)
+        this.handleAlert(err[0],'error')
       })
     });
   }
@@ -95,22 +95,22 @@ class DrawerForm extends Component {
             <Row gutter={24}>
               <Col span={8}>
                 <FormItem label="SKU">
-                  {getFieldDecorator('sku', {
+                  {getFieldDecorator('sku',{ initialValue: sku },{
                      rules: [{
-                       required: false,
-                       message: '',
+                       required: this.props.create ? true : false,
+                       message: 'SKU is required',
                      }],
                    })(
                      <Input
                        type='text'
-                       placeholder={sku}
+                       placeholder="SKU"
                      />
                    )}
                 </FormItem>
               </Col>
               <Col span={16}>
                 <FormItem label="Title">
-                  {getFieldDecorator('title', {
+                  {getFieldDecorator('title',{ initialValue: title }, {
                      rules: [{
                        required: false,
                        message: '',
@@ -118,14 +118,14 @@ class DrawerForm extends Component {
                    })(
                      <Input
                        type='text'
-                       placeholder={title}
+                       placeholder="Title"
                      />
                    )}
                 </FormItem>
               </Col>
               <Col span={8}>
                 <FormItem label="Quantity">
-                  {getFieldDecorator('quantity', {
+                  {getFieldDecorator('quantity',{ initialValue: quantity }, {
                      rules: [{
                        required: false,
                        message: '',
@@ -133,14 +133,14 @@ class DrawerForm extends Component {
                    })(
                      <Input
                        type='number'
-                       placeholder={quantity}
+                       placeholder="Quantity"
                      />
                    )}
                 </FormItem>
               </Col>
               <Col span={8}>
                 <FormItem label="Weight">
-                  {getFieldDecorator('weight', {
+                  {getFieldDecorator('weight',{ initialValue: weight }, {
                      rules: [{
                        required: false,
                        message: '',
@@ -148,14 +148,14 @@ class DrawerForm extends Component {
                    })(
                      <Input
                        type='number'
-                       placeholder={weight}
+                       placeholder="Weight"
                      />
                    )}
                 </FormItem>
               </Col>
               <Col span={8}>
                 <FormItem label="Price">
-                  {getFieldDecorator('price', {
+                  {getFieldDecorator('price',{ initialValue: price }, {
                      rules: [{
                        required: false,
                        message: '',
@@ -163,14 +163,14 @@ class DrawerForm extends Component {
                    })(
                      <Input
                        type='number'
-                       placeholder={price}
+                       placeholder="Price"
                      />
                    )}
                 </FormItem>
               </Col>
               <Col span={8}>
                 <FormItem label="Barcode">
-                  {getFieldDecorator('barcode', {
+                  {getFieldDecorator('barcode',{ initialValue: barcode }, {
                      rules: [{
                        required: false,
                        message: '',
@@ -178,14 +178,14 @@ class DrawerForm extends Component {
                    })(
                      <Input
                        type='text'
-                       placeholder={barcode}
+                       placeholder="Barcode"
                      />
                    )}
                 </FormItem>
               </Col>
               <Col span={8}>
                 <FormItem label="Brand">
-                  {getFieldDecorator('brand', {
+                  {getFieldDecorator('brand',{ initialValue: brand }, {
                      rules: [{
                        required: false,
                        message: '',
@@ -193,14 +193,14 @@ class DrawerForm extends Component {
                    })(
                      <Input
                        type='text'
-                       placeholder={brand}
+                       placeholder="Brand"
                      />
                    )}
                 </FormItem>
               </Col>
               <Col span={8}>
                 <FormItem label="Supplier">
-                  {getFieldDecorator('supplier', {
+                  {getFieldDecorator('supplier',{ initialValue: supplier }, {
                      rules: [{
                        required: false,
                        message: '',
@@ -208,7 +208,7 @@ class DrawerForm extends Component {
                    })(
                      <Input
                        type='text'
-                       placeholder={supplier}
+                       placeholder='Supplier'
                      />
                    )}
                 </FormItem>

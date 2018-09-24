@@ -10,7 +10,7 @@ export function fetchAllProducts(query, sortBy, sortDirection, activePage, rowsP
 			})
 			.catch(err => {
 				dispatch(addError(err.message));
-				reject();
+				reject(err.message);
 			})
 		});
 	}
@@ -25,7 +25,7 @@ export function importProducts(products, currentUser, update){
 			})
 			.catch(err => {
 				dispatch(addError(err.message));
-				reject();
+				reject(err.message);
 			})
 		});
 	}
