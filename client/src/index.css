@@ -15,17 +15,30 @@ ul {
   font-family: 'Work Sans', sans-serif !important;
 }
 
-body #root,
-body #root .ant-layout.ant-layout-has-sider {
+body #root {
   height: 100%;
+  display: table;
+  width: 100%;  
 }
+
+.ant-layout {
+  /* display: table !important;
+  width: 100%; */
+  height: 100%;
+  display: table-cell;
+  position: relative;
+}
+
+/* body #root .ant-layout.ant-layout-has-sider {
+  height: 100%;
+} */
 
 
 /* .ant-layout.ant-layout-has-sider > .ant-layout {
   overflow-x: initial !important;
 } */
 
-.layout.desktop {
+/* .layout.desktop {
   margin-left: 80px;
 }
 
@@ -35,7 +48,7 @@ body #root .ant-layout.ant-layout-has-sider {
 
 .layout.sider-open {
   margin-left: 255px;
-}
+} */
 
 .bold {
   font-weight: 700;
@@ -525,7 +538,7 @@ label.container .checkmark:after {
   white-space: nowrap;
 }
 
-@media screen and (max-width: 1300px) {
+@media screen and (max-width: 1800px) {
   .ant-table table tr td.lg-cell {
     min-width: 200px;
   }
@@ -593,9 +606,12 @@ i.sort-icon {
   height: 100%;
 }
 
+*/
+
 .ant-layout-sider-children {
-  height: 100%;
-} */
+  position: fixed;
+  width: 255px;
+}
 
 .ant-menu-dark .ant-menu-submenu-selected > .ant-menu-submenu-title > .ant-menu-submenu-arrow {
   opacity: .5 !important;
@@ -604,7 +620,6 @@ i.sort-icon {
 .stkd-sidebar.ant-layout-sider.ant-layout-sider-dark {
   background: #2c2e3e;
   height: 100%;
-  position: fixed;
 }
 
 .stkd-sidebar .ant-menu-dark {
