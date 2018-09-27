@@ -7,7 +7,6 @@ import NavbarMobile from './NavbarMobile';
 import NotFound from '../components/NotFound';
 import ProductTable from '../components/ProductTable';
 import CustomTable from '../components/CustomTable';
-import ProductTableVirtual from '../components/ProductTableVirtual';
 const { Header, Sider, Content, Footer } = Layout;
 const SubMenu = Menu.SubMenu;
 
