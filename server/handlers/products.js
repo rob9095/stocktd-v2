@@ -1,57 +1,104 @@
 const db = require('../models');
+const { createImportStatus } = require('../handlers/importStatus');
 
 exports.processProductImport = async (req, res, next) => {
 	try {
-		// if(req.body.update) {
-		// 	let updates = req.body.products.json.map(p => ({
-		// 		updateOne: {
-		// 			filter: { skuCompany: `${p.sku}-${req.body.company}`},
-		// 			update: {...p, company: req.body.company, skuCompany: `${p.sku}-${req.body.company}`},
-		// 			upsert: true,
-		// 		}
-		// 	}))
-		// 	let updatedProducts = await db.Product.bulkWrite(updates)
-		// 	let products = await db.Product.find({company: req.body.company})
-		// 	return res.status(200).json(updatedProducts, products)
-		// } else {
-		// 	let inserts = req.body.products.json.map(p => ({
-		// 		insertOne: {
-		// 			document: {...p, company: req.body.company, skuCompany: `${p.sku}-${req.body.company}`},
-		// 		}
-		// 	}))
-		// 	let addedProducts = await db.Product.bulkWrite(inserts)
-		// 	let products = await db.Product.find({company: req.body.company})
-		// 	return res.status(200).json(addedProducts, products)
+		// let updates = req.body.products.map(p => ({
+		// updateOne: {
+		// 	filter: { skuCompany: `${p.sku}-${req.body.company}`},
+		// 	update: {...p, company: req.body.company},
+		// 	upsert: true,
 		// }
-		// find all company products
-		let companyProducts = await db.Product.find({company: req.body.company})
+		// 	insertOne: {
+		// 		document: {
+		// 			...p,
+		// 			company: req.body.company,
+		// 			skuCompany: `${p.sku}-${req.body.company}`,
+		// 			quantityToShip: 0,
+		// 		}
+		// 	}
+		// }))
 		// loop over all products and create array of updates to bulk write
-		let productUpdates = req.body.products.json.map(p => {
-			// find the related product and update interval
-			let foundProduct = companyProducts.find(product => product.sku === p.sku)
-			if (foundProduct && req.body.update) {
+		if (req.body.products.length > 7000) {
+			return next({
+				status: 404,
+				message: ['Request to large']
+			})
+		}
+		let updates = req.body.products.map(p => {
+			if(p.action === 'delete') {
 				return {
-					updateOne: {
+					deleteOne: {
 						filter: { skuCompany: `${p.sku}-${req.body.company}`},
-						update: { ...p },
 					}
 				}
 			} else {
-				// otherwise insert it with inital qty of 0
 				return {
-					insertOne: {
-						document: {
-							...p,
-							company: req.body.company,
-							skuCompany: `${p.sku}-${req.body.company}`,
-							quantityToShip: 0,
-						}
+					updateOne: {
+						filter: { skuCompany: `${p.sku}-${req.body.company}`},
+						update: { ...p, skuCompany: `${p.sku}-${req.body.company}`, company: req.body.company },
+						upsert: true,
 					}
 				}
 			}
 		})
-		let updatedProducts = await db.Product.bulkWrite(productUpdates)
-		return res.status(200).json({updatedProducts})
+		await db.Product.bulkWrite(updates)
+		return res.status(200).json({status: 'success'})
+		//let importStatus = await createImportStatus('Product',req.body.company,updates)
+		// let updateProducts = [];
+		// if (updates.length > 7000)  {
+		// 	await db.Product.bulkWrite(updates)
+		// } else {
+		// 	await db.Product.bulkWrite(updates)
+		// }
+		// let newProducts = await db.Product.find({quantityToShip: undefined})
+		// let newProductUpdates = newProducts.map(p=>({
+		// 	updateOne: {
+		// 		filter: { skuCompany: p.skuCompany},
+		// 		update: {quantityToShip: 0}
+		// 	}
+		// }))
+		// if (newProductUpdates.length > 7000) {
+		// 	let totalBatches = newProductUpdates.length / 7000
+		// 	let batches = [];
+		// 	for (let x = 0; x<=totalBatches;x++) {
+		// 		batches.push([...newProductUpdates.splice(x,x+7000)])
+		// 	}
+		// 	for (batch of batches) {
+		// 		db.Product.bulkWrite(batch)
+		// 	}
+		// } else {
+		// 	await db.Product.bulkWrite(newProductUpdates)
+		// }
+		// find all company products
+		// let companyProducts = await db.Product.find({company: req.body.company})
+		// // loop over all products and create array of updates to bulk write
+		// let productUpdates = req.body.products.map(p => {
+		// 	// find the related product and update interval
+		// 	let foundProduct = companyProducts.find(product => product.sku === p.sku)
+		// 	if (foundProduct && req.body.update) {
+		// 		return {
+		// 			updateOne: {
+		// 				filter: { skuCompany: `${p.sku}-${req.body.company}`},
+		// 				update: { ...p },
+		// 			}
+		// 		}
+		// 	} else {
+		// 		// otherwise insert it with inital qty of 0
+		// 		return {
+		// 			insertOne: {
+		// 				document: {
+		// 					...p,
+		// 					company: req.body.company,
+		// 					skuCompany: `${p.sku}-${req.body.company}`,
+		// 					quantityToShip: 0,
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// })
+		// let updatedProducts = await db.Product.bulkWrite(productUpdates)
+		// return res.status(200).json({updatedProducts})
 	} catch(err) {
 		if(err.code === 11000) {
 			console.log(err)

@@ -27,6 +27,16 @@ export const validateInputs = (json, validInputs) => {
               });
             }
           }
+          if (input.type === 'array' && line[input.value] !== undefined) {
+            if (!input.validValues.includes(line[input.value])){
+              errorList.push(`Invalid Input: "${line[input.value]}" on line ${c+1} is not a valid ${input.value}`)
+              reject({
+                errorType: 'error',
+                errorHeader: 'Please fix the errors and upload the file again',
+                errorList,
+              });
+            }
+          }
         }
         c++
       }

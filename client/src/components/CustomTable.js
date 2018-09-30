@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { fetchAllProducts, updateProducts, deleteProducts, importProducts } from '../store/actions/products';
-import { Button, Pagination, Divider, Icon, Spin, Form, Switch, Dropdown, Menu, Modal, message } from 'antd';
+import { Button, Pagination, Divider, Icon, Spin, Form, Switch, Dropdown, Menu, Modal, message, Row, Col } from 'antd';
 import WrappedProductSearchForm from './ProductSearchForm';
 import EditItemDrawer from './EditItemDrawer';
 import ImportModal from './ImportModal';
@@ -32,7 +32,7 @@ class CustomTable extends Component {
       headers: [
         {id: 'select-all', text: '', width: 75, noSort: true},
         {id: 'sku', text: 'SKU', width: 175, span: 8, className: 'no-wrap'},
-        {id: 'title', text: 'Title', width: 800, span: 8},
+        {id: 'title', text: 'Title', width: 800, span: 8, className: 'lg-cell'},
         {id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 4, className: 'no-wrap'},
         {id: 'quantityToShip', text: 'To Ship', width: 175, type: 'number', span: 4, className: 'no-wrap'},
         {id: 'price', text: 'Price', width: 75, type: 'number', span: 4, className: 'no-wrap'},
@@ -183,6 +183,11 @@ class CustomTable extends Component {
           showImportModal: true,
         })
           break;
+        case 'search':
+        this.setState({
+          showFilters: true,
+        })
+          break;
         default:
           console.log('unknown menu option');
       }
@@ -267,14 +272,11 @@ class CustomTable extends Component {
 
     handleProductImport = (json) => {
       return new Promise((resolve,reject) => {
-        console.log(json)
-        this.props.importProducts({json}, this.props.currentUser)
+        this.props.importProducts(json, this.props.currentUser)
         .then(res=>{
-          console.log(res)
           resolve(res)
         })
         .catch(err=>{
-          console.log(err)
           reject(err)
         })
       })
@@ -446,6 +448,7 @@ class CustomTable extends Component {
                 {value:'supplier'},
                 {value:'brand'},
                 {value:'weight'},
+                {value:'action'},
               ]}
               validInputs={[
                 {value:'sku', required: true},
@@ -456,19 +459,26 @@ class CustomTable extends Component {
                 {value:'supplier'},
                 {value:'brand'},
                 {value:'weight', type: 'number'},
+                {value:'action', type: 'array', validValues: ['update','delete']},
               ]}
+              onSubmit={this.handleProductImport}
+              onSuccess={this.handleDataFetch}
             />
           )}
           <div className="ant-table stkd-content no-pad contain">
             <Spin spinning={this.state.loading}>
-              <Pagination className="ant-table-pagination" {...this.state.pagination} />
-              <span className="table-options">
-                <Dropdown overlay={bulkMenu} disabled={this.state.selected.length === 0}>
-                  <Button size="small">
-                    {`Action on ${this.state.selected.length} selected`} <Icon type="down" />
-                  </Button>
-                </Dropdown>
-              </span>
+              <div className="table-options">
+                <div>
+                  <Dropdown className="bulk-dropdown" overlay={bulkMenu} disabled={this.state.selected.length === 0}>
+                    <Button size="small">
+                      {`Action on ${this.state.selected.length} selected`} <Icon type="down" />
+                    </Button>
+                  </Dropdown>
+                </div>
+                <div>
+                  <Pagination className="ant-table-pagination" {...this.state.pagination} />
+                </div>
+              </div>
                 <table>
                   <thead className="ant-table-thead">
                     <tr>

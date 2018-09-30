@@ -41,8 +41,9 @@ class DrawerForm extends Component {
     this.props.form.validateFields((err, inputs) => {
       console.log('Received values of form: ', inputs);
       // fitler out any empty entries or equal selects
-      if (inputs.sku === '') {
-        delete inputs.sku
+      if (inputs.sku === '' || inputs.sku === undefined) {
+        this.handleAlert('SKU cannot be blank', 'error')
+        return
       }
       // fitler out any empty entries or values that are the same
       const values = Object.entries(inputs).filter(val=>val[1] !== undefined && val[1] !== this.props.product[val[0]])
@@ -77,7 +78,7 @@ class DrawerForm extends Component {
     return (
         <Drawer
           title={this.props.title}
-          width={720}
+          width={document.documentElement.clientWidth < 720 ? '100%' : 720}
           placement="right"
           onClose={this.toggle}
           maskClosable={false}
@@ -93,7 +94,7 @@ class DrawerForm extends Component {
           )}
           <Form layout="vertical" hideRequiredMark>
             <Row gutter={24}>
-              <Col span={8}>
+              <Col xs={24} sm={8}>
                 <FormItem label="SKU">
                   {getFieldDecorator('sku',{ initialValue: sku },{
                      rules: [{
@@ -108,7 +109,7 @@ class DrawerForm extends Component {
                    )}
                 </FormItem>
               </Col>
-              <Col span={16}>
+              <Col xs={24} sm={16}>
                 <FormItem label="Title">
                   {getFieldDecorator('title',{ initialValue: title }, {
                      rules: [{
@@ -123,7 +124,7 @@ class DrawerForm extends Component {
                    )}
                 </FormItem>
               </Col>
-              <Col span={8}>
+              <Col xs={24} sm={8}>
                 <FormItem label="Quantity">
                   {getFieldDecorator('quantity',{ initialValue: quantity }, {
                      rules: [{
@@ -138,7 +139,7 @@ class DrawerForm extends Component {
                    )}
                 </FormItem>
               </Col>
-              <Col span={8}>
+              <Col xs={24} sm={8}>
                 <FormItem label="Weight">
                   {getFieldDecorator('weight',{ initialValue: weight }, {
                      rules: [{
@@ -153,7 +154,7 @@ class DrawerForm extends Component {
                    )}
                 </FormItem>
               </Col>
-              <Col span={8}>
+              <Col xs={24} sm={8}>
                 <FormItem label="Price">
                   {getFieldDecorator('price',{ initialValue: price }, {
                      rules: [{
@@ -168,7 +169,7 @@ class DrawerForm extends Component {
                    )}
                 </FormItem>
               </Col>
-              <Col span={8}>
+              <Col xs={24} sm={8}>
                 <FormItem label="Barcode">
                   {getFieldDecorator('barcode',{ initialValue: barcode }, {
                      rules: [{
@@ -183,7 +184,7 @@ class DrawerForm extends Component {
                    )}
                 </FormItem>
               </Col>
-              <Col span={8}>
+              <Col xs={24} sm={8}>
                 <FormItem label="Brand">
                   {getFieldDecorator('brand',{ initialValue: brand }, {
                      rules: [{
@@ -198,7 +199,7 @@ class DrawerForm extends Component {
                    )}
                 </FormItem>
               </Col>
-              <Col span={8}>
+              <Col xs={24} sm={8}>
                 <FormItem label="Supplier">
                   {getFieldDecorator('supplier',{ initialValue: supplier }, {
                      rules: [{

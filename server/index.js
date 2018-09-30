@@ -33,6 +33,8 @@ app.use('/api/purchase-orders', poRoutes);
 
 app.use(errorHandler);
 
-app.listen(PORT, function(){
+const server = app.listen(PORT, function(){
 	console.log(`Server starting on port ${PORT}`)
 });
+
+server.timeout = 720000;

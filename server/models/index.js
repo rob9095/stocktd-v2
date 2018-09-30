@@ -3,7 +3,7 @@ mongoose.set('debug', true);
 mongoose.Promise = Promise;
 
 mongoose.connect('mongodb://localhost/stocktd', {
-	keepAlive: true
+	keepAlive: true,
 });
 
 module.exports.User = require('./user');
@@ -17,3 +17,4 @@ module.exports.PoProduct = require('./poProduct');
 module.exports.PurchaseOrder = require('./purchaseOrder');
 module.exports.Order = require('./order');
 module.exports.OrderProduct = require('./orderProduct');
+module.exports.ImportStatus = require('./importStatus');
