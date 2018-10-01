@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import { Switch, Route, withRouter, Link, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Button, Layout, Menu, Icon, Breadcrumb, Row, Col, Popover, Input, Timeline } from 'antd';
+import { Button, Layout, Menu, Icon, Breadcrumb, Row, Col } from 'antd';
 import Navbar from './Navbar';
 import NavbarMobile from './NavbarMobile';
 import NotFound from '../components/NotFound';
 import ProductTable from '../components/ProductTable';
-import CustomTable from '../components/CustomTable';
-const { Header, Sider, Content, Footer } = Layout;
+import PurchaseOrderTable from '../components/PurchaseOrderTable';
+import ProductTableLegacy from '../components/ProductTableLegacy';
+const { Sider } = Layout;
 const SubMenu = Menu.SubMenu;
 
 class Dashboard extends Component {
@@ -150,8 +151,8 @@ class Dashboard extends Component {
           </div>
           <div className="bottom">
             <Switch>
-              <Route path="/app/products/custom" render={props => (
-                <CustomTable />
+              <Route path="/app/purchase-orders" render={props => (
+                <PurchaseOrderTable />
               )} />
               <Route path="/app/products" render={props => (
                 <ProductTable />

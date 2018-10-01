@@ -9,6 +9,7 @@ const authRoutes = require('./routes/auth');
 const accountRoutes = require('./routes/account');
 const productRoutes = require('./routes/products');
 const poRoutes = require('./routes/purchaseOrders');
+const modelRoutes = require('./routes/models');
 const db = require("./models");
 const { loginRequired, ensureCorrectUser } = require('./middleware/auth');
 const PORT = 8080;
@@ -30,6 +31,9 @@ app.use('/api/products', productRoutes);
 
 //purchase order routes
 app.use('/api/purchase-orders', poRoutes);
+
+//purchase order routes
+app.use('/api/models', modelRoutes);
 
 app.use(errorHandler);
 

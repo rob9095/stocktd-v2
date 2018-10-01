@@ -155,9 +155,6 @@ class ImportModal extends Component {
   render() {
     return (
       <div>
-        <Button type="primary" onClick={this.showModal}>
-          Open Modal
-        </Button>
         <Modal
           title={this.props.title}
           visible={this.state.visible}

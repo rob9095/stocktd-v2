@@ -6,7 +6,6 @@ import Navbar from './Navbar';
 import NavbarMobile from './NavbarMobile';
 import NotFound from '../components/NotFound';
 import ProductTable from '../components/ProductTable';
-import CustomTable from '../components/CustomTable';
 const { Header, Sider, Content, Footer } = Layout;
 const SubMenu = Menu.SubMenu;
 
@@ -161,9 +160,6 @@ class DashboardLegacy extends Component {
           }
               <Content className="app-container">
                 <Switch>
-                  <Route path="/app-old/products/custom" render={props => (
-                    <CustomTable />
-                  )} />
                   <Route path="/app-old/products" render={props => (
                     <ProductTable />
                   )} />

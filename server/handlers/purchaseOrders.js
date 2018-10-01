@@ -11,8 +11,10 @@ function groupBy(objectArray, property) {
  }, {});
 }
 
-const updateMath = (current, update, type) => {
-  return type === 'outbound' ? parseInt(current - update) : parseInt(current + update)
+const updateMath = (current, update, poType) => {
+  const c = parseInt(current)
+  const u = parseInt(update)
+  return poType === 'outbound' ? c - u : c + u
 }
 
 exports.processPurchaseOrderImport = async (req, res, next) => {
@@ -22,7 +24,7 @@ exports.processPurchaseOrderImport = async (req, res, next) => {
     let poData = req.body.json.map((po,i)=>({
       name: po['po name'],
       type: po['po type'],
-      isComplete: po['po status'] === 'complete' || po['po status'] === undefined  ? true : false,
+      status: po['po status'] ? po['po status'] : 'complete',
       sku: po['sku'],
       quantity: po['quantity'],
       company: req.body.company,

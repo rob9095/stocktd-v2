@@ -4,7 +4,7 @@ import { Form, Row, Col, Input, Button, Icon, Select } from 'antd';
 const Option = Select.Option;
 const FormItem = Form.Item;
 
-class ProductSearchForm extends Component {
+class FilterForm extends Component {
   state = {
     selects: {
 
@@ -111,5 +111,5 @@ class ProductSearchForm extends Component {
   }
 }
 
-const WrappedProductSearchForm = Form.create()(ProductSearchForm);
-export default WrappedProductSearchForm
+const WrappedFilterForm = Form.create()(FilterForm);
+export default WrappedFilterForm

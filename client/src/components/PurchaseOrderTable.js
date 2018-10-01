@@ -1,15 +1,17 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchAllProducts, updateProducts, deleteProducts, importProducts } from '../store/actions/products';
+import { fetchAllProducts, updateProducts } from '../store/actions/products';
+import { importPurchaseOrder, fetchPurchaseOrders, updatePurchaseOrders, fetchCompanyPoProducts } from '../store/actions/purchaseOrders';
+import { queryModelData, deleteModelDocuments } from '../store/actions/models';
 import { Button, Pagination, Divider, Icon, Spin, Form, Switch, Dropdown, Menu, Modal, message, Row, Col } from 'antd';
-import WrappedProductSearchForm from './ProductSearchForm';
+import WrappedFilterForm from './FilterForm';
 import EditItemDrawer from './EditItemDrawer';
 import ImportModal from './ImportModal';
 
 const confirm = Modal.confirm;
 const FormItem = Form.Item;
 
-class CustomTable extends Component {
+class PurchaseOrderTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -31,17 +33,14 @@ class CustomTable extends Component {
       showImportModal: false,
       headers: [
         {id: 'select-all', text: '', width: 75, noSort: true},
-        {id: 'sku', text: 'SKU', width: 175, span: 8, className: 'no-wrap'},
-        {id: 'title', text: 'Title', width: 800, span: 8, className: 'lg-cell'},
+        {id: 'name', text: 'Name', width: 400, span: 8, className: 'no-wrap'},
+        {id: 'type', text: 'Type', width: 250, span: 8, className: 'lg-cell'},
+        {id: 'status', text: 'Status', width: 250, span: 8, className: 'no-wrap'},
         {id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 4, className: 'no-wrap'},
-        {id: 'quantityToShip', text: 'To Ship', width: 175, type: 'number', span: 4, className: 'no-wrap'},
-        {id: 'price', text: 'Price', width: 75, type: 'number', span: 4, className: 'no-wrap'},
-        {id: 'weight', text: 'Weight', width: 75, type: 'number', span: 4, className: 'no-wrap'},
-        {id: 'brand', text: 'Brand', width: 100, span: 8},
-        {id: 'supplier', text: 'Supplier', width: 100, span: 8},
+        {id: 'createdOn', text: 'Date Created', width: 100, type: 'date', span: 4, className: 'no-wrap'},
         {id: 'actions', text: 'Actions', width: 100, noSort: true},
       ],
-      hiddenCols: ['supplier'],
+      hiddenCols: [''],
       pagination: {
         position: 'bottom',
         current: 1,
@@ -69,12 +68,12 @@ class CustomTable extends Component {
     })
     requestedPage === undefined ? requestedPage = this.state.activePage : null;
     requestedRowsPerPage === undefined ? requestedRowsPerPage = this.state.rowsPerPage : null;
-    this.props.fetchAllProducts(this.state.query,this.state.column, this.state.direction, requestedPage, requestedRowsPerPage, this.props.currentUser.user.company)
-    .then(({products, activePage, totalPages, rowsPerPage, skip})=>{
+    this.props.queryModelData('PurchaseOrder',this.state.query,this.state.column, this.state.direction, requestedPage, requestedRowsPerPage, this.props.currentUser.user.company)
+    .then(({data, activePage, totalPages, rowsPerPage, skip})=>{
       this.setState({
         loading: false,
         skip,
-        data: products,
+        data,
         activePage,
         totalPages,
         rowsPerPage,
@@ -209,7 +208,7 @@ class CustomTable extends Component {
        let data = this.state.data.filter(p=>ids.indexOf(p._id) === -1)
        let selected = this.state.selected.filter(id=>ids.indexOf(id) === -1)
        const end = ids.length > 1 ? 's' : ''
-       this.props.deleteProducts(ids,this.props.currentUser)
+       this.props.deleteModelDocuments('PurchaseOrder',ids,this.props.currentUser)
        .then(res=>{
          this.handleMessage('success',`Product${end} Deleted Successfully`)
          this.setState({
@@ -272,7 +271,7 @@ class CustomTable extends Component {
 
     handleProductImport = (json) => {
       return new Promise((resolve,reject) => {
-        this.props.importProducts(json, this.props.currentUser)
+        this.props.importPurchaseOrder(json, this.props.currentUser)
         .then(res=>{
           resolve(res)
         })
@@ -292,18 +291,18 @@ class CustomTable extends Component {
     render() {
       const bulkMenu = (
         <Menu onClick={this.handleBulkMenuClick}>
-          <Menu.Item name="order" key="order">Create Order</Menu.Item>
-          <Menu.Item name="po" key="po">Create PO</Menu.Item>
-          <Menu.Item name="label" key="label">Print Labels</Menu.Item>
-          <Menu.Item name="delete" key="delete">Delete Products</Menu.Item>
+          <Menu.Item name="order" key="order">Scan POs</Menu.Item>
+          <Menu.Item name="po" key="po">Duplicate POs</Menu.Item>
+          <Menu.Item name="label" key="label">Print Product Labels</Menu.Item>
+          <Menu.Item name="delete" key="delete">Delete POs</Menu.Item>
         </Menu>
       );
       const optionsMenu = (
         <Menu onClick={this.handleOptionsMenuClick}>
-          <Menu.Item name="search" key="search">Search Products</Menu.Item>
-          <Menu.Item name="import" key="import">Import Products</Menu.Item>
-          <Menu.Item name="export" key="export">Export Products</Menu.Item>
-          <Menu.Item name="add" key="add">Add One Product</Menu.Item>
+          <Menu.Item name="search" key="search">Search POs</Menu.Item>
+          <Menu.Item name="import" key="import">Import POs</Menu.Item>
+          <Menu.Item name="export" key="export">Export POs</Menu.Item>
+          <Menu.Item name="add" key="add">Create PO</Menu.Item>
           <Menu.Item name="display" key="display">Display Options</Menu.Item>
         </Menu>
       );
@@ -364,13 +363,13 @@ class CustomTable extends Component {
           const menu = (
             <Menu key={`${p._id}-menu`} onClick={this.handleActionMenuClick}>
               <Menu.Item>
-                <a id={p._id} name="copy">Copy Product</a>
+                <a id={p._id} name="scan">Scan PO</a>
               </Menu.Item>
               <Menu.Item>
-                <a id={p._id} name="order">Add to Order</a>
+                <a id={p._id} name="copy">Copy PO</a>
               </Menu.Item>
               <Menu.Item>
-                <a id={p._id} name="delete">Delete Product</a>
+                <a id={p._id} name="delete">Delete PO</a>
               </Menu.Item>
             </Menu>
           )
@@ -400,7 +399,7 @@ class CustomTable extends Component {
     })
       return(
         <div>
-          <h1>Products</h1>
+          <h1>Purchase Orders</h1>
           <Form layout="inline">
             <FormItem label="Search">
               <Switch checked={this.state.showFilters} onChange={this.toggle('showFilters')} />
@@ -412,7 +411,7 @@ class CustomTable extends Component {
             </Dropdown>
           </Form>
           {this.state.showFilters && (
-            <WrappedProductSearchForm
+            <WrappedFilterForm
               inputs={this.state.headers.filter(h=>h.noSort !== true)}
               onFilterSearch={this.handleFilterSearch}
             />
@@ -420,7 +419,7 @@ class CustomTable extends Component {
           {this.state.showEditItemDrawer && (
             <EditItemDrawer
               product={this.state.itemDrawerProduct}
-              title={'Edit Product'}
+              title={'Edit Purchase Order'}
               onClose={this.toggle('showEditItemDrawer')}
               onSave={this.handleProductUpdate}
               create={false}
@@ -437,29 +436,20 @@ class CustomTable extends Component {
           )}
           {this.state.showImportModal && (
             <ImportModal
-              title="Import Products"
+              title="Import Purchase Orders"
               onClose={this.toggle('showImportModal')}
               headers={[
                 {value:'sku', required: true},
-                {value:'title'},
-                {value: 'barcode'},
-                {value:'quantity'},
-                {value:'price'},
-                {value:'supplier'},
-                {value:'brand'},
-                {value:'weight'},
-                {value:'action'},
+                {value:'po type', required: true},
+                {value:'po name', required: true},
+                {value:'quantity', required: true},
+                {value:'po status'},
               ]}
               validInputs={[
                 {value:'sku', required: true},
-                {value:'title'},
-                {value: 'barcode'},
-                {value:'quantity', type: 'number'},
-                {value:'price', type: 'number'},
-                {value:'supplier'},
-                {value:'brand'},
-                {value:'weight', type: 'number'},
-                {value:'action', type: 'array', validValues: ['update','delete']},
+                {value:'po type', required: true, type: 'array', validValues: ['inbound','outbound']},
+                {value:'quantity', type: 'number', required: true},
+                {value:'po status', type: 'array', validValues: ['complete','processing']},
               ]}
               onSubmit={this.handleProductImport}
               onSuccess={this.handleDataFetch}
@@ -496,11 +486,11 @@ class CustomTable extends Component {
     }
   }
 
-  function mapStateToProps(state) {
-   return {
-     currentUser: state.currentUser,
-     errors: state.errors,
-   };
-  }
+function mapStateToProps(state) {
+ return {
+   currentUser: state.currentUser,
+   errors: state.errors,
+ };
+}
 
-  export default connect(mapStateToProps, {fetchAllProducts, deleteProducts, updateProducts, importProducts})(CustomTable);
+export default connect(mapStateToProps, {fetchAllProducts, deleteModelDocuments, updateProducts, importPurchaseOrder, queryModelData})(PurchaseOrderTable);

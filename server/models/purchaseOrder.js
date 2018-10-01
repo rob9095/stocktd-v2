@@ -9,9 +9,13 @@ const purchaseOrderSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  isComplete: {
-    type: Boolean,
-    default: false,
+  status: {
+    type: String,
+    default: 'complete',
+  },
+  quantity: {
+    type: Number,
+    default: 0,
   },
   poRef: {
     type: 'String',
