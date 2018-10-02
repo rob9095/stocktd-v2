@@ -1,15 +1,22 @@
 import React, { Component } from 'react';
-import { Form, Row, Col, Input, Button, Icon, Select } from 'antd';
+import { Form, Row, Col, Input, Button, Icon, Select, Switch } from 'antd';
 
 const Option = Select.Option;
 const FormItem = Form.Item;
 
 class FilterForm extends Component {
   state = {
+    open: false,
     selects: {
 
     },
   };
+
+  toggle = () => {
+    this.setState({
+      open: !this.state.open,
+    })
+  }
 
   handleReset = () => {
     this.props.form.resetFields();
@@ -93,20 +100,29 @@ class FilterForm extends Component {
       }
     })
     return (
-      <Form
-        className="ant-advanced-search-form"
-        onSubmit={this.handleSubmit}
-      >
-        <Row gutter={24}>{inputs}</Row>
-        <Row gutter={24}>
-          <Col span={24} className="center-a" style={{ margin: '20px 10px' }}>
-            <Button type="primary" htmlType="submit">Search</Button>
-            <Button style={{ marginLeft: 8 }} onClick={this.handleReset}>
-              Clear
-            </Button>
-          </Col>
-        </Row>
-      </Form>
+      <div>
+        <Form layout="inline">
+          <FormItem label="Search">
+            <Switch checked={this.state.open} onChange={this.toggle} />
+          </FormItem>
+        </Form>
+        {this.state.open && (
+          <Form
+            className="ant-advanced-search-form"
+            onSubmit={this.handleSubmit}
+          >
+            <Row gutter={24}>{inputs}</Row>
+            <Row gutter={24}>
+              <Col span={24} className="center-a" style={{ margin: '20px 10px' }}>
+                <Button type="primary" htmlType="submit">Search</Button>
+                <Button style={{ marginLeft: 8 }} onClick={this.handleReset}>
+                  Clear
+                </Button>
+              </Col>
+            </Row>
+          </Form>
+        )}
+      </div>
     );
   }
 }
