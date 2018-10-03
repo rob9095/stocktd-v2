@@ -401,21 +401,16 @@ class PurchaseOrderTable extends Component {
         <div>
           <h1>Purchase Orders</h1>
           <Form layout="inline">
-            <FormItem label="Search">
-              <Switch checked={this.state.showFilters} onChange={this.toggle('showFilters')} />
-            </FormItem>
             <Dropdown overlay={optionsMenu}>
               <Button style={{float: 'right', marginLeft: 10}} type="primary" icon="setting">
                 Options <Icon type="down" />
               </Button>
             </Dropdown>
           </Form>
-          {this.state.showFilters && (
-            <WrappedFilterForm
-              inputs={this.state.headers.filter(h=>h.noSort !== true)}
-              onFilterSearch={this.handleFilterSearch}
-            />
-          )}
+          <WrappedFilterForm
+            inputs={this.state.headers.filter(h=>h.noSort !== true)}
+            onFilterSearch={this.handleFilterSearch}
+          />
           {this.state.showEditItemDrawer && (
             <EditItemDrawer
               product={this.state.itemDrawerProduct}
