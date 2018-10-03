@@ -17,6 +17,87 @@ const updateMath = (current, update, poType) => {
   return poType === 'outbound' ? c - u : c + u
 }
 
+exports.handlePOImport = async (req, res, next) => {
+  try{
+    const company = req.body.company
+    let poData = req.body.json.map((po,i)=>({
+      name: po['po name'],
+      type: po['po type'],
+      status: po['po status'] ? po['po status'] : 'complete',
+      sku: po['sku'],
+      quantity: po['quantity'],
+      company: company,
+      skuCompany: `${po['sku']}-${company}`,
+      poRef: `${company}-${po['po name']}-${po['po type']}-${po['po status']}`,
+    }))
+    let groupedPOs = groupBy(poData, 'poRef');
+    let poUpdates = [];
+    let poProductUpdates = [];
+    let productUpdates = [];
+    for (let po of Object.entries(groupedPOs)) {
+      let poRef = po[0]
+      let poArr = po[1]
+      let qtyArr = poArr.map(line => parseInt(line.quantity))
+      let sum = qtyArr.reduce((acc, cv) => (acc + cv), 0)
+      let poProductsObj = groupBy(poArr, 'skuCompany')
+      poUpdates.push({
+        updateOne: {
+    					filter: { poRef, },
+    					update: {
+                name: poArr[0].name,
+                type: poArr[0].type,
+                status: poArr[0].status,
+                poRef,
+                company: poArr[0].company,
+                quantity: sum,
+              },
+    					upsert: true,
+    				}
+          })
+      for (let skuRef of Object.entries(poProductsObj)) {
+        let skuArr = skuRef[1]
+        let currentSku = skuRef[0]
+        let skuQtyArr = skuArr.map(sku => parseInt(sku.quantity))
+        let skuSum = skuQtyArr.reduce((acc, cv) => (acc + cv), 0)
+        let product = skuArr[0]
+        poProductUpdates.push({
+    				updateOne: {
+    					filter: { skuCompany: currentSku, poRef},
+    					update: {...product, quantity: skuSum},
+    					upsert: true,
+    				}
+    			})
+        productUpdates.push({
+          updateOne: {
+            filter: {skuCompany: currentSku},
+            update: {
+              company,
+              sku: product.sku,
+              skuCompany: currentSku,
+              $inc: product.type === 'outbound' ?
+                { quantity: parseInt(-skuSum) }
+                :
+                { quantity: parseInt(skuSum) }
+            },
+            upsert: true,
+          }
+        })
+      }
+    }
+    let updatedPOs = await db.PurchaseOrder.bulkWrite(poUpdates)
+    let updatedPoProducts = await db.PoProduct.bulkWrite(poProductUpdates)
+    let updatedProducts = await db.Product.bulkWrite(productUpdates)
+    //need to really loop through each updateResponse and for any inserted Docs go and add default values with more bulk writes...
+    return res.status(200).json({
+      updatedPOs,
+      updatedPoProducts,
+      updatedProducts,
+    })
+  } catch(err) {
+    return next(err)
+  }
+}
+
 exports.processPurchaseOrderImport = async (req, res, next) => {
 	try {
     let addedPOs = [];
@@ -29,7 +110,7 @@ exports.processPurchaseOrderImport = async (req, res, next) => {
       quantity: po['quantity'],
       company: req.body.company,
       skuCompany: `${po['sku']}-${req.body.company}`,
-      poRef: `${req.body.company}-${po['po name']}-${po['po type']}-${po['po status'] === 'complete' ? true : false}-${Date.now()}`,
+      poRef: `${req.body.company}-${po['po name']}-${po['po type']}-${po['po status']}-${Date.now()}`,
     }))
     // group the po's by their unique ref, combined "-" seperate string of company name, po name, po type, po status, current date obj
     let groupedPOs = groupBy(poData, 'poRef');

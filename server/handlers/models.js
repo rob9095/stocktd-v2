@@ -30,6 +30,7 @@ exports.queryModelData = async (req, res, next) => {
 		const skip = (req.body.activePage * req.body.rowsPerPage) - req.body.rowsPerPage
 		const totalPages = Math.floor(count / req.body.rowsPerPage)
 		let data = await db[req.body.model].find(query).skip(skip).limit(limit).sort({[req.body.sortBy]: req.body.sortDirection})
+		console.log(data)
 		return res.status(200).json({
 			data,
 			totalPages,

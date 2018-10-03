@@ -41,11 +41,10 @@ const PoProductSchema = new mongoose.Schema({
   },
   createdOn: {
     type: Date,
-    default: Date.now(),
+    default: Date.now,
   },
   lastScan: {
     type: Date,
-    default: Date.now(),
   },
   scannedBy: {
     type: mongoose.Schema.Types.ObjectId,
