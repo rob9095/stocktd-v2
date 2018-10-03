@@ -23,7 +23,7 @@ exports.handlePOImport = async (req, res, next) => {
     let poData = req.body.json.map((po,i)=>({
       name: po['po name'],
       type: po['po type'],
-      status: po['po status'] ? po['po status'] : 'complete',
+      status: po['status'] ? po['status'] : 'complete',
       sku: po['sku'],
       quantity: po['quantity'],
       company: company,

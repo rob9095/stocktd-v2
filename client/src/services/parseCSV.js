@@ -9,14 +9,16 @@ export const validateInputs = (json, validInputs) => {
       let c = 0;
       for (let line of json) {
         for (let input of validInputs) {
-          if (line[input.value] === '' && input.required === true) {
-            errorList.push(`Missing Required Input: "${input.value}" on line ${c+1} is missing`)
+          // check required inputs for empty strings
+          if (line[input.value] === '' && input.required === true && input.type !== 'array') {
+            errorList.push(`Invalid Input: "${input.value}" on line ${c+1} is empty or missing`)
             reject({
               errorType: 'error',
               errorHeader: 'Please fix the errors and upload the file again',
               errorList,
             });
           }
+          // check numbers for NaNs
           if (input.type === 'number') {
             if (!Number.isInteger(parseInt(line[input.value]))) {
               errorList.push(`Invalid Number: "${line[input.value]}" on line ${c+1} is not a valid number`)
@@ -27,6 +29,7 @@ export const validateInputs = (json, validInputs) => {
               });
             }
           }
+          //check inputs valid Values if it's an array
           if (input.type === 'array' && line[input.value] !== undefined) {
             if (!input.validValues.includes(line[input.value])){
               errorList.push(`Invalid Input: "${line[input.value]}" on line ${c+1} is not a valid ${input.value}`)

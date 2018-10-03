@@ -438,13 +438,26 @@ class PurchaseOrderTable extends Component {
                 {value:'po type', required: true},
                 {value:'po name', required: true},
                 {value:'quantity', required: true},
-                {value:'po status'},
+                {value:'status'},
+                {title:'title'},
+                {barcode: 'barcode'},
+                {price: 'price'},
+                {supplier: 'supplier'},
+                {brand: 'brand'},
+                {weight: 'weight'},
               ]}
               validInputs={[
                 {value:'sku', required: true},
+                {value:'po name', required: true},
                 {value:'po type', required: true, type: 'array', validValues: ['inbound','outbound']},
                 {value:'quantity', type: 'number', required: true},
                 {value:'po status', type: 'array', validValues: ['complete','processing']},
+                {title:'title'},
+                {barcode: 'barcode'},
+                {price: 'price'},
+                {supplier: 'supplier'},
+                {brand: 'brand'},
+                {weight: 'weight'},
               ]}
               onSubmit={this.handleProductImport}
               onSuccess={this.handleDataFetch}
