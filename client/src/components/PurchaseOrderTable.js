@@ -33,10 +33,10 @@ class PurchaseOrderTable extends Component {
       showImportModal: false,
       headers: [
         {id: 'select-all', text: '', width: 75, noSort: true},
-        {id: 'name', text: 'Name', width: 400, span: 8, className: 'no-wrap'},
-        {id: 'type', text: 'Type', width: 250, span: 8, className: 'lg-cell'},
-        {id: 'status', text: 'Status', width: 250, span: 8, className: 'no-wrap'},
-        {id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 4, className: 'no-wrap'},
+        {id: 'name', text: 'Name', width: 400, span: 6, className: 'no-wrap'},
+        {id: 'type', text: 'Type', width: 250, span: 6, className: 'lg-cell'},
+        {id: 'status', text: 'Status', width: 250, span: 6, className: 'no-wrap'},
+        {id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 6, className: 'no-wrap'},
         {id: 'createdOn', text: 'Date Created', width: 100, type: 'date', span: 8, className: 'no-wrap'},
         {id: 'actions', text: 'Actions', width: 100, noSort: true},
       ],
@@ -70,6 +70,12 @@ class PurchaseOrderTable extends Component {
     requestedRowsPerPage === undefined ? requestedRowsPerPage = this.state.rowsPerPage : null;
     this.props.queryModelData('PurchaseOrder',this.state.query,this.state.column, this.state.direction, requestedPage, requestedRowsPerPage, this.props.currentUser.user.company)
     .then(({data, activePage, totalPages, rowsPerPage, skip})=>{
+      data = data.map(po => ({
+        ...po,
+        createdOn: new Date(po.createdOn).toLocaleString()
+      }))
+      console.log(data)
+
       this.setState({
         loading: false,
         skip,

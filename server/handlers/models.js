@@ -2,18 +2,20 @@ const db = require('../models');
 
 exports.queryModelData = async (req, res, next) => {
 	try {
+		// query is a object built from the incoming query array. incoming query array structure looks like [['searchKey','searchValue || searchArr'],[],etc]
 		let query = {
 			company: req.body.company,
 		}
 		for (let val of req.body.query){
+			// array of dates
 			if (Array.isArray(val[1])){
-				let startDate = new Date(val[1][0]).toISOString()
-				let endDate = new Date(val[1][1]).toISOString()
-				console.log(startDate)
+				let startDate = val[1][0]
+				let endDate = val[1][1]
 				query = {
 					...query,
-					[val[0]]: { $gte: startDate, $lte: endDate }
+					[val[0]]: { $gte: startDate, $lt: endDate }
 				}
+				// numbers
 			} else if ((Number.isInteger(parseInt(val[1])))) {
 				console.log(val[2])
 				query = val[2] === undefined ?
@@ -26,6 +28,7 @@ exports.queryModelData = async (req, res, next) => {
 					 ...query,
 					 [val[0]]: {[`$${val[2]}`]: val[1]},
 				 }
+				 //regex text feilds
 			} else {
 				query = {
 					...query,

@@ -11,6 +11,7 @@ class FilterForm extends Component {
     selects: {
 
     },
+    dates: [],
   };
 
   toggle = () => {
@@ -30,8 +31,14 @@ class FilterForm extends Component {
     })
   }
 
-  onChange = (date, dateString) => {
+  handleDateSelect = (date, dateString) => {
     console.log(date, dateString);
+    let endDate = new Date(`${dateString[1]}T23:59:59.999Z`)
+    let offSet = endDate.getTimezoneOffset()
+    this.setState({
+      // adds local offset in minutes to second date so query works, I have no clue why
+      dates: [dateString[0], new Date(endDate).getTime() + offSet*60000],
+    })
   }
 
   handleSubmit = (e) => {
@@ -40,16 +47,20 @@ class FilterForm extends Component {
       console.log('Received values of form: ', values);
       // fitler out any empty entries or equal selects
       const selects = Object.entries(this.state.selects).filter(val=>val[1] !== '' && val[1] !== '=')
+      console.log('selects are')
       console.log(selects)
       const query = Object.entries(values).filter(val=>val[1] !== '' && val[1] !== undefined).map(val=>{
         //check if we have a select for the query value, if we do add it to the element in the query array
-        let select = selects.find(s=>s[0] === val[0])
+        let select = selects.find(s=>s[0] === `${val[0]}Select`)
         if(select) {
           return [...val,select[1]]
+        } else if(Array.isArray(val[1])) {
+          return [[val[0]],this.state.dates]
         } else {
           return [...val]
         }
       })
+      console.log(query)
       this.props.onFilterSearch(query)
     });
   }
@@ -95,7 +106,7 @@ class FilterForm extends Component {
                    message: '',
                  }],
                })(
-                 <RangePicker key={i.id} onChange={this.onChange} />
+                 <RangePicker key={i.id} onChange={this.handleDateSelect} />
                )}
             </FormItem>
           </Col>
