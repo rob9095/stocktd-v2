@@ -1,4 +1,4 @@
-po name,po type,po status,sku,quantity
+po name,po type,status,sku,quantity
 new po,inbound,processing,NEW-SKU,20
 new po,inbound,processing,RH0135-A-2/3,10
 new po,inbound,processing,RH0135-A-3/4,10

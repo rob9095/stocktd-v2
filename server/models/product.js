@@ -53,6 +53,10 @@ const productSchema = new mongoose.Schema({
   },
   asin: {
     type: String,
+  },
+  createdOn: {
+    type: Date,
+    default: Date.now,
   }
 })
 

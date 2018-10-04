@@ -50,6 +50,7 @@ exports.handlePOImport = async (req, res, next) => {
                 poRef,
                 company: poArr[0].company,
                 quantity: sum,
+                $setOnInsert: { createdOn: new Date() }
               },
     					upsert: true,
     				}
@@ -74,6 +75,7 @@ exports.handlePOImport = async (req, res, next) => {
               company,
               sku: product.sku,
               skuCompany: currentSku,
+              $setOnInsert: { createdOn: new Date(), quantityToShip: 0, },
               $inc: product.type === 'outbound' ?
                 { quantity: parseInt(-skuSum) }
                 :

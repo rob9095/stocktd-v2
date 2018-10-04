@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Form, Row, Col, Input, Button, Icon, Select, Switch } from 'antd';
+import { Form, Row, Col, Input, Button, Icon, Select, Switch, DatePicker } from 'antd';
 
 const Option = Select.Option;
 const FormItem = Form.Item;
+const { RangePicker } = DatePicker;
 
 class FilterForm extends Component {
   state = {
@@ -27,6 +28,10 @@ class FilterForm extends Component {
     this.setState({
       selects: {[select.props.id]: value},
     })
+  }
+
+  onChange = (date, dateString) => {
+    console.log(date, dateString);
   }
 
   handleSubmit = (e) => {
@@ -64,7 +69,7 @@ class FilterForm extends Component {
       if (i.type === 'number') {
         return(
           <Col xs={i.span*3} md={i.span} key={i.id}>
-            <FormItem label={`${i.text}`}>
+            <FormItem key={i.id} label={`${i.text}`}>
               {getFieldDecorator(i.id, {
                  rules: [{
                    required: false,
@@ -80,10 +85,25 @@ class FilterForm extends Component {
             </FormItem>
           </Col>
         )
+      } if (i.type === 'date') {
+        return (
+          <Col xs={i.span*3} md={i.span} key={i.id}>
+            <FormItem key={i.id} label={`${i.text}`}>
+              {getFieldDecorator(i.id, {
+                 rules: [{
+                   required: false,
+                   message: '',
+                 }],
+               })(
+                 <RangePicker key={i.id} onChange={this.onChange} />
+               )}
+            </FormItem>
+          </Col>
+        )
       } else {
         return (
           <Col xs={i.span*3} md={i.span} key={i.id}>
-            <FormItem label={`${i.text}`}>
+            <FormItem key={i.id} label={`${i.text}`}>
               {getFieldDecorator(i.id, {
                  rules: [{
                    required: false,

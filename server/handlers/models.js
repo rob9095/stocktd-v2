@@ -6,7 +6,15 @@ exports.queryModelData = async (req, res, next) => {
 			company: req.body.company,
 		}
 		for (let val of req.body.query){
-			if ((Number.isInteger(parseInt(val[1])))) {
+			if (Array.isArray(val[1])){
+				let startDate = new Date(val[1][0]).toISOString()
+				let endDate = new Date(val[1][1]).toISOString()
+				console.log(startDate)
+				query = {
+					...query,
+					[val[0]]: { $gte: startDate, $lte: endDate }
+				}
+			} else if ((Number.isInteger(parseInt(val[1])))) {
 				console.log(val[2])
 				query = val[2] === undefined ?
 					{
@@ -30,7 +38,6 @@ exports.queryModelData = async (req, res, next) => {
 		const skip = (req.body.activePage * req.body.rowsPerPage) - req.body.rowsPerPage
 		const totalPages = Math.floor(count / req.body.rowsPerPage)
 		let data = await db[req.body.model].find(query).skip(skip).limit(limit).sort({[req.body.sortBy]: req.body.sortDirection})
-		console.log(data)
 		return res.status(200).json({
 			data,
 			totalPages,

@@ -37,7 +37,7 @@ class PurchaseOrderTable extends Component {
         {id: 'type', text: 'Type', width: 250, span: 8, className: 'lg-cell'},
         {id: 'status', text: 'Status', width: 250, span: 8, className: 'no-wrap'},
         {id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 4, className: 'no-wrap'},
-        {id: 'createdOn', text: 'Date Created', width: 100, type: 'date', span: 4, className: 'no-wrap'},
+        {id: 'createdOn', text: 'Date Created', width: 100, type: 'date', span: 8, className: 'no-wrap'},
         {id: 'actions', text: 'Actions', width: 100, noSort: true},
       ],
       hiddenCols: [''],
