@@ -531,6 +531,10 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
   background: #2c2e3e;
 }
 
+.full-width {
+  width: 100%;
+}
+
 
 /* Search Form */
 .number-input.pre-select {

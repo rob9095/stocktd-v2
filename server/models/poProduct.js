@@ -5,21 +5,31 @@ const PoProductSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'PurchaseOrder',
   },
-  poName: {
+  poRef: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  name: {
     type: String,
   },
-  poType: {
+  type: {
     type: String,
     required: true,
   },
+  status: {
+    type: String,
+    default: 'complete',
+  },
   sku: {
     type: String,
+    required: true,
   },
-  companySku: {
+  skuCompany: {
     type: String,
     require: true,
   },
-  poProductId: {
+  productId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Product',
   },

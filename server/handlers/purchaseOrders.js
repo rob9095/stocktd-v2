@@ -28,7 +28,7 @@ exports.handlePOImport = async (req, res, next) => {
       quantity: po['quantity'],
       company: company,
       skuCompany: `${po['sku']}-${company}`,
-      poRef: `${company}-${po['po name']}-${po['po type']}-${po['po status']}`,
+      poRef: `${company}-${po['po name']}-${po['po type']}-${po['status'] ? po['status'] : 'complete'}`,
     }))
     let groupedPOs = groupBy(poData, 'poRef');
     let poUpdates = [];
@@ -112,7 +112,7 @@ exports.processPurchaseOrderImport = async (req, res, next) => {
       quantity: po['quantity'],
       company: req.body.company,
       skuCompany: `${po['sku']}-${req.body.company}`,
-      poRef: `${req.body.company}-${po['po name']}-${po['po type']}-${po['po status']}-${Date.now()}`,
+      poRef: `${req.body.company}-${po['po name']}-${po['po type']}-${po['po status']}`,
     }))
     // group the po's by their unique ref, combined "-" seperate string of company name, po name, po type, po status, current date obj
     let groupedPOs = groupBy(poData, 'poRef');
@@ -216,21 +216,24 @@ exports.getCompanyPoProducts = async (req, res, next) => {
 
 exports.updatePurchaseOrder = async (req, res, next) => {
   try {
-    let poUpdates = req.body.purchaseOrders.map(po=>{
-      return {
-        updateOne: {
-          filter: { _id: po._id},
-          update: {...po},
-        }
-      }
-    })
-    let poProductUpdates = req.body.poProducts.map(poLine => ({
+    let poUpdates = req.body.updates.map(po=>({
       updateOne: {
-        filter: { skuCompany: poLine.skuCompany, poRef: poLine.poRef},
-        update: {...poLine},
-        upsert: true,
+        filter: { _id: po.id},
+        update: {...po},
       }
     }))
+    let poProductUpdates = []
+    for (let po of req.body.updates) {
+      let products = await db.PoProduct.find({poRef: po.poRef})
+      console.log(products[0].skuCompany)
+      let updates = products.map(poLine => ({
+        updateOne: {
+          filter: { skuCompany: poLine.skuCompany, poRef: poLine.poRef},
+          update: {...po},
+        }
+      }))
+      poProductUpdates.push(...updates)
+    }
     let updatedPurchaseOrders = await db.PurchaseOrder.bulkWrite(poUpdates)
     let updatedPoProducts = await db.PoProduct.bulkWrite(poProductUpdates)
     return res.status(200).json({

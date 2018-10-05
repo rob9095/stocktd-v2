@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import { Alert, Drawer, Form, Button, Col, Row, Input } from 'antd';
+import { Alert, Drawer, Form, Button, Col, Row, Input, Select, DatePicker } from 'antd';
+const moment = require('moment');
 
+const Option = Select.Option;
 const FormItem = Form.Item;
 
 class DrawerForm extends Component {
@@ -35,15 +37,33 @@ class DrawerForm extends Component {
     })
   }
 
+  handleDateChange = (date, dateString) => {
+    console.log(date, dateString);
+    this.setState({
+      date: dateString,
+    })
+  }
+
+  handleSelect = (value, select) => {
+    this.setState({
+      selects: {[select.props.id]: value},
+    })
+  }
+
+  valideRequiredInputs = () => {
+
+  }
+
   handleSubmit = (e) => {
     e.preventDefault();
     this.hideAlert();
     this.props.form.validateFields((err, inputs) => {
       console.log('Received values of form: ', inputs);
-      // fitler out any empty entries or equal selects
-      if (inputs.sku === '' || inputs.sku === undefined) {
-        this.handleAlert('SKU cannot be blank', 'error')
-        return
+      for (let input of this.props.inputs) {
+        if (inputs[input.id] === undefined || inputs[input.id] === '') {
+          this.handleAlert(`${input.text} cannot be blank`, 'error')
+          return
+        }
       }
       // fitler out any empty entries or values that are the same
       const values = Object.entries(inputs).filter(val=>val[1] !== undefined && val[1] !== this.props.item[val[0]])
@@ -53,11 +73,12 @@ class DrawerForm extends Component {
       }
       let update = {
         id: this.props.item._id,
+        poRef: this.props.item.poRef,
       }
       for (let val of values) {
         update = {
           ...update,
-          [val[0]]: val[1],
+          [val[0]]: val[0] === 'createdOn' ? new Date(val[1]).toLocaleString() : val[1],
         }
       }
       console.log(update)
@@ -76,29 +97,77 @@ class DrawerForm extends Component {
     const { getFieldDecorator } = this.props.form;
     let item = this.props.item
     let inputs = this.props.inputs.map(i=>{
-      return (
-        <Col xs={i.span*3} sm={i.span} key={i.id}>
-          <FormItem label={`${i.text}`}>
-            {getFieldDecorator(i.id, { initialValue: item[i.id] }, {
-               rules: [{
-                 required: i.required,
-                 message: i.message,
-               }],
-             })(
-               i.type === 'textarea' ?
-                 <Input.TextArea
+      if (i.type === 'textarea') {
+        return (
+          <Col xs={i.span*3} sm={i.span} key={i.id}>
+            <FormItem label={`${i.text}`}>
+              {getFieldDecorator(i.id, { initialValue: item[i.id] }, {
+                 rules: [{
+                   required: i.required,
+                   message: i.message,
+                 }],
+               })(
+                  <Input.TextArea
                    rows={i.textRows}
                    placeholder={i.text}
-                 />
-                 :
-                 <Input
+                  />
+               )}
+            </FormItem>
+          </Col>
+        )
+      } else if (i.type === 'date') {
+        return (
+          <Col xs={i.span*3} sm={i.span} key={i.id}>
+            <FormItem label={`${i.text}`}>
+              {getFieldDecorator(i.id, { initialValue: moment(item[i.id]) }, {
+                 rules: [{
+                   required: i.required,
+                   message: i.message,
+                 }],
+               })(
+                  <DatePicker onChange={this.handleDateChange} className={i.className} />
+               )}
+            </FormItem>
+          </Col>
+        )
+      } else if (i.type == 'dropdown') {
+        return (
+          <Col xs={i.span*3} sm={i.span} key={i.id}>
+            <FormItem label={`${i.text}`}>
+              {getFieldDecorator(i.id, { initialValue: item[i.id] }, {
+                 rules: [{
+                   required: i.required,
+                   message: i.message,
+                 }],
+               })(
+                 <Select key={`${i.id}Select`} onChange={this.handleSelect} size="large" >
+                   {i.values.map(val => (
+                     <Option id={`${i.id}Select`} key={val.id} value={val.id}>{val.text}</Option>
+                   ))}
+                 </Select>
+               )}
+            </FormItem>
+          </Col>
+        )
+      } else {
+        return (
+          <Col xs={i.span*3} sm={i.span} key={i.id}>
+            <FormItem label={`${i.text}`}>
+              {getFieldDecorator(i.id, { initialValue: item[i.id] }, {
+                 rules: [{
+                   required: i.required,
+                   message: i.message,
+                 }],
+               })(
+                  <Input
                    type={i.type}
                    placeholder={i.text}
-                 />
-             )}
-          </FormItem>
-        </Col>
-      )
+                  />
+               )}
+            </FormItem>
+          </Col>
+        )
+      }
     })
     return (
         <Drawer

@@ -61,10 +61,10 @@ export function fetchCompanyPoProducts(currentUser, filter){
 	}
 }
 
-export function updatePurchaseOrders(purchaseOrders, poProducts, currentUser){
+export function updatePurchaseOrders(updates, currentUser){
   return dispatch => {
 		return new Promise((resolve,reject) => {
-			return apiCall('post', '/api/purchase-orders/update', {purchaseOrders, poProducts, company: currentUser.user.company})
+			return apiCall('post', '/api/purchase-orders/update', {updates, company: currentUser.user.company})
 			.then((res) => {
 				resolve(res);
 			})

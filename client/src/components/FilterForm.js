@@ -37,19 +37,18 @@ class FilterForm extends Component {
     let offSet = endDate.getTimezoneOffset()
     this.setState({
       // adds local offset in minutes to second date so query works, I have no clue why
-      dates: [dateString[0], new Date(endDate).getTime() + offSet*60000],
+      dates: date.length > 0 ? [dateString[0], new Date(endDate).getTime() + offSet*60000] : null,
     })
   }
 
   handleSubmit = (e) => {
     e.preventDefault();
+    console.log(this.state)
     this.props.form.validateFields((err, values) => {
       console.log('Received values of form: ', values);
       // fitler out any empty entries or equal selects
       const selects = Object.entries(this.state.selects).filter(val=>val[1] !== '' && val[1] !== '=')
-      console.log('selects are')
-      console.log(selects)
-      const query = Object.entries(values).filter(val=>val[1] !== '' && val[1] !== undefined).map(val=>{
+      const query = Object.entries(values).filter(val=>val[1] !== '' && val[1] !== undefined && val[1].length > 0).map(val=>{
         //check if we have a select for the query value, if we do add it to the element in the query array
         let select = selects.find(s=>s[0] === `${val[0]}Select`)
         if(select) {
@@ -60,7 +59,6 @@ class FilterForm extends Component {
           return [...val]
         }
       })
-      console.log(query)
       this.props.onFilterSearch(query)
     });
   }

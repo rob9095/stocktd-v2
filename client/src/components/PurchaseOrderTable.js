@@ -5,9 +5,10 @@ import { importPurchaseOrder, fetchPurchaseOrders, updatePurchaseOrders, fetchCo
 import { queryModelData, deleteModelDocuments } from '../store/actions/models';
 import { Button, Pagination, Divider, Icon, Spin, Form, Switch, Dropdown, Menu, Modal, message, Row, Col } from 'antd';
 import WrappedFilterForm from './FilterForm';
-import EditItemDrawer from './EditItemDrawer';
+import EditItemDrawerv2 from './EditItemDrawerv2';
 import ImportModal from './ImportModal';
 
+const moment = require('moment');
 const confirm = Modal.confirm;
 const FormItem = Form.Item;
 
@@ -29,7 +30,7 @@ class PurchaseOrderTable extends Component {
       showFilters: false,
       showEditItemDrawer: false,
       showCreateItemDrawer: false,
-      itemDrawerProduct: {},
+      drawerItem: {},
       showImportModal: false,
       headers: [
         {id: 'select-all', text: '', width: 75, noSort: true},
@@ -123,10 +124,10 @@ class PurchaseOrderTable extends Component {
     };
 
     handleRowEdit = async (e) => {
-      let itemDrawerProduct = this.state.data.find(p=>p._id === e.target.id)
+      let drawerItem = this.state.data.find(p=>p._id === e.target.id)
       this.setState({
         showEditItemDrawer: true,
-        itemDrawerProduct,
+        drawerItem,
       })
       console.log(e.target.id)
     }
@@ -247,7 +248,7 @@ class PurchaseOrderTable extends Component {
       this.handleDataFetch()
     }
 
-    handleProductUpdate = (updates) => {
+    handlePOUpdate = (updates) => {
       return new Promise((resolve,reject) => {
         let data = this.state.data.map(p=>{
           let update = updates.find(u=>u.id === p._id)
@@ -262,8 +263,9 @@ class PurchaseOrderTable extends Component {
             }
           }
         })
-        this.props.updateProducts(updates, this.props.currentUser)
+        this.props.updatePurchaseOrders(updates,this.props.currentUser)
         .then((res)=>{
+          console.log(data)
           this.setState({
             data,
           })
@@ -275,7 +277,7 @@ class PurchaseOrderTable extends Component {
       })
     }
 
-    handleProductImport = (json) => {
+    handleImport = (json) => {
       return new Promise((resolve,reject) => {
         this.props.importPurchaseOrder(json, this.props.currentUser)
         .then(res=>{
@@ -391,6 +393,11 @@ class PurchaseOrderTable extends Component {
             </td>
           )
         }
+        if (col.type === 'date') {
+          return (
+            <td key={`${p._id}-${col.id}`} className={col.className}>{moment(p[col.id]).format('M/D/YY')}</td>
+          )
+        }
         return (
             <td key={`${p._id}-${col.id}`} className={col.className}>{p[col.id]}</td>
           )
@@ -418,23 +425,36 @@ class PurchaseOrderTable extends Component {
             onFilterSearch={this.handleFilterSearch}
           />
           {this.state.showEditItemDrawer && (
-            <EditItemDrawer
-              product={this.state.itemDrawerProduct}
+            // <EditItemDrawer
+            //   product={this.state.itemDrawerProduct}
+            //   title={'Edit Purchase Order'}
+            //   onClose={this.toggle('showEditItemDrawer')}
+            //   onSave={this.handleProductUpdate}
+            //   create={false}
+            // />
+            <EditItemDrawerv2
+              inputs={[
+                {id: 'name', text: 'Name', span: 16, className: 'no-wrap', required: true, type: 'text', message: 'Name cannot be blank'},
+                {id: 'createdOn', text: 'Date Created', span: 8, className: 'full-width', required: true, type: 'date'},
+                {id: 'type', text: 'PO Type', span: 12, className: 'no-wrap', required: true, type: 'dropdown', values: [{id:'inbound',text:'Inbound'},{id:'outbound',text:'Outbound'}]},
+                {id: 'status', text: 'PO Status', span: 12, className: 'no-wrap', required: true, type: 'dropdown', values: [{id:'complete',text:'Complete'},{id:'processing',text:'Processing'}]},
+              ]}
+              item={this.state.drawerItem}
               title={'Edit Purchase Order'}
               onClose={this.toggle('showEditItemDrawer')}
-              onSave={this.handleProductUpdate}
+              onSave={this.handlePOUpdate}
               create={false}
             />
           )}
-          {this.state.showCreateItemDrawer && (
+          {/* {this.state.showCreateItemDrawer && (
             <EditItemDrawer
               product={{}}
               title={'Create Product'}
               onClose={this.toggle('showCreateItemDrawer')}
-              onSave={this.handleProductImport}
+              onSave={this.handleImport}
               create={true}
             />
-          )}
+          )} */}
           {this.state.showImportModal && (
             <ImportModal
               title="Import Purchase Orders"
@@ -465,7 +485,7 @@ class PurchaseOrderTable extends Component {
                 {value:'brand'},
                 {value:'weight', type: 'number'},
               ]}
-              onSubmit={this.handleProductImport}
+              onSubmit={this.handleImport}
               onSuccess={this.handleDataFetch}
             />
           )}
@@ -507,4 +527,4 @@ function mapStateToProps(state) {
  };
 }
 
-export default connect(mapStateToProps, {fetchAllProducts, deleteModelDocuments, updateProducts, importPurchaseOrder, queryModelData})(PurchaseOrderTable);
+export default connect(mapStateToProps, {fetchAllProducts, deleteModelDocuments, updateProducts, importPurchaseOrder, queryModelData, updatePurchaseOrders})(PurchaseOrderTable);
