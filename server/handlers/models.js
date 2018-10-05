@@ -15,7 +15,7 @@ exports.queryModelData = async (req, res, next) => {
 					...query,
 					[val[0]]: { $gte: startDate, $lt: endDate }
 				}
-				// numbers
+				// numbers, if we get a third array item use it as $lte,$gte,$gt,$lt, otherwise use non Regex check
 			} else if ((Number.isInteger(parseInt(val[1])))) {
 				console.log(val[2])
 				query = val[2] === undefined ?

@@ -1,9 +1,9 @@
-po name,po type,status,sku,quantity
-another po,inbound,processing,NEW-SKU,20
-another po,inbound,processing,RH0135-A-2/3,10
-another po,inbound,processing,RH0135-A-3/4,10
-another po,inbound,complete,IMNEW,10
-one more po,outbound,complete,NEW-SKU,20
-one more po,outbound,complete,RH0135-A-2/3,10
-one more po,outbound,complete,RH0135-A-3/4,10
-one more po,outbound,complete,IMNEW,10
+po name,po type,status,sku,quantity,title
+and more pos,inbound,processing,NEW-SKU,20,test
+and more pos,inbound,processing,RH0135-A-2/3,10,
+and more pos,inbound,processing,RH0135-A-3/4,10,
+and more pos,inbound,complete,IMNEW,10,
+and more pos,outbound,complete,NEW-SKU,20,
+and more pos,outbound,complete,RH0135-A-2/3,10,
+and more pos,outbound,complete,RH0135-A-3/4,10,
+and more pos,outbound,complete,IMNEW,10,

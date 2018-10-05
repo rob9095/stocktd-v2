@@ -34,7 +34,7 @@ class PurchaseOrderTable extends Component {
       headers: [
         {id: 'select-all', text: '', width: 75, noSort: true},
         {id: 'name', text: 'Name', width: 400, span: 6, className: 'no-wrap'},
-        {id: 'type', text: 'Type', width: 250, span: 6, className: 'lg-cell'},
+        {id: 'type', text: 'Type', width: 250, span: 6, className: 'no-wrap'},
         {id: 'status', text: 'Status', width: 250, span: 6, className: 'no-wrap'},
         {id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 6, className: 'no-wrap'},
         {id: 'createdOn', text: 'Date Created', width: 100, type: 'date', span: 8, className: 'no-wrap'},
@@ -445,12 +445,12 @@ class PurchaseOrderTable extends Component {
                 {value:'po name', required: true},
                 {value:'quantity', required: true},
                 {value:'status'},
-                {title:'title'},
-                {barcode: 'barcode'},
-                {price: 'price'},
-                {supplier: 'supplier'},
-                {brand: 'brand'},
-                {weight: 'weight'},
+                {value:'title'},
+                {value:'barcode'},
+                {value:'price'},
+                {value:'supplier'},
+                {value:'brand'},
+                {value:'weight'},
               ]}
               validInputs={[
                 {value:'sku', required: true},
@@ -458,12 +458,12 @@ class PurchaseOrderTable extends Component {
                 {value:'po type', required: true, type: 'array', validValues: ['inbound','outbound']},
                 {value:'quantity', type: 'number', required: true},
                 {value:'po status', type: 'array', validValues: ['complete','processing']},
-                {title:'title'},
-                {barcode: 'barcode'},
-                {price: 'price'},
-                {supplier: 'supplier'},
-                {brand: 'brand'},
-                {weight: 'weight'},
+                {value:'title'},
+                {value:'barcode'},
+                {price:'price', type: 'number'},
+                {value:'supplier'},
+                {value:'brand'},
+                {value:'weight', type: 'number'},
               ]}
               onSubmit={this.handleProductImport}
               onSuccess={this.handleDataFetch}
