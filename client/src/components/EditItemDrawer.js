@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import { Alert, Drawer, Form, Button, Col, Row, Input } from 'antd';
+import { Alert, Drawer, Form, Button, Col, Row, Input, Select, DatePicker } from 'antd';
+const moment = require('moment');
 
+const Option = Select.Option;
 const FormItem = Form.Item;
 
 class DrawerForm extends Component {
@@ -35,35 +37,50 @@ class DrawerForm extends Component {
     })
   }
 
+  handleDateChange = (date, dateString) => {
+    console.log(date, dateString);
+    this.setState({
+      date: dateString,
+    })
+  }
+
+  handleSelect = (value, select) => {
+    this.setState({
+      selects: {[select.props.id]: value},
+    })
+  }
+
   handleSubmit = (e) => {
     e.preventDefault();
     this.hideAlert();
     this.props.form.validateFields((err, inputs) => {
       console.log('Received values of form: ', inputs);
-      // fitler out any empty entries or equal selects
-      if (inputs.sku === '' || inputs.sku === undefined) {
-        this.handleAlert('SKU cannot be blank', 'error')
-        return
+      for (let input of this.props.inputs) {
+        if (inputs[input.id] === undefined || inputs[input.id] === '' || inputs[input.id] === null) {
+          this.handleAlert(`${input.text} cannot be blank`, 'error')
+          return
+        }
       }
       // fitler out any empty entries or values that are the same
-      const values = Object.entries(inputs).filter(val=>val[1] !== undefined && val[1] !== this.props.product[val[0]])
+      const values = Object.entries(inputs).filter(val=>val[1] !== undefined && val[1] !== this.props.item[val[0]])
       if (values.length === 0) {
         this.handleAlert('No Updates Found','warning');
         return
       }
       let update = {
-        id: this.props.product._id,
+        id: this.props.item._id,
+        poRef: this.props.item.poRef,
       }
       for (let val of values) {
         update = {
           ...update,
-          [val[0]]: val[1],
+          [val[0]]: val[0] === 'createdOn' ? new Date(val[1]).toLocaleString() : val[1],
         }
       }
       console.log(update)
       this.props.onSave(this.props.create ? [inputs] : [update])
       .then(res=>{
-        this.handleAlert('Product Saved','success')
+        this.handleAlert('Changes Saved','success')
       })
       .catch(err=>{
         console.log(err)
@@ -74,7 +91,80 @@ class DrawerForm extends Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { title, sku, quantity, weight, barcode, price, supplier, brand } = this.props.product
+    let item = this.props.item
+    let inputs = this.props.inputs.map(i=>{
+      if (i.type === 'textarea') {
+        return (
+          <Col xs={i.span*3} sm={i.span} key={i.id}>
+            <FormItem label={`${i.text}`}>
+              {getFieldDecorator(i.id, { initialValue: item[i.id] }, {
+                 rules: [{
+                   required: i.required,
+                   message: i.message,
+                 }],
+               })(
+                  <Input.TextArea
+                   rows={i.textRows}
+                   placeholder={i.text}
+                  />
+               )}
+            </FormItem>
+          </Col>
+        )
+      } else if (i.type === 'date') {
+        return (
+          <Col xs={i.span*3} sm={i.span} key={i.id}>
+            <FormItem label={`${i.text}`}>
+              {getFieldDecorator(i.id, { initialValue: !this.props.create ? moment(item[i.id]) : moment() }, {
+                 rules: [{
+                   required: i.required,
+                   message: i.message,
+                 }],
+               })(
+                  <DatePicker onChange={this.handleDateChange} className={i.className} />
+               )}
+            </FormItem>
+          </Col>
+        )
+      } else if (i.type === 'dropdown') {
+        return (
+          <Col xs={i.span*3} sm={i.span} key={i.id}>
+            <FormItem label={`${i.text}`}>
+              {getFieldDecorator(i.id, { initialValue: item[i.id] }, {
+                 rules: [{
+                   required: i.required,
+                   message: i.message,
+                 }],
+               })(
+                 <Select key={`${i.id}Select`} onChange={this.handleSelect} size="large" >
+                   {i.values.map(val => (
+                     <Option id={`${i.id}Select`} key={val.id} value={val.id}>{val.text}</Option>
+                   ))}
+                 </Select>
+               )}
+            </FormItem>
+          </Col>
+        )
+      } else {
+        return (
+          <Col xs={i.span*3} sm={i.span} key={i.id}>
+            <FormItem label={`${i.text}`}>
+              {getFieldDecorator(i.id, { initialValue: item[i.id] }, {
+                 rules: [{
+                   required: i.required,
+                   message: i.message,
+                 }],
+               })(
+                  <Input
+                   type={i.type}
+                   placeholder={i.text}
+                  />
+               )}
+            </FormItem>
+          </Col>
+        )
+      }
+    })
     return (
         <Drawer
           title={this.props.title}
@@ -92,141 +182,9 @@ class DrawerForm extends Component {
           {this.state.showAlert && (
             <Alert style={{margin: '-10px 0px 10px 0px'}} closable afterClose={this.hideAlert} message={this.state.alertText} type={this.state.alertType} showIcon />
           )}
-          <Form layout="vertical" hideRequiredMark>
-            <Row gutter={24}>
-              <Col xs={24} sm={8}>
-                <FormItem label="SKU">
-                  {getFieldDecorator('sku',{ initialValue: sku },{
-                     rules: [{
-                       required: this.props.create ? true : false,
-                       message: 'SKU is required',
-                     }],
-                   })(
-                     <Input
-                       type='text'
-                       placeholder="SKU"
-                     />
-                   )}
-                </FormItem>
-              </Col>
-              <Col xs={24} sm={16}>
-                <FormItem label="Title">
-                  {getFieldDecorator('title',{ initialValue: title }, {
-                     rules: [{
-                       required: false,
-                       message: '',
-                     }],
-                   })(
-                     <Input
-                       type='text'
-                       placeholder="Title"
-                     />
-                   )}
-                </FormItem>
-              </Col>
-              <Col xs={24} sm={8}>
-                <FormItem label="Quantity">
-                  {getFieldDecorator('quantity',{ initialValue: quantity }, {
-                     rules: [{
-                       required: false,
-                       message: '',
-                     }],
-                   })(
-                     <Input
-                       type='number'
-                       placeholder="Quantity"
-                     />
-                   )}
-                </FormItem>
-              </Col>
-              <Col xs={24} sm={8}>
-                <FormItem label="Weight">
-                  {getFieldDecorator('weight',{ initialValue: weight }, {
-                     rules: [{
-                       required: false,
-                       message: '',
-                     }],
-                   })(
-                     <Input
-                       type='number'
-                       placeholder="Weight"
-                     />
-                   )}
-                </FormItem>
-              </Col>
-              <Col xs={24} sm={8}>
-                <FormItem label="Price">
-                  {getFieldDecorator('price',{ initialValue: price }, {
-                     rules: [{
-                       required: false,
-                       message: '',
-                     }],
-                   })(
-                     <Input
-                       type='number'
-                       placeholder="Price"
-                     />
-                   )}
-                </FormItem>
-              </Col>
-              <Col xs={24} sm={8}>
-                <FormItem label="Barcode">
-                  {getFieldDecorator('barcode',{ initialValue: barcode }, {
-                     rules: [{
-                       required: false,
-                       message: '',
-                     }],
-                   })(
-                     <Input
-                       type='text'
-                       placeholder="Barcode"
-                     />
-                   )}
-                </FormItem>
-              </Col>
-              <Col xs={24} sm={8}>
-                <FormItem label="Brand">
-                  {getFieldDecorator('brand',{ initialValue: brand }, {
-                     rules: [{
-                       required: false,
-                       message: '',
-                     }],
-                   })(
-                     <Input
-                       type='text'
-                       placeholder="Brand"
-                     />
-                   )}
-                </FormItem>
-              </Col>
-              <Col xs={24} sm={8}>
-                <FormItem label="Supplier">
-                  {getFieldDecorator('supplier',{ initialValue: supplier }, {
-                     rules: [{
-                       required: false,
-                       message: '',
-                     }],
-                   })(
-                     <Input
-                       type='text'
-                       placeholder='Supplier'
-                     />
-                   )}
-                </FormItem>
-              </Col>
-              <Col span={24}>
-                <Form.Item label="Description">
-                  {getFieldDecorator('description', {
-                    rules: [
-                      {
-                        required: false,
-                        message: '',
-                      },
-                    ],
-                  })(<Input.TextArea rows={4} placeholder="Description" />)}
-                </Form.Item>
-              </Col>
-            </Row>
+
+          <Form layout="vertical" onSubmit={this.handleSubmit}>
+            <Row gutter={24}>{inputs}</Row>
             <div
               style={{
                 position: 'absolute',

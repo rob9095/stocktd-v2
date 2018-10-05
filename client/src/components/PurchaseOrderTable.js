@@ -1,23 +1,21 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchAllProducts, updateProducts } from '../store/actions/products';
-import { importPurchaseOrder, fetchPurchaseOrders, updatePurchaseOrders, fetchCompanyPoProducts } from '../store/actions/purchaseOrders';
+import { importPurchaseOrder, updatePurchaseOrders } from '../store/actions/purchaseOrders';
 import { queryModelData, deleteModelDocuments } from '../store/actions/models';
-import { Button, Pagination, Divider, Icon, Spin, Form, Switch, Dropdown, Menu, Modal, message, Row, Col } from 'antd';
+import { Button, Pagination, Divider, Icon, Spin, Form, Dropdown, Menu, Modal, message } from 'antd';
 import WrappedFilterForm from './FilterForm';
-import EditItemDrawerv2 from './EditItemDrawerv2';
+import EditItemDrawer from './EditItemDrawer';
 import ImportModal from './ImportModal';
 
 const moment = require('moment');
 const confirm = Modal.confirm;
-const FormItem = Form.Item;
 
 class PurchaseOrderTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
       loading: true,
-      rowsPerPage: 100,
+      rowsPerPage: 10,
       activePage: 1,
       totalPages: 0,
       skip: 0,
@@ -67,16 +65,14 @@ class PurchaseOrderTable extends Component {
     this.setState({
       loading: true,
     })
-    requestedPage === undefined ? requestedPage = this.state.activePage : null;
-    requestedRowsPerPage === undefined ? requestedRowsPerPage = this.state.rowsPerPage : null;
+    requestedPage = requestedPage === undefined ? this.state.activePage : null;
+    requestedRowsPerPage = requestedRowsPerPage === undefined ? this.state.rowsPerPage : null;
     this.props.queryModelData('PurchaseOrder',this.state.query,this.state.column, this.state.direction, requestedPage, requestedRowsPerPage, this.props.currentUser.user.company)
     .then(({data, activePage, totalPages, rowsPerPage, skip})=>{
       data = data.map(po => ({
         ...po,
         createdOn: new Date(po.createdOn).toLocaleString()
       }))
-      console.log(data)
-
       this.setState({
         loading: false,
         skip,
@@ -105,7 +101,7 @@ class PurchaseOrderTable extends Component {
 
     handleRowCheck = (e, id) => {
       let selected = this.state.selected;
-      if (this.state.selected.indexOf(id) != -1) {
+      if (this.state.selected.indexOf(id) !== -1) {
         selected = this.state.selected.filter(s => s !== id)
       } else {
         selected.push(id)
@@ -113,7 +109,7 @@ class PurchaseOrderTable extends Component {
       this.setState({ selected });
     }
 
-    isSelected = id => this.state.selected.indexOf(id) != -1;
+    isSelected = id => this.state.selected.indexOf(id) !== -1;
 
     handleSelectAllClick = () => {
       if (!this.state.selectAll) {
@@ -164,7 +160,8 @@ class PurchaseOrderTable extends Component {
       }
     }
 
-    handleBulkMenuClick = async ({ item, key, keyPath }) => {
+    handleBulkMenuClick = async (e,{ item, key, keyPath }) => {
+      e.preventDefault()
       switch(key) {
         case 'delete':
           let items = await this.showConfirm(null,'Delete',this.state.selected)
@@ -187,11 +184,6 @@ class PurchaseOrderTable extends Component {
         case 'import':
         this.setState({
           showImportModal: true,
-        })
-          break;
-        case 'search':
-        this.setState({
-          showFilters: true,
         })
           break;
         default:
@@ -265,7 +257,6 @@ class PurchaseOrderTable extends Component {
         })
         this.props.updatePurchaseOrders(updates,this.props.currentUser)
         .then((res)=>{
-          console.log(data)
           this.setState({
             data,
           })
@@ -307,7 +298,6 @@ class PurchaseOrderTable extends Component {
       );
       const optionsMenu = (
         <Menu onClick={this.handleOptionsMenuClick}>
-          <Menu.Item name="search" key="search">Search POs</Menu.Item>
           <Menu.Item name="import" key="import">Import POs</Menu.Item>
           <Menu.Item name="export" key="export">Export POs</Menu.Item>
           <Menu.Item name="add" key="add">Create PO</Menu.Item>
@@ -395,7 +385,7 @@ class PurchaseOrderTable extends Component {
         }
         if (col.type === 'date') {
           return (
-            <td key={`${p._id}-${col.id}`} className={col.className}>{moment(p[col.id]).format('M/D/YY')}</td>
+            <td key={`${p._id}-${col.id}`} className={col.className}>{moment(new Date(p[col.id])).format('M/D/YY')}</td>
           )
         }
         return (
@@ -425,14 +415,7 @@ class PurchaseOrderTable extends Component {
             onFilterSearch={this.handleFilterSearch}
           />
           {this.state.showEditItemDrawer && (
-            // <EditItemDrawer
-            //   product={this.state.itemDrawerProduct}
-            //   title={'Edit Purchase Order'}
-            //   onClose={this.toggle('showEditItemDrawer')}
-            //   onSave={this.handleProductUpdate}
-            //   create={false}
-            // />
-            <EditItemDrawerv2
+            <EditItemDrawer
               inputs={[
                 {id: 'name', text: 'Name', span: 16, className: 'no-wrap', required: true, type: 'text', message: 'Name cannot be blank'},
                 {id: 'createdOn', text: 'Date Created', span: 8, className: 'full-width', required: true, type: 'date'},
@@ -446,15 +429,21 @@ class PurchaseOrderTable extends Component {
               create={false}
             />
           )}
-          {/* {this.state.showCreateItemDrawer && (
+          {this.state.showCreateItemDrawer && (
             <EditItemDrawer
-              product={{}}
-              title={'Create Product'}
+              inputs={[
+                {id: 'name', text: 'Name', span: 16, className: 'no-wrap', required: true, type: 'text', message: 'Name cannot be blank'},
+                {id: 'createdOn', text: 'Date Created', span: 8, className: 'full-width', required: true, type: 'date'},
+                {id: 'type', text: 'PO Type', span: 12, className: 'no-wrap', required: true, type: 'dropdown', values: [{id:'inbound',text:'Inbound'},{id:'outbound',text:'Outbound'}]},
+                {id: 'status', text: 'PO Status', span: 12, className: 'no-wrap', required: true, type: 'dropdown', values: [{id:'complete',text:'Complete'},{id:'processing',text:'Processing'}]},
+              ]}
+              item={{}}
+              title={'Create Purchase Order'}
               onClose={this.toggle('showCreateItemDrawer')}
               onSave={this.handleImport}
               create={true}
             />
-          )} */}
+          )}
           {this.state.showImportModal && (
             <ImportModal
               title="Import Purchase Orders"
@@ -527,4 +516,4 @@ function mapStateToProps(state) {
  };
 }
 
-export default connect(mapStateToProps, {fetchAllProducts, deleteModelDocuments, updateProducts, importPurchaseOrder, queryModelData, updatePurchaseOrders})(PurchaseOrderTable);
+export default connect(mapStateToProps, {deleteModelDocuments, importPurchaseOrder, queryModelData, updatePurchaseOrders})(PurchaseOrderTable);

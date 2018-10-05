@@ -1,11 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
-import { Avatar, Modal, Button, Upload, Icon, message, Alert, Spin, Tabs, List } from 'antd';
+import { Avatar, Modal, Button, Upload, Icon, Alert, Spin, List } from 'antd';
 import { parseCSV, validateInputs, validateHeaders } from '../services/parseCSV';
 import { importProducts } from '../store/actions/products';
 
-const TabPane = Tabs.TabPane;
-const Dragger = Upload.Dragger;
 
 class ImportModal extends Component {
   state = {
@@ -96,7 +94,6 @@ class ImportModal extends Component {
         await this.props.onSubmit(batch)
         .then(res=>{
           progress = progress + batch.length
-          //this.props.onSuccess()
         })
         .catch(err=>{
           console.log(err)

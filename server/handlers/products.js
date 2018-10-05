@@ -3,22 +3,6 @@ const { createImportStatus } = require('../handlers/importStatus');
 
 exports.processProductImport = async (req, res, next) => {
 	try {
-		// let updates = req.body.products.map(p => ({
-		// updateOne: {
-		// 	filter: { skuCompany: `${p.sku}-${req.body.company}`},
-		// 	update: {...p, company: req.body.company},
-		// 	upsert: true,
-		// }
-		// 	insertOne: {
-		// 		document: {
-		// 			...p,
-		// 			company: req.body.company,
-		// 			skuCompany: `${p.sku}-${req.body.company}`,
-		// 			quantityToShip: 0,
-		// 		}
-		// 	}
-		// }))
-		// loop over all products and create array of updates to bulk write
 		if (req.body.products.length > 7000) {
 			return next({
 				status: 404,
@@ -38,6 +22,7 @@ exports.processProductImport = async (req, res, next) => {
 						filter: { skuCompany: `${p.sku}-${req.body.company}`},
 						update: { ...p, skuCompany: `${p.sku}-${req.body.company}`, company: req.body.company },
 						upsert: true,
+						$setOnInsert: { createdOn: new Date(), quantityToShip: 0, },
 					}
 				}
 			}
@@ -158,7 +143,6 @@ exports.updateProducts = async (req,res,next) => {
 					updateOne: {
 						filter: { _id: u.id },
 						update: { ...u },
-						upsert: true,
 					}
 				}
 			} else {
@@ -166,7 +150,6 @@ exports.updateProducts = async (req,res,next) => {
 					updateOne: {
 						filter: {_id: u.id},
 						update: { ...u, skuCompany: `${u.sku}-${req.body.company}` },
-						upsert: true,
 					}
 				}
 			}

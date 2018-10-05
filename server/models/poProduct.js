@@ -8,7 +8,6 @@ const PoProductSchema = new mongoose.Schema({
   poRef: {
     type: String,
     required: true,
-    unique: true,
   },
   name: {
     type: String,

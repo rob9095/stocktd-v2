@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import { Layout, Menu, Icon, Row, Col, Popover, Input, Timeline } from 'antd';
+import { Layout, Icon, Popover, Input, Timeline } from 'antd';
 import NavMenu from './NavMenu';
 import UserCard from '../components/UserCard';
-const SubMenu = Menu.SubMenu;
 const { Header } = Layout;
 
 class Navbar extends Component {

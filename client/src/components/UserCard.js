@@ -1,17 +1,8 @@
-import React, { Component } from 'react';
-import { Button, Menu, Icon, Avatar } from 'antd';
+import React from 'react';
+import { Button, Icon } from 'antd';
 
 const UserCard = ({currentUser}) => (
   <div className="user-card-container">
-    {/* <div className="user-card-header">
-      <div className="avatar">
-        <Avatar style={{ color: '#716aca', backgroundColor: 'rgb(243, 240, 255)' }}>{currentUser.user.company[0]}</Avatar>
-      </div>
-      <div className="user-card-details">
-        <h2>{currentUser.user.company}</h2>
-        <h4 className="grey-color">{currentUser.user.email}</h4>
-      </div>
-    </div> */}
     <div className="user-card-menu">
       <div className="ant-menu-item">
         <span>

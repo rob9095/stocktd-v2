@@ -19,6 +19,12 @@ const updateMath = (current, update, poType) => {
 
 exports.handlePOImport = async (req, res, next) => {
   try{
+    if (req.body.json.length > 7000) {
+			return next({
+				status: 404,
+				message: ['Request to large']
+			})
+		}
     const company = req.body.company
     let poData = req.body.json.map((po,i)=>({
       name: po['po name'],
@@ -66,6 +72,7 @@ exports.handlePOImport = async (req, res, next) => {
     					filter: { skuCompany: currentSku, poRef},
     					update: {...product, quantity: skuSum},
     					upsert: true,
+              $setOnInsert: { createdOn: new Date(), scannedQuantity: 0 }
     				}
     			})
         productUpdates.push({
@@ -89,7 +96,6 @@ exports.handlePOImport = async (req, res, next) => {
     let updatedPOs = await db.PurchaseOrder.bulkWrite(poUpdates)
     let updatedPoProducts = await db.PoProduct.bulkWrite(poProductUpdates)
     let updatedProducts = await db.Product.bulkWrite(productUpdates)
-    //need to really loop through each updateResponse and for any inserted Docs go and add default values with more bulk writes...
     return res.status(200).json({
       updatedPOs,
       updatedPoProducts,

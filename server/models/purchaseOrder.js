@@ -20,6 +20,7 @@ const purchaseOrderSchema = new mongoose.Schema({
   poRef: {
     type: 'String',
     required: true,
+    unique: true,
   },
   createdOn: {
     type: Date,

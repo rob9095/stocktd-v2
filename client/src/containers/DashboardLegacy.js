@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { Switch, Route, withRouter, Link, Redirect } from 'react-router-dom';
+import { Switch, Route, withRouter, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Button, Layout, Menu, Icon, Breadcrumb, Row, Col, Popover, Input, Timeline } from 'antd';
+import { Layout, Menu, Icon, Breadcrumb, Row, Col } from 'antd';
 import Navbar from './Navbar';
 import NavbarMobile from './NavbarMobile';
 import NotFound from '../components/NotFound';
 import ProductTable from '../components/ProductTable';
-const { Header, Sider, Content, Footer } = Layout;
+const { Sider, Content, Footer } = Layout;
 const SubMenu = Menu.SubMenu;
 
 class DashboardLegacy extends Component {

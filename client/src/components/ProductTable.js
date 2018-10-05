@@ -2,10 +2,9 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { fetchAllProducts, updateProducts, importProducts } from '../store/actions/products';
 import { queryModelData, deleteModelDocuments } from '../store/actions/models';
-import { Button, Pagination, Divider, Icon, Spin, Form, Switch, Dropdown, Menu, Modal, message, Row, Col } from 'antd';
+import { Button, Pagination, Divider, Icon, Spin, Form, Dropdown, Menu, Modal, message, Row, Col } from 'antd';
 import WrappedFilterForm from './FilterForm';
 import EditItemDrawer from './EditItemDrawer';
-import EditItemDrawerv2 from './EditItemDrawerv2';
 import ImportModal from './ImportModal';
 
 const confirm = Modal.confirm;
@@ -415,14 +414,7 @@ class ProductTable extends Component {
             onFilterSearch={this.handleFilterSearch}
           />
           {this.state.showEditItemDrawer && (
-            // <EditItemDrawer
-            //   product={this.state.itemDrawerProduct}
-            //   title={'Edit Product'}
-            //   onClose={this.toggle('showEditItemDrawer')}
-            //   onSave={this.handleProductUpdate}
-            //   create={false}
-            // />
-            <EditItemDrawerv2
+            <EditItemDrawer
               inputs={[
                 {id: 'sku', text: 'SKU', span: 8, className: 'no-wrap', required: true, type: 'text', message: 'SKU cannot be blank'},
                 {id: 'title', text: 'Title', span: 16, className: 'lg-field', type: 'text', required: false},
@@ -443,7 +435,18 @@ class ProductTable extends Component {
           )}
           {this.state.showCreateItemDrawer && (
             <EditItemDrawer
-              product={{}}
+              inputs={[
+                {id: 'sku', text: 'SKU', span: 8, className: 'no-wrap', required: true, type: 'text', message: 'SKU cannot be blank'},
+                {id: 'title', text: 'Title', span: 16, className: 'lg-field', type: 'text', required: false},
+                {id: 'quantity', text: 'Quantity', type: 'number', span: 8, className: 'no-wrap', type: 'text', required: false},
+                {id: 'quantityToShip', text: 'To Ship', type: 'number', span: 8, className: 'no-wrap', required: false},
+                {id: 'price', text: 'Price', type: 'number', span: 8, className: 'no-wrap', required: false},
+                {id: 'weight', text: 'Weight', type: 'number', span: 8, className: 'no-wrap', required: false},
+                {id: 'brand', text: 'Brand', span: 8, type: 'text', required: false},
+                {id: 'supplier', text: 'Supplier', span: 8, type: 'text', required: false},
+                {id: 'description', text: 'Description', span: 24, type: 'textarea', required: false, textRows: 4},
+              ]}
+              item={{}}
               title={'Create Product'}
               onClose={this.toggle('showCreateItemDrawer')}
               onSave={this.handleProductImport}
