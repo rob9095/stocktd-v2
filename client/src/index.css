@@ -63,7 +63,8 @@ body #root {
 }
 
 #app-content .bottom {
-    padding: 20px;
+  padding: 20px;
+  overflow-x: hidden;
 }
 
 #app-footer {

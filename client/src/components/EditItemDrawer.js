@@ -106,6 +106,7 @@ class DrawerForm extends Component {
                   <Input.TextArea
                    rows={i.textRows}
                    placeholder={i.text}
+                   disabled={i.disabled}
                   />
                )}
             </FormItem>
@@ -115,13 +116,13 @@ class DrawerForm extends Component {
         return (
           <Col xs={i.span*3} sm={i.span} key={i.id}>
             <FormItem label={`${i.text}`}>
-              {getFieldDecorator(i.id, { initialValue: !this.props.create ? moment(item[i.id]) : moment() }, {
+              {getFieldDecorator(i.id, { initialValue: !this.props.create ? moment(new Date(item[i.id])) : moment() }, {
                  rules: [{
                    required: i.required,
                    message: i.message,
                  }],
                })(
-                  <DatePicker onChange={this.handleDateChange} className={i.className} />
+                  <DatePicker onChange={this.handleDateChange} className={i.className} disabled={i.disabled} />
                )}
             </FormItem>
           </Col>
@@ -136,7 +137,7 @@ class DrawerForm extends Component {
                    message: i.message,
                  }],
                })(
-                 <Select key={`${i.id}Select`} onChange={this.handleSelect} size="large" >
+                 <Select key={`${i.id}Select`} onChange={this.handleSelect} size="large" disabled={i.disabled}>
                    {i.values.map(val => (
                      <Option id={`${i.id}Select`} key={val.id} value={val.id}>{val.text}</Option>
                    ))}
@@ -158,6 +159,7 @@ class DrawerForm extends Component {
                   <Input
                    type={i.type}
                    placeholder={i.text}
+                   disabled={i.disabled}
                   />
                )}
             </FormItem>

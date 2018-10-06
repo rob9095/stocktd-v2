@@ -7,6 +7,7 @@ import NavbarMobile from './NavbarMobile';
 import NotFound from '../components/NotFound';
 import ProductTable from '../components/ProductTable';
 import PurchaseOrderTable from '../components/PurchaseOrderTable';
+import PoProductTable from '../components/PoProductTable';
 import ProductTableLegacy from '../components/ProductTableLegacy';
 const { Sider } = Layout;
 const SubMenu = Menu.SubMenu;
@@ -151,10 +152,13 @@ class Dashboard extends Component {
           </div>
           <div className="bottom">
             <Switch>
-              <Route path="/app/purchase-orders" render={props => (
+              <Route exact path="/app/po-products" render={props => (
+                <PoProductTable />
+              )} />
+              <Route exact path="/app/purchase-orders" render={props => (
                 <PurchaseOrderTable />
               )} />
-              <Route path="/app/products" render={props => (
+              <Route exact path="/app/products" render={props => (
                 <ProductTable />
               )} />
               <Route exact path="/app" render={props => (

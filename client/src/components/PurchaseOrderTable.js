@@ -152,7 +152,7 @@ class PurchaseOrderTable extends Component {
         case 'delete':
           let items = await this.showConfirm(null,'Delete',[item.props.children.props.id])
           if (items !== 'cancel') {
-            this.handleProductDelete(items)
+            this.handleItemDelete(items)
           }
           break;
         default:
@@ -166,7 +166,7 @@ class PurchaseOrderTable extends Component {
         case 'delete':
           let items = await this.showConfirm(null,'Delete',this.state.selected)
           if (items !== 'cancel') {
-            this.handleProductDelete(items)
+            this.handleItemDelete(items)
           }
           break;
         default:
@@ -203,7 +203,7 @@ class PurchaseOrderTable extends Component {
       message[type](text)
     }
 
-    handleProductDelete = (ids) => {
+    handleItemDelete = (ids) => {
        let data = this.state.data.filter(p=>ids.indexOf(p._id) === -1)
        let selected = this.state.selected.filter(id=>ids.indexOf(id) === -1)
        const end = ids.length > 1 ? 's' : ''
@@ -387,10 +387,11 @@ class PurchaseOrderTable extends Component {
           return (
             <td key={`${p._id}-${col.id}`} className={col.className}>{moment(new Date(p[col.id])).format('M/D/YY')}</td>
           )
+        } else {
+          return (
+              <td key={`${p._id}-${col.id}`} className={col.className}>{p[col.id]}</td>
+            )
         }
-        return (
-            <td key={`${p._id}-${col.id}`} className={col.className}>{p[col.id]}</td>
-          )
       })
       return (
         <tr className="ant-table-row"
