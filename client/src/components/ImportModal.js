@@ -4,6 +4,8 @@ import { Avatar, Modal, Button, Upload, Icon, Alert, Spin, List } from 'antd';
 import { parseCSV, validateInputs, validateHeaders } from '../services/parseCSV';
 import { importProducts } from '../store/actions/products';
 
+const Dragger = Upload.Dragger;
+
 
 class ImportModal extends Component {
   state = {

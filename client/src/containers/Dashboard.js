@@ -39,8 +39,9 @@ class Dashboard extends Component {
 
   componentDidMount() {
     if(!this.props.currentUser.isAuthenticated) {
-      this.state({
+      this.setState({
         loginRedirect: true,
+        redirectPath: '/signin',
       })
     }
     this.setState({
@@ -153,13 +154,13 @@ class Dashboard extends Component {
           <div className="bottom">
             <Switch>
               <Route exact path="/app/po-products" render={props => (
-                <PoProductTable />
+                <PoProductTable showHeader {...props} />
               )} />
               <Route exact path="/app/purchase-orders" render={props => (
-                <PurchaseOrderTable />
+                <PurchaseOrderTable {...props} />
               )} />
               <Route exact path="/app/products" render={props => (
-                <ProductTable />
+                <ProductTable {...props} />
               )} />
               <Route exact path="/app" render={props => (
                 <div>

@@ -70,6 +70,7 @@ class DrawerForm extends Component {
       let update = {
         id: this.props.item._id,
         poRef: this.props.item.poRef,
+        oldQty: this.props.item.quantity,
       }
       for (let val of values) {
         update = {

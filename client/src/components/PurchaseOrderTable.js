@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Link, Redirect } from 'react-router-dom';
 import { importPurchaseOrder, updatePurchaseOrders } from '../store/actions/purchaseOrders';
 import { queryModelData, deleteModelDocuments } from '../store/actions/models';
 import { Button, Pagination, Divider, Icon, Spin, Form, Dropdown, Menu, Modal, message } from 'antd';
 import WrappedFilterForm from './FilterForm';
 import EditItemDrawer from './EditItemDrawer';
 import ImportModal from './ImportModal';
+import PoProductTable from '../components/PoProductTable';
 
 const moment = require('moment');
 const confirm = Modal.confirm;
@@ -23,6 +25,7 @@ class PurchaseOrderTable extends Component {
       selected: [],
       selectAll: false,
       column: 'sku',
+      openPOs: [],
       direction: 'ascending',
       query: [],
       showFilters: false,
@@ -160,14 +163,22 @@ class PurchaseOrderTable extends Component {
       }
     }
 
-    handleBulkMenuClick = async (e,{ item, key, keyPath }) => {
-      e.preventDefault()
+    handleBulkMenuClick = async ({ item, key, keyPath }) => {
       switch(key) {
         case 'delete':
           let items = await this.showConfirm(null,'Delete',this.state.selected)
           if (items !== 'cancel') {
             this.handleItemDelete(items)
           }
+          break;
+        case 'open':
+          let poRefs = this.state.data.filter(p=>this.state.selected.includes(p._id)).map(p=>(['poRef',p.poRef]))
+          this.setState({
+            redirect: {
+              pathname: `/app/po-products`,
+              poRefs,
+            }
+          })
           break;
         default:
           console.log('unknown menu option');
@@ -290,8 +301,9 @@ class PurchaseOrderTable extends Component {
     render() {
       const bulkMenu = (
         <Menu onClick={this.handleBulkMenuClick}>
-          <Menu.Item name="order" key="order">Scan POs</Menu.Item>
-          <Menu.Item name="po" key="po">Duplicate POs</Menu.Item>
+          <Menu.Item name="open" key="open">Open POs</Menu.Item>
+          <Menu.Item name="scan" key="scan">Scan POs</Menu.Item>
+          <Menu.Item name="copy" key="copy">Duplicate POs</Menu.Item>
           <Menu.Item name="label" key="label">Print Product Labels</Menu.Item>
           <Menu.Item name="delete" key="delete">Delete POs</Menu.Item>
         </Menu>
@@ -383,6 +395,19 @@ class PurchaseOrderTable extends Component {
             </td>
           )
         }
+        if (col.id === 'name') {
+          return (
+            <td key={`${p._id}-${col.id}`} className={col.className}>
+              <Link to={{
+                  pathname: '/app/po-products',
+                  poRefs: [['poRef',p.poRef]],
+                }}
+              >
+                {p[col.id]}
+              </Link>
+            </td>
+          )
+        }
         if (col.type === 'date') {
           return (
             <td key={`${p._id}-${col.id}`} className={col.className}>{moment(new Date(p[col.id])).format('M/D/YY')}</td>
@@ -401,6 +426,13 @@ class PurchaseOrderTable extends Component {
         </tr>
       )
     })
+      if (this.state.redirect) {
+        return (
+          <Redirect
+            to={this.state.redirect}
+          />
+        )
+      }
       return(
         <div>
           <h1>Purchase Orders</h1>
@@ -410,6 +442,11 @@ class PurchaseOrderTable extends Component {
                 Options <Icon type="down" />
               </Button>
             </Dropdown>
+            <Link to="/app/po-products">
+              <Button style={{float: 'right', marginLeft: 10}} type="primary" icon="tags">
+                PO Products
+              </Button>
+            </Link>
           </Form>
           <WrappedFilterForm
             inputs={this.state.headers.filter(h=>h.noSort !== true)}

@@ -135,6 +135,12 @@ class FilterForm extends Component {
             <Switch checked={this.state.open} onChange={this.toggle} />
           </FormItem>
         </Form>
+        {this.props.showTags && (
+          <div className="active-po-tags">
+            <h4>{this.props.tagTitle}</h4>
+            {this.props.tags}
+          </div>
+        )}
         {this.state.open && (
           <Form
             className="ant-advanced-search-form"

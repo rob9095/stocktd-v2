@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchAllProducts, updateProducts, importProducts } from '../store/actions/products';
+import { Link } from 'react-router-dom';
+import { importProducts } from '../store/actions/products';
+import { updatePoProducts } from '../store/actions/poProducts';
 import { queryModelData, deleteModelDocuments } from '../store/actions/models';
-import { Button, Pagination, Divider, Icon, Spin, Form, Switch, Dropdown, Menu, Modal, message, Row, Col } from 'antd';
+import { Button, Pagination, Divider, Icon, Spin, Form, Switch, Dropdown, Menu, Modal, message, Row, Col, Tag } from 'antd';
 import WrappedFilterForm from './FilterForm';
 import EditItemDrawer from './EditItemDrawer';
 import ImportModal from './ImportModal';
@@ -22,10 +24,10 @@ class PoProductTable extends Component {
       data: [],
       selected: [],
       selectAll: false,
-      column: 'sku',
-      direction: 'ascending',
+      column: 'createdOn',
+      direction: 'descending',
       query: [],
-      showFilters: false,
+      poRefs: [],
       showEditItemDrawer: false,
       showCreateItemDrawer: false,
       itemDrawerProduct: {},
@@ -69,7 +71,8 @@ class PoProductTable extends Component {
     })
     requestedPage === undefined ? requestedPage = this.state.activePage : null;
     requestedRowsPerPage === undefined ? requestedRowsPerPage = this.state.rowsPerPage : null;
-    this.props.queryModelData('PoProduct',this.state.query,this.state.column, this.state.direction, requestedPage, requestedRowsPerPage, this.props.currentUser.user.company)
+    let query = this.state.poRefs ? [...this.state.poRefs,...this.state.query] : this.state.query
+    this.props.queryModelData('PoProduct',query,this.state.column, this.state.direction, requestedPage, requestedRowsPerPage, this.props.currentUser.user.company)
     .then(({data, activePage, totalPages, rowsPerPage, skip})=>{
       data = data.map(po => ({
         ...po,
@@ -97,18 +100,27 @@ class PoProductTable extends Component {
       console.log(err)
     })
   }
-    componentDidMount() {
+    async componentDidMount() {
+      await this.setState({
+        poRefs: this.props.history.location.poRefs ? this.props.history.location.poRefs : [],
+      })
       this.handleDataFetch();
     }
 
-    handleRowCheck = (e, id) => {
-      let selected = this.state.selected;
-      if (this.state.selected.indexOf(id) != -1) {
-        selected = this.state.selected.filter(s => s !== id)
+    handleArrayToggle = (prop, val) => {
+      let arr = this.state[prop]
+      if (this.state[prop].indexOf(val) != -1) {
+        arr = this.state[prop].filter(v => v !== val)
       } else {
-        selected.push(id)
+        arr.push(val)
       }
-      this.setState({ selected });
+      this.setState({
+        [prop]: arr,
+      })
+    }
+
+    handleRowCheck = (e, id) => {
+      this.handleArrayToggle('selected',id)
     }
 
     isSelected = id => this.state.selected.indexOf(id) != -1;
@@ -187,11 +199,6 @@ class PoProductTable extends Component {
           showImportModal: true,
         })
           break;
-        case 'search':
-        this.setState({
-          showFilters: true,
-        })
-          break;
         default:
           console.log('unknown menu option');
       }
@@ -261,7 +268,7 @@ class PoProductTable extends Component {
             }
           }
         })
-        this.props.updateProducts(updates, this.props.currentUser)
+        this.props.updatePoProducts(updates, this.props.currentUser)
         .then((res)=>{
           this.setState({
             data,
@@ -293,20 +300,42 @@ class PoProductTable extends Component {
       this.handleDataFetch()
     }
 
+    updatePoRefs = async (arg,fetch) => {
+      let poRefs = this.state.poRefs
+      let foundRef = poRefs.find(arr => arr[1] === arg[1])
+      if (foundRef) {
+        console.log('filtering')
+        poRefs = poRefs.filter(arr=>arr[1] !== arg[1])
+      } else {
+        console.log('pushing')
+        poRefs.push(arg)
+      }
+      console.log(poRefs)
+      await this.setState({
+        poRefs,
+      })
+      fetch && this.handleDataFetch();
+    }
+
     render() {
+      let poTags = this.state.poRefs.map(poRef=>{
+        let name = poRef[1].split('-')[1]
+        return(
+          <Tag key={poRef} closable onClose={()=>this.updatePoRefs(poRef,true)}>{name}</Tag>
+        )
+      })
       const bulkMenu = (
         <Menu onClick={this.handleBulkMenuClick}>
-          <Menu.Item name="order" key="order">Create Order</Menu.Item>
-          <Menu.Item name="po" key="po">Create PO</Menu.Item>
+          <Menu.Item name="order" key="order">Create new Order</Menu.Item>
+          <Menu.Item name="po" key="po">Create new PO</Menu.Item>
           <Menu.Item name="label" key="label">Print Labels</Menu.Item>
-          <Menu.Item name="delete" key="delete">Delete Products</Menu.Item>
+          <Menu.Item name="delete" key="delete">Delete from PO</Menu.Item>
         </Menu>
       );
       const optionsMenu = (
         <Menu onClick={this.handleOptionsMenuClick}>
-          <Menu.Item name="import" key="import">Import POs</Menu.Item>
-          <Menu.Item name="export" key="export">Export POs</Menu.Item>
-          <Menu.Item name="create" key="create">Create PO</Menu.Item>
+          <Menu.Item name="import" key="import">Import PO</Menu.Item>
+          <Menu.Item name="export" key="export">Export PO</Menu.Item>
           <Menu.Item name="add" key="add">Add One Product</Menu.Item>
           <Menu.Item name="display" key="display">Display Options</Menu.Item>
         </Menu>
@@ -410,17 +439,29 @@ class PoProductTable extends Component {
     })
       return(
         <div>
-          <h1>Purchase Order Products</h1>
-          <Form layout="inline">
-            <Dropdown overlay={optionsMenu}>
-              <Button style={{float: 'right', marginLeft: 10}} type="primary" icon="setting">
-                Options <Icon type="down" />
-              </Button>
-            </Dropdown>
-          </Form>
+          {this.props.showHeader && (
+            <div>
+              <h1>Purchase Order Products</h1>
+              <Form layout="inline">
+                <Dropdown overlay={optionsMenu}>
+                  <Button style={{float: 'right', marginLeft: 10}} type="primary" icon="setting">
+                    Options <Icon type="down" />
+                  </Button>
+                </Dropdown>
+                <Link to="/app/purchase-orders">
+                  <Button style={{float: 'right', marginLeft: 10}} type="primary" icon="file-done">
+                    Purchase Orders
+                  </Button>
+                </Link>
+              </Form>
+            </div>
+          )}
           <WrappedFilterForm
             inputs={this.state.headers.filter(h=>h.noSort !== true)}
             onFilterSearch={this.handleFilterSearch}
+            tags={poTags}
+            showTags={true}
+            tagTitle={'Current POs: '}
           />
           {this.state.showEditItemDrawer && (
             <EditItemDrawer
@@ -428,10 +469,10 @@ class PoProductTable extends Component {
                 {id: 'sku', text: 'SKU', span: 8, required: true, type: 'text', disabled: true,},
                 {id: 'quantity', text: 'Quantity', span: 8, required: true, type: 'number'},
                 {id: 'scannedQuantity', text: 'Scanned', span: 8, required: true, type: 'number'},
-                {id: 'name', text: 'PO Name', span: 16, className: 'no-wrap', required: true, type: 'text', message: 'Name cannot be blank'},
-                {id: 'createdOn', text: 'Date Created', span: 8, className: 'full-width', required: true, type: 'date'},
-                {id: 'type', text: 'PO Type', span: 12, className: 'no-wrap', required: true, type: 'dropdown', values: [{id:'inbound',text:'Inbound'},{id:'outbound',text:'Outbound'}]},
-                {id: 'status', text: 'PO Status', span: 12, className: 'no-wrap', required: true, type: 'dropdown', values: [{id:'complete',text:'Complete'},{id:'processing',text:'Processing'}]},
+                {id: 'name', text: 'PO Name', span: 16, className: 'no-wrap', required: true, type: 'text', message: 'Name cannot be blank', disabled: true,},
+                {id: 'createdOn', text: 'Date Created', span: 8, className: 'full-width', required: true, type: 'date', disabled: true,},
+                {id: 'type', text: 'PO Type', span: 12, className: 'no-wrap', required: true, type: 'dropdown', values: [{id:'inbound',text:'Inbound'},{id:'outbound',text:'Outbound'}], disabled: true,},
+                {id: 'status', text: 'PO Status', span: 12, className: 'no-wrap', required: true, type: 'dropdown', values: [{id:'complete',text:'Complete'},{id:'processing',text:'Processing'}], disabled: true,},
               ]}
               item={this.state.itemDrawerProduct}
               title={'Edit PO Product'}
@@ -530,4 +571,4 @@ class PoProductTable extends Component {
    };
   }
 
-  export default connect(mapStateToProps, {fetchAllProducts, updateProducts, importProducts, queryModelData, deleteModelDocuments})(PoProductTable);
+  export default connect(mapStateToProps, {updatePoProducts, importProducts, queryModelData, deleteModelDocuments})(PoProductTable);
