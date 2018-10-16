@@ -44,3 +44,53 @@ exports.updatePoProducts = async (req, res, next) => {
     return next(err);
   }
 }
+
+exports.removePoProducts = async (req, res, next) => {
+  try {
+    let poProductRemovals = req.body.data.map(p=>{
+      return ({
+        deleteOne: {
+          filter: {_id: p.id},
+        }
+      })
+    })
+    let productUpdates = req.body.data.map(p => {
+      let qty = parseInt(p.quantity) - parseInt(p.oldQty)
+      return({
+        updateOne: {
+          filter: {skuCompany: p.sku+"-"+req.body.company},
+          update: {
+            $inc: p.type === 'outbound' ?
+              { quantity: parseInt(p.quantity) }
+              :
+              { quantity: parseInt(-p.quantity) },
+          }
+        }
+      })
+    })
+    let poUpdates = req.body.data.map(p => {
+      return ({
+        updateOne: {
+          filter: {poRef: p.poRef},
+          update: {
+            $inc: p.type === 'outbound' ?
+              { quantity: parseInt(p.quantity) }
+              :
+              { quantity: parseInt(-p.quantity) },
+          }
+        }
+      })
+    })
+    // add extra operation here to delete PO if it has no more PoProducts
+    let updatedPos = await db.PurchaseOrder.bulkWrite(poUpdates)
+    let removedPoProducts = await db.PoProduct.bulkWrite(poProductRemovals)
+    let updatedProducts = await db.Product.bulkWrite(productUpdates)
+    return res.status(200).json({
+      updatedPos,
+      removedPoProducts,
+      updatedPoProducts,
+    })
+  } catch(err) {
+    return next(err);
+  }
+}
