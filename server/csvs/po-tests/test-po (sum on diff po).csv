@@ -1,0 +1,5 @@
+PO Name,PO Type,SKU,Quantity,status
+alpha,outbound,RH0920-7/8,27,processing
+alpha,outbound,RH0920-7/8,3,processing
+beta,outbound,RH0920-7/8,5,processing
+beta,outbound,RH0920-7/8,5,processing
