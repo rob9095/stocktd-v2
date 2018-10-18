@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { importProducts } from '../store/actions/products';
-import { updatePoProducts } from '../store/actions/poProducts';
+import { updatePoProducts, removePoProducts } from '../store/actions/poProducts';
 import { queryModelData, deleteModelDocuments } from '../store/actions/models';
 import { Button, Pagination, Divider, Icon, Spin, Form, Switch, Dropdown, Menu, Modal, message, Row, Col, Tag } from 'antd';
 import WrappedFilterForm from './FilterForm';
@@ -217,10 +217,12 @@ class PoProductTable extends Component {
     }
 
     handleItemDelete = (ids) => {
+       let poProductRemovals = this.state.data.filter(p=>ids.indexOf(p._id) !== -1)
        let data = this.state.data.filter(p=>ids.indexOf(p._id) === -1)
        let selected = this.state.selected.filter(id=>ids.indexOf(id) === -1)
        const end = ids.length > 1 ? 's' : ''
-       this.props.deleteModelDocuments('PoProduct',ids,this.props.currentUser)
+       console.log(this.props.currentUser)
+       this.props.removePoProducts(poProductRemovals,this.props.currentUser)
        .then(res=>{
          this.handleMessage('success',`Product${end} Deleted Successfully`)
          this.setState({
@@ -571,4 +573,4 @@ class PoProductTable extends Component {
    };
   }
 
-  export default connect(mapStateToProps, {updatePoProducts, importProducts, queryModelData, deleteModelDocuments})(PoProductTable);
+  export default connect(mapStateToProps, {updatePoProducts, importProducts, queryModelData, deleteModelDocuments, removePoProducts})(PoProductTable);

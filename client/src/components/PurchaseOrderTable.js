@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link, Redirect } from 'react-router-dom';
-import { importPurchaseOrder, updatePurchaseOrders } from '../store/actions/purchaseOrders';
+import { importPurchaseOrder, updatePurchaseOrders, removePurchaseOrders } from '../store/actions/purchaseOrders';
 import { queryModelData, deleteModelDocuments } from '../store/actions/models';
 import { Button, Pagination, Divider, Icon, Spin, Form, Dropdown, Menu, Modal, message } from 'antd';
 import WrappedFilterForm from './FilterForm';
@@ -216,9 +216,11 @@ class PurchaseOrderTable extends Component {
 
     handleItemDelete = (ids) => {
        let data = this.state.data.filter(p=>ids.indexOf(p._id) === -1)
+       let removedPos = this.state.data.filter(p=>ids.indexOf(p._id) !== -1).map(po=>({id: po._id, poRef: po.poRef}))
+       console.log(removedPos)
        let selected = this.state.selected.filter(id=>ids.indexOf(id) === -1)
        const end = ids.length > 1 ? 's' : ''
-       this.props.deleteModelDocuments('PurchaseOrder',ids,this.props.currentUser)
+       this.props.removePurchaseOrders(removedPos,this.props.currentUser)
        .then(res=>{
          this.handleMessage('success',`Product${end} Deleted Successfully`)
          this.setState({
@@ -554,4 +556,4 @@ function mapStateToProps(state) {
  };
 }
 
-export default connect(mapStateToProps, {deleteModelDocuments, importPurchaseOrder, queryModelData, updatePurchaseOrders})(PurchaseOrderTable);
+export default connect(mapStateToProps, {deleteModelDocuments, importPurchaseOrder, queryModelData, updatePurchaseOrders, removePurchaseOrders})(PurchaseOrderTable);
