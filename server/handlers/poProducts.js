@@ -90,10 +90,7 @@ exports.removePoProducts = async (req, res, next) => {
         updateOne: {
           filter: {poRef: p.poRef, company: req.body.company},
           update: {
-            $inc: p.type === 'outbound' ?
-              { quantity: parseInt(p.quantity) }
-              :
-              { quantity: parseInt(-p.quantity) },
+            $inc: { quantity: parseInt(-p.quantity) }
           }
         }
       })

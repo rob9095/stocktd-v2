@@ -69,9 +69,13 @@ exports.handlePOImport = async (req, res, next) => {
         poProductUpdates.push({
     				updateOne: {
     					filter: { skuCompany: currentSku, poRef},
-    					update: {...product, quantity: skuSum},
+    					update: {
+                ...product,
+                quantity: skuSum,
+                $setOnInsert: { createdOn: new Date(), scannedQuantity: 0 }
+              }
+              ,
     					upsert: true,
-              $setOnInsert: { createdOn: new Date(), scannedQuantity: 0 }
     				}
     			})
         productUpdates.push({
