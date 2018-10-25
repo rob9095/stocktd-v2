@@ -43,10 +43,13 @@ exports.updatePoProducts = async (req, res, next) => {
     let emptyPOs = await db.PurchaseOrder.find({company: req.body.company, quantity: 0})
     let poRemovals = emptyPOs.map(po=>({
       deleteOne: {
-        filter: {_id: po._id}
+        filter: {_id: po.id}
       }
     }))
-    let removedPos = await db.PurchaseOrder.bulkWrite(poRemovals)
+    let removedPos = []
+    if (poRemovals.length > 0) {
+      removedPos = await db.PurchaseOrder.bulkWrite(poRemovals)
+    }
     return res.status(200).json({
       poRemovals,
       updatedPos,
