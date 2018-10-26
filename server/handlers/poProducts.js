@@ -10,7 +10,7 @@ exports.updatePoProducts = async (req, res, next) => {
     let poProductUpdates = req.body.updates.map(p=>{
       return ({
         updateOne: {
-          filter: {_id: p._id},
+          filter: {_id: p.id},
           update: {...p},
         }
         })
