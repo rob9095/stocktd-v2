@@ -28,6 +28,7 @@ class PoProductTable extends Component {
       direction: 'descending',
       query: [],
       poRefs: [],
+      poNames: [],
       showEditItemDrawer: false,
       showCreateItemDrawer: false,
       itemDrawerProduct: {},
@@ -101,9 +102,12 @@ class PoProductTable extends Component {
     })
   }
     async componentDidMount() {
-      await this.setState({
-        poRefs: this.props.history.location.poRefs ? this.props.history.location.poRefs : [],
-      })
+      if (this.props.history.location.poRefs) {
+        await this.setState({
+          poRefs: this.props.history.location.poRefs.map(p=>(['poRef',p.poRef])),
+          poNames: this.props.history.location.poRefs,
+        })
+      }
       this.handleDataFetch();
     }
 
@@ -302,15 +306,15 @@ class PoProductTable extends Component {
       this.handleDataFetch()
     }
 
-    updatePoRefs = async (arg,fetch) => {
+    updatePoRefs = async (poRef,fetch) => {
       let poRefs = this.state.poRefs
-      let foundRef = poRefs.find(arr => arr[1] === arg[1])
+      let foundRef = poRefs.find(arr => arr[1] === poRef)
       if (foundRef) {
         console.log('filtering')
-        poRefs = poRefs.filter(arr=>arr[1] !== arg[1])
+        poRefs = poRefs.filter(arr=>arr[1] !== poRef)
       } else {
         console.log('pushing')
-        poRefs.push(arg)
+        poRefs.push(poRef)
       }
       console.log(poRefs)
       await this.setState({
@@ -320,10 +324,9 @@ class PoProductTable extends Component {
     }
 
     render() {
-      let poTags = this.state.poRefs.map(poRef=>{
-        let name = poRef[1].split('-')[1]
+      let poTags = this.state.poNames.map(po=>{
         return(
-          <Tag key={poRef} closable onClose={()=>this.updatePoRefs(poRef,true)}>{name}</Tag>
+          <Tag key={po.poRef} closable onClose={()=>this.updatePoRefs(po.poRef,true)}>{po.name}</Tag>
         )
       })
       const bulkMenu = (

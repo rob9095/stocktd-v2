@@ -172,7 +172,7 @@ class PurchaseOrderTable extends Component {
           }
           break;
         case 'open':
-          let poRefs = this.state.data.filter(p=>this.state.selected.includes(p._id)).map(p=>(['poRef',p.poRef]))
+          let poRefs = this.state.data.filter(p=>this.state.selected.includes(p._id)).map(p=>({name: p.name, poRef: p.poRef}))
           this.setState({
             redirect: {
               pathname: `/app/po-products`,
