@@ -130,17 +130,17 @@ class FilterForm extends Component {
     })
     return (
       <div>
-        <Form layout="inline">
+        <Form layout="inline" style={{width: '10%', display: 'inline'}}>
           <FormItem label="Search">
             <Switch checked={this.state.open} onChange={this.toggle} />
-          </FormItem>
+          </FormItem>       
         </Form>
-        {this.props.showTags && (
+        {/* {this.props.showTags && (
           <div className="active-po-tags">
             <h4>{this.props.tagTitle}</h4>
             {this.props.tags}
           </div>
-        )}
+        )} */}
         {this.state.open && (
           <Form
             className="ant-advanced-search-form"
