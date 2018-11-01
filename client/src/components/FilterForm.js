@@ -1,23 +1,27 @@
 import React, { Component } from 'react';
-import { Form, Row, Col, Input, Button, Select, Switch, DatePicker } from 'antd';
+import { Form, Row, Col, Input, Button, Select, Switch, DatePicker, Icon } from 'antd';
 
+const InputGroup = Input.Group;
 const Option = Select.Option;
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
 
 class FilterForm extends Component {
   state = {
-    open: false,
+    showFilterForm: false,
+    showScannerForm: false,
     selects: {
 
     },
     dates: [],
   };
 
-  toggle = () => {
-    this.setState({
-      open: !this.state.open,
-    })
+  toggle = (prop) => {
+    return () => {
+      this.setState({
+        [prop]: !this.state[prop],
+      })
+    }
   }
 
   handleReset = () => {
@@ -132,16 +136,15 @@ class FilterForm extends Component {
       <div>
         <Form layout="inline" style={{width: '10%', display: 'inline'}}>
           <FormItem label="Search">
-            <Switch checked={this.state.open} onChange={this.toggle} />
-          </FormItem>       
+            <Switch checked={this.state.showFilterForm} onChange={this.toggle('showFilterForm')} />
+          </FormItem> 
+          {this.props.showScannerForm && (
+            <FormItem label="Scan">
+              <Switch checked={this.state.showScannerForm} onChange={this.toggle('showScannerForm')} />
+            </FormItem> 
+          )}       
         </Form>
-        {/* {this.props.showTags && (
-          <div className="active-po-tags">
-            <h4>{this.props.tagTitle}</h4>
-            {this.props.tags}
-          </div>
-        )} */}
-        {this.state.open && (
+        {this.state.showFilterForm && (
           <Form
             className="ant-advanced-search-form"
             onSubmit={this.handleSubmit}
@@ -157,6 +160,15 @@ class FilterForm extends Component {
             </Row>
           </Form>
         )}
+        {this.state.showScannerForm && (
+          <div className="scan-input-container">
+            <InputGroup compact>
+              <Input addonBefore="rob" style={{ width: '30%' }} defaultValue="Box Name" />
+              <Input style={{ width: '50%' }} defaultValue="Scan ID" />
+              <Input addonAfter={<Icon type="search" />} type="number" style={{ width: '20%' }} defaultValue="1" />
+            </InputGroup>
+          </div>
+        )}        
       </div>
     );
   }

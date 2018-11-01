@@ -8,7 +8,6 @@ import { Button, Pagination, Divider, Icon, Spin, Form, Switch, Dropdown, Menu, 
 import WrappedFilterForm from './FilterForm';
 import EditItemDrawer from './EditItemDrawer';
 import ImportModal from './ImportModal';
-import ScanForm from './ScanForm';
 
 const moment = require('moment');
 const confirm = Modal.confirm;
@@ -467,11 +466,7 @@ class PoProductTable extends Component {
               inputs={this.state.headers.filter(h=>h.noSort !== true)}
               onFilterSearch={this.handleFilterSearch}
               tags={poTags}
-              showTags={true}
-              tagTitle={'Current POs: '}
-            />
-            <ScanForm
-            
+              showScannerForm
             />
           </div>
           <div>Current POs: {poTags}</div>
