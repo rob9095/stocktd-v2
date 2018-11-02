@@ -1,16 +1,10 @@
 const db = require('../models');
 
-// returns the type of value: either array, number, or string
-const getType = (value) => {
-	if ((Number.isInteger(parseInt(value)))) {
-		return 'number';
-	} else if (Array.isArray(value)) {
-		return 'array'
-	} else {
-		return 'string'
-	}
-}
-
+/*
+* QUERY pagnated model data
+* Accepted Values: array of arrays in req.body.query, the document model in req.body.model,  sortDirection, sortBy, activePage, rowsPerPage in req.body
+* Returns: Array of pagnated docs in data, pagnation information
+*/
 exports.queryModelData = async (req, res, next) => {
 	try {
 		// query is a object built from the incoming query array. incoming query array structure looks like [['searchKey','searchValue || searchArr'],[],etc]
@@ -76,6 +70,11 @@ exports.queryModelData = async (req, res, next) => {
 	}
 }
 
+/*
+*	DELETE model documents
+*	Accepted Values: array of model IDs in req.body.data, document model name in req.body.model
+*	Returns: array of deleted documents
+*/
 exports.removeModelDocuments = async (req,res,next) => {
 	try {
 		let updates = req.body.data.map(id=>({
@@ -85,6 +84,40 @@ exports.removeModelDocuments = async (req,res,next) => {
 		}))
 		let deletedDocs = await db[req.body.model].bulkWrite(updates)
 		return res.status(200).json({deletedDocs})
+	} catch(err) {
+		return next(err)
+	}
+}
+
+/*
+*	UPSERT model documents
+*	Accepted Values: array of model objects in req.body.data, document model name in req.body.model
+*	Returns: array of upserted documents
+*/
+exports.upsertModelDocuments = async (req,res,next) => {
+	try {
+		let updates = req.body.data.map(doc=>({
+			updateOne: {
+				filter: {_id: doc.id},
+				update: {...doc},
+			}
+		}))
+		let upsertedDocs = await db[req.body.model].bulkWrite(updates)
+		return res.status(200).json({upsertedDocs})
+	} catch(err) {
+		return next(err)
+	}
+}
+
+/*
+*	GET model documents matching documentRef
+*	Accepted Values: object of document refs to search by, document model name in req.body.model
+*	Returns: array of matching documents
+*/
+exports.getAllModelDocuments = async (req,res,next) => {
+	try {
+		let data = await db[req.body.model].find(req.body.documentRef)
+		return res.status(200).json({data})
 	} catch(err) {
 		return next(err)
 	}

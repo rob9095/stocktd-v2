@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Form, Row, Col, Input, Button, Select, Switch, DatePicker, Icon } from 'antd';
+import { getAllModelDocuments } from '../store/actions/models';
 
-const InputGroup = Input.Group;
 const Option = Select.Option;
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
@@ -10,11 +10,40 @@ class FilterForm extends Component {
   state = {
     showFilterForm: false,
     showScannerForm: false,
+    boxPrefixList: [],
     selects: {
 
     },
     dates: [],
   };
+
+  getBoxPrefixes = async () => {
+    // get the box prefixes for this user
+    await getAllModelDocuments('BoxPrefix',{user: this.props.currentUser.id},this.props.currentUser.company)
+    .then(res=>{
+      let boxPrefixList = res.data.map(pf => ({
+        value: pf.name,
+        id: pf._id,
+      }))
+      this.setState({
+        boxPrefixList,
+      })
+    })
+    .catch(err=>{
+      console.log(err)
+      // just set the default from their username/id
+      this.setState({
+        boxPrefixList: [{value: this.props.currentUser.email.split('@')[0], id: this.props.currentUser.id}],
+      })
+    })    
+  }
+
+  componentDidMount() {
+    if (this.props.showScannerForm) {
+      this.getBoxPrefixes()
+      console.log(this.state.boxPrefixList)
+    }
+  }
 
   toggle = (prop) => {
     return () => {
@@ -69,6 +98,12 @@ class FilterForm extends Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
+    const boxSelect = (
+      <Select style={{minWidth: 100}} defaultValue="Rob">
+        <Option value="Rob">Rob</Option>
+        <Option value="add">Add New</Option>
+      </Select>
+    );
     let inputs = this.props.inputs.map(i=>{
       const selectBefore = (
         <Select key={`${i.id}Select`} defaultValue={'='} onChange={this.handleSelect} showArrow={false} className="number-input pre-select">
@@ -161,13 +196,62 @@ class FilterForm extends Component {
           </Form>
         )}
         {this.state.showScannerForm && (
-          <div className="scan-input-container">
-            <InputGroup compact>
-              <Input addonBefore="rob" style={{ width: '30%' }} defaultValue="Box Name" />
-              <Input style={{ width: '50%' }} defaultValue="Scan ID" />
-              <Input addonAfter={<Icon type="search" />} type="number" style={{ width: '20%' }} defaultValue="1" />
-            </InputGroup>
-          </div>
+          <Form
+            className="scan-form"
+            onSubmit={this.handleScan}
+          >
+            <Row gutter={24}>
+              <Col s={24} md={8}>
+              <FormItem label="Box Name">
+                {getFieldDecorator('boxName', {
+                  rules: [{
+                    required: true,
+                    message: 'Box Name Required',
+                  }],
+                })(
+                  <Input addonBefore={boxSelect} placeholder="Box Name" />
+                )}
+              </FormItem>
+              </Col>
+              <Col s={24} md={10}>
+              <FormItem label="Scan ID">
+                {getFieldDecorator('scanId', {
+                  rules: [{
+                    required: true,
+                    message: 'Scan ID Required',
+                  }],
+                })(
+                  <Input placeholder="Scan ID" />
+                )}
+              </FormItem>
+              </Col>
+              <Col s={24} md={4}>
+              <FormItem label="Quantity">
+                {getFieldDecorator('scanQuantity', {initialValue: '1' }, {
+                  rules: [{
+                    required: true,
+                    message: 'Scan Quantity Required',
+                  }],
+                })(
+                  <Input type="number" />
+                )}
+              </FormItem>
+              </Col>
+              <Col s={24} md={2} style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: 113,
+                }}>
+                <Button
+                type="primary"
+                htmlType="submit"
+                >
+                  Scan
+                </Button>
+              </Col>
+            </Row>
+          </Form>
         )}        
       </div>
     );

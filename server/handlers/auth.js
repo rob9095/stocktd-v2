@@ -96,6 +96,11 @@ exports.signup = async function(req, res, next) {
 		user.companyId = createdCompany._id
 		user.save();
 		createdCompany.save();
+		//create default box prefix for user
+		await db.BoxPrefix.create({
+			name: req.body.email.split('@')[0],
+			user: user._id,
+		})
 		let { id, email, company } = user;
 		let token = jwt.sign(
 		{

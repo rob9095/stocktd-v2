@@ -25,8 +25,32 @@ export function deleteModelDocuments(model, data, currentUser){
 			})
 			.catch(err => {
 				dispatch(addError(err.message));
-				reject();
+				reject(err.message);
 			})
 		});
 	}
+}
+
+export function getAllModelDocuments(model, documentRef, company){
+  return new Promise((resolve,reject) => {
+		return apiCall('post', '/api/models/get-all', {model, documentRef, company})
+		.then((res) => {
+			resolve(res);
+		})
+		.catch(err => {
+			reject(err.message);
+		})
+	});
+}
+
+export function upsertModelDocuments(model, data, company){
+	return new Promise((resolve,reject) => {
+		return apiCall('post', '/api/models/upsert', {model, data, company})
+		.then((res) => {
+			resolve(res);
+		})
+		.catch(err => {
+			reject(err.message);
+		})
+	});
 }

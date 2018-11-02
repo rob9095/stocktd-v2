@@ -18,3 +18,4 @@ module.exports.PurchaseOrder = require('./purchaseOrder');
 module.exports.Order = require('./order');
 module.exports.OrderProduct = require('./orderProduct');
 module.exports.ImportStatus = require('./importStatus');
+module.exports.BoxPrefix = require('./boxPrefix');
