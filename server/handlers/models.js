@@ -100,6 +100,7 @@ exports.upsertModelDocuments = async (req,res,next) => {
 			updateOne: {
 				filter: {_id: doc.id},
 				update: {...doc},
+				upsert: true,
 			}
 		}))
 		let upsertedDocs = await db[req.body.model].bulkWrite(updates)

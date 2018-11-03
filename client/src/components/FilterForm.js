@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Form, Row, Col, Input, Button, Select, Switch, DatePicker, Icon } from 'antd';
 import { getAllModelDocuments } from '../store/actions/models';
+import InsertDataModal from './InsertDataModal';
 
 const Option = Select.Option;
 const FormItem = Form.Item;
@@ -8,6 +9,7 @@ const { RangePicker } = DatePicker;
 
 class FilterForm extends Component {
   state = {
+    showDataModal: false,
     showFilterForm: false,
     showScannerForm: false,
     boxPrefixList: [],
@@ -26,14 +28,17 @@ class FilterForm extends Component {
         id: pf._id,
       }))
       this.setState({
-        boxPrefixList,
+        boxPrefixList: [...boxPrefixList, {value: 'Add New', id: 'Add New'}],
       })
     })
     .catch(err=>{
       console.log(err)
       // just set the default from their username/id
       this.setState({
-        boxPrefixList: [{value: this.props.currentUser.email.split('@')[0], id: this.props.currentUser.id}],
+        boxPrefixList: [
+          {value: this.props.currentUser.email.split('@')[0], id: this.props.currentUser.id},
+          {value: 'Add New', id: 'Add New'},
+        ],
       })
     })    
   }
@@ -96,12 +101,22 @@ class FilterForm extends Component {
     });
   }
 
+  handlePrefixSelect = (value, option) => {
+    if (value === "Add New") {
+      this.setState({
+        showDataModal: true,
+      })
+    }
+  }
+
   render() {
     const { getFieldDecorator } = this.props.form;
+    let preFixOptions = this.state.boxPrefixList.map(pf => (
+      <Option value={pf.value} key={pf.id}>{pf.value}</Option>
+    ))
     const boxSelect = (
-      <Select style={{minWidth: 100}} defaultValue="Rob">
-        <Option value="Rob">Rob</Option>
-        <Option value="add">Add New</Option>
+      <Select onSelect={this.handlePrefixSelect} style={{minWidth: 100}} defaultActiveFirstOption>
+        {preFixOptions}
       </Select>
     );
     let inputs = this.props.inputs.map(i=>{
@@ -169,6 +184,18 @@ class FilterForm extends Component {
     })
     return (
       <div>
+        {this.state.showDataModal && (
+          <InsertDataModal
+            currentUser={this.props.currentUser}
+            title={'Add Box Prefix'}
+            inputs={[
+              {span: 24, id: 'name', text: 'Box Prefix', required: true, message: 'Box Prefix is required'},
+            ]}
+            okText={'Save'}
+            cancelText={'Cancel'}
+            onClose={this.toggle('showDataModal')}
+          />
+        )}
         <Form layout="inline" style={{width: '10%', display: 'inline'}}>
           <FormItem label="Search">
             <Switch checked={this.state.showFilterForm} onChange={this.toggle('showFilterForm')} />
