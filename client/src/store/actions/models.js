@@ -43,9 +43,9 @@ export function getAllModelDocuments(model, documentRef, company){
 	});
 }
 
-export function upsertModelDocuments(model, data, company){
+export function upsertModelDocuments(model, data, company, filterRef){
 	return new Promise((resolve,reject) => {
-		return apiCall('post', '/api/models/upsert', {model, data, company})
+		return apiCall('post', '/api/models/upsert', {model, data, company, filterRef})
 		.then((res) => {
 			resolve(res);
 		})

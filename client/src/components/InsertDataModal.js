@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
-import { Modal, Form, Row, Col, Input } from 'antd';
-import { upsertModelDocuments } from '../store/actions/models';
+import { Alert, Modal, Form, Row, Col, Input } from 'antd';
 
 const FormItem = Form.Item;
 
 class ModalForm extends Component {
   constructor(props) {
     super(props)
-    this.state = { visible: true }
+    this.state = { visible: true}
   }
 
   close = () => {
@@ -21,7 +20,32 @@ class ModalForm extends Component {
     e.preventDefault();
     this.props.form.validateFields((err, data) => {
       console.log('Received values of form: ', data);
-      upsertModelDocuments('BoxPrefix', [data], this.props.currentUser.company)
+      if (err) {
+        return
+      } else {
+        this.props.onSave(data)
+        .then(res =>{
+          this.handleAlert(res.text, res.status)
+        })
+        .catch(err =>{
+          console.log(err)
+          this.handleAlert(err.text, err.status)
+        })
+      }
+    })
+  }
+
+  handleAlert = (alertText, alertType) => {
+    this.setState({
+      showAlert: true,
+      alertText,
+      alertType,
+    })
+  }
+
+  hideAlert = () => {
+    this.setState({
+      showAlert: false,
     })
   }
 
@@ -57,6 +81,16 @@ class ModalForm extends Component {
           cancelText={this.props.cancelText}
         >
           <Form>
+            {this.state.showAlert && (
+              <Alert 
+                style={{margin: '-10px 0px 10px 0px'}}
+                closable
+                afterClose={this.hideAlert}
+                message={this.state.alertText}
+                type={this.state.alertType}
+                showIcon
+              />
+            )}
             <Row gutter={24}>{inputs}</Row>
           </Form>
         </Modal>

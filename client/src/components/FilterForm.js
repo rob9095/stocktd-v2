@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Form, Row, Col, Input, Button, Select, Switch, DatePicker, Icon } from 'antd';
-import { getAllModelDocuments } from '../store/actions/models';
+import { getAllModelDocuments, upsertModelDocuments } from '../store/actions/models';
 import InsertDataModal from './InsertDataModal';
 
 const Option = Select.Option;
@@ -12,7 +12,9 @@ class FilterForm extends Component {
     showDataModal: false,
     showFilterForm: false,
     showScannerForm: false,
-    boxPrefixList: [],
+    boxPrefixList: [
+      {value: this.props.currentUser.email.split('@')[0], id: this.props.currentUser.id},     
+    ],
     selects: {
 
     },
@@ -23,22 +25,18 @@ class FilterForm extends Component {
     // get the box prefixes for this user
     await getAllModelDocuments('BoxPrefix',{user: this.props.currentUser.id},this.props.currentUser.company)
     .then(res=>{
-      let boxPrefixList = res.data.map(pf => ({
+      let userPrefixList = res.data.map(pf => ({
         value: pf.name,
         id: pf._id,
       }))
       this.setState({
-        boxPrefixList: [...boxPrefixList, {value: 'Add New', id: 'Add New'}],
+        boxPrefixList: [...this.state.boxPrefixList, ...userPrefixList, {value: 'Add New', id: 'Add New'}],
       })
     })
     .catch(err=>{
       console.log(err)
-      // just set the default from their username/id
       this.setState({
-        boxPrefixList: [
-          {value: this.props.currentUser.email.split('@')[0], id: this.props.currentUser.id},
-          {value: 'Add New', id: 'Add New'},
-        ],
+        boxPrefixList: [...this.state.boxPrefixList, {value: 'Add New', id: 'Add New'}],
       })
     })    
   }
@@ -109,13 +107,29 @@ class FilterForm extends Component {
     }
   }
 
+  handleNewBoxPrefix = (data) => {
+    return new Promise((resolve,reject) => {
+      upsertModelDocuments('BoxPrefix', [{...data, user: this.props.currentUser.id}], this.props.currentUser.company, 'name')
+      .then(res => {
+        resolve({text:'Box Prefix Added',status:'success'})
+        this.setState({
+          boxPrefixList: [{value: data.name, id: res.upsertedDocs.upserted[0]._id}, ...this.state.boxPrefixList]
+        })
+      })
+      .catch(err => {
+        console.log(err)
+        reject({text:'Failed to Add Box Prefix',status:'error'})
+      })
+    })
+  }
+
   render() {
     const { getFieldDecorator } = this.props.form;
     let preFixOptions = this.state.boxPrefixList.map(pf => (
       <Option value={pf.value} key={pf.id}>{pf.value}</Option>
     ))
-    const boxSelect = (
-      <Select onSelect={this.handlePrefixSelect} style={{minWidth: 100}} defaultActiveFirstOption>
+    let boxSelect = (
+      <Select onSelect={this.handlePrefixSelect} style={{minWidth: 100}} defaultValue={this.state.boxPrefixList[0].value}>
         {preFixOptions}
       </Select>
     );
@@ -194,6 +208,7 @@ class FilterForm extends Component {
             okText={'Save'}
             cancelText={'Cancel'}
             onClose={this.toggle('showDataModal')}
+            onSave={this.handleNewBoxPrefix}
           />
         )}
         <Form layout="inline" style={{width: '10%', display: 'inline'}}>

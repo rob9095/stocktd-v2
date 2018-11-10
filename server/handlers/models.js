@@ -98,7 +98,7 @@ exports.upsertModelDocuments = async (req,res,next) => {
 	try {
 		let updates = req.body.data.map(doc=>({
 			updateOne: {
-				filter: {_id: doc.id},
+				filter: {[req.body.filterRef]: doc[req.body.filterRef]},
 				update: {...doc},
 				upsert: true,
 			}
