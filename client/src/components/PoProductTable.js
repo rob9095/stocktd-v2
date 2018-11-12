@@ -466,7 +466,6 @@ class PoProductTable extends Component {
               currentUser={this.props.currentUser.user}
               inputs={this.state.headers.filter(h=>h.noSort !== true)}
               onFilterSearch={this.handleFilterSearch}
-              tags={poTags}
               showScannerForm
             />
           </div>

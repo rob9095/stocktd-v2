@@ -451,6 +451,7 @@ class PurchaseOrderTable extends Component {
             </Link>
           </Form>
           <WrappedFilterForm
+            currentUser={this.props.currentUser.user}
             inputs={this.state.headers.filter(h=>h.noSort !== true)}
             onFilterSearch={this.handleFilterSearch}
           />
