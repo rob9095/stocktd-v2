@@ -10,7 +10,7 @@ class ScanForm extends Component {
   state = {
     showDataModal: false,
     boxPrefixList: [
-      {value: this.props.currentUser.email.split('@')[0], id: this.props.currentUser.id},     
+      {value: 'Add New', id: 'Add New'}, 
     ],
   };
 
@@ -24,13 +24,15 @@ class ScanForm extends Component {
         id: pf._id,
       }))
       this.setState({
-        boxPrefixList: [...this.state.boxPrefixList, ...userPrefixList, {value: 'Add New', id: 'Add New'}],
+        boxPrefixList: [...userPrefixList, ...this.state.boxPrefixList],
+        currentPrefix: userPrefixList[0].value,
       })
     })
     .catch(err=>{
       console.log(err)
       this.setState({
-        boxPrefixList: [...this.state.boxPrefixList, {value: 'Add New', id: 'Add New'}],
+        boxPrefixList: [{value: this.props.currentUser.email.split('@')[0], id: this.props.currentUser.id}, {value: 'Add New', id: 'Add New'}],
+        currentPrefix: this.props.currentUser.email.split('@')[0],
       })
     })    
   }
@@ -52,6 +54,10 @@ class ScanForm extends Component {
       this.setState({
         showDataModal: true,
       })
+    } else {
+      this.setState({
+        currentPrefix: value,
+      })
     }
   }
 
@@ -61,7 +67,8 @@ class ScanForm extends Component {
       .then(res => {
         resolve({text:'Box Prefix Added',status:'success'})
         this.setState({
-          boxPrefixList: [{value: data.name, id: res.upsertedDocs.upserted[0]._id}, ...this.state.boxPrefixList]
+          boxPrefixList: [{value: data.name, id: res.upsertedDocs.upserted[0]._id}, ...this.state.boxPrefixList],
+          currentPrefix: data.name,
         })
       })
       .catch(err => {
@@ -77,7 +84,7 @@ class ScanForm extends Component {
       <Option value={pf.value} key={pf.id}>{pf.value}</Option>
     ))
     let boxSelect = (
-      <Select onSelect={this.handlePrefixSelect} style={{minWidth: 100}} defaultValue={this.state.boxPrefixList[0].value}>
+      <Select onSelect={this.handlePrefixSelect} style={{minWidth: 105}} value={this.state.currentPrefix} >
         {preFixOptions}
       </Select>
     );
