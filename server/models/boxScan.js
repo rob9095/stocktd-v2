@@ -5,31 +5,32 @@ const boxScanSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  scannedProductId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product',
+  quantity: {
+    type: Number,
+    required: true,
   },
-  scannedSKU: {
-    type: String,
-  },
-  boxLocation: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Location',
-  },
-  companyName: {
+  sku: {
     type: String,
     required: true,
   },
-  companyId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Company',
+  company: {
+    type: String,
     required: true,
+  },
+  poRef: {
+    type: String,
+  },
+  barcode: {
+    type: String,
+  },
+  location: {
+    type: String,
   },
   createdOn: {
     type: Date,
-    default: Date.now(),
+    default: Date.now,
   },
-  scannedBy: {
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   },

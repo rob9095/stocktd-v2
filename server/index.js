@@ -11,6 +11,7 @@ const productRoutes = require('./routes/products');
 const poRoutes = require('./routes/purchaseOrders');
 const modelRoutes = require('./routes/models');
 const poProductRoutes = require('./routes/poProducts');
+const boxScanRoutes = require('./routes/boxScans');
 const db = require("./models");
 const { loginRequired, ensureCorrectUser } = require('./middleware/auth');
 const PORT = 8080;
@@ -38,6 +39,9 @@ app.use('/api/models', modelRoutes);
 
 //po products routes
 app.use('/api/po-products', poProductRoutes);
+
+//po products routes
+app.use('/api/scans', boxScanRoutes);
 
 
 app.use(errorHandler);
