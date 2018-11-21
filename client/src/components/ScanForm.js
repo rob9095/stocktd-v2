@@ -78,6 +78,14 @@ class ScanForm extends Component {
     })
   }
 
+ 
+  handleSubmit = (e) => {
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      console.log('Received values of form: ', values);
+    });
+  } 
+
   render() {
     const { getFieldDecorator } = this.props.form;
     let preFixOptions = this.state.boxPrefixList.map(pf => (
@@ -105,6 +113,7 @@ class ScanForm extends Component {
         )}
         <Form
             className="scan-form"
+            onSubmit={this.handleSubmit}
           >
             <Row gutter={24}>
               <Col s={24} md={8}>
