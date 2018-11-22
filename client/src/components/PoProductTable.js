@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { importProducts } from '../store/actions/products';
 import { updatePoProducts, removePoProducts } from '../store/actions/poProducts';
 import { queryModelData, deleteModelDocuments } from '../store/actions/models';
+import { addBoxScan } from '../store/actions/boxScans';
 import { Button, Pagination, Divider, Icon, Spin, Form, Switch, Dropdown, Menu, Modal, message, Row, Col, Tag } from 'antd';
 import WrappedFilterForm from './FilterForm';
 import EditItemDrawer from './EditItemDrawer';
@@ -323,6 +324,10 @@ class PoProductTable extends Component {
       fetch && this.handleDataFetch();
     }
 
+    handleScan = (scan) => {
+      this.props.addBoxScan(scan, this.state.poRefs, this.props.currentUser.user.company)
+    }
+
     render() {
       let poTags = this.state.poNames.map(po=>{
         return(
@@ -467,6 +472,7 @@ class PoProductTable extends Component {
               inputs={this.state.headers.filter(h=>h.noSort !== true)}
               onFilterSearch={this.handleFilterSearch}
               showScannerForm
+              onScan={this.handleScan}
             />
           </div>
           <div>Current POs: {poTags}</div>
@@ -578,4 +584,4 @@ class PoProductTable extends Component {
    };
   }
 
-  export default connect(mapStateToProps, {updatePoProducts, importProducts, queryModelData, deleteModelDocuments, removePoProducts})(PoProductTable);
+  export default connect(mapStateToProps, {updatePoProducts, importProducts, queryModelData, deleteModelDocuments, removePoProducts, addBoxScan})(PoProductTable);

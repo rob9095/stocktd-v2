@@ -67,6 +67,10 @@ class FilterForm extends Component {
     });
   }
 
+  handleScan = (scan) => {
+    this.props.onScan(scan)
+  }
+
   render() {
     const { getFieldDecorator } = this.props.form;
     let inputs = this.props.inputs.map(i=>{
@@ -163,6 +167,8 @@ class FilterForm extends Component {
         {this.state.showScannerForm && (
           <WrappedScanForm
             currentUser={this.props.currentUser}
+            poRefs={this.props.poRefs}
+            onScan={this.handleScan}
           />
         )}
       </div>

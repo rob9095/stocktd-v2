@@ -83,6 +83,9 @@ class ScanForm extends Component {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       console.log('Received values of form: ', values);
+      if (!err) {
+        this.props.onScan(values)
+      }
     });
   } 
 
