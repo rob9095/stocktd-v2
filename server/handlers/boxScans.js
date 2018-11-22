@@ -7,14 +7,15 @@ rew.body.scan has user, quantity, barcode, name
 
 exports.upsertBoxScan = async (req,res,next) => {
   try {
-    let product = await db.Product.find({barcode: { $regex : new RegExp(req.body.scan.barcode, "i") }})
+    let [product,...products] = await db.Product.find({barcode: { $regex : new RegExp(req.body.scan.barcode, "i") }})
     if (!product) {
       return next({
         status: 400,
-        message: ['Barcode not found']
+        message: 'Barcode not found',
       })
     }
     let andQuery = req.body.poRefs.map(poRef=>({poRef}))
+    console.log(andQuery)
     let poProducts = await db.PoProduct.find({
       skuCompany: product.skuCompany,
       $and: [{$or: andQuery}],
@@ -28,11 +29,15 @@ exports.upsertBoxScan = async (req,res,next) => {
     }
     let updatedBoxScan = {}
     for (let poRef of req.body.poRefs) {
+      console.log(poProducts)
+      console.log(poRef)
       let poProduct = poProducts.find(p=>p.skuCompany === product.skuCompany && poRef === p.poRef)
+      console.log(poProduct)
       if (poProduct) {
+        // product found
         updatedPoRef = poRef
         let markComplete = poProduct.complete ? true : poProduct.scannedQuantity + req.body.scan.quantity === poProduct.quantity ? true : false
-        updatedPoProduct = await db.findByIdAndUpdate(poProduct._id,{
+        updatedPoProduct = await db.PoProduct.findByIdAndUpdate(poProduct._id,{
           $inc: { scannedQuantity: parseInt(req.body.scan.quantity) },
           status: markComplete ? 'complete' : 'processing',
         })
@@ -49,13 +54,21 @@ exports.upsertBoxScan = async (req,res,next) => {
           poRef,
           createdOn: new Date(),
         }
-        updatedBoxScan = await db.BoxScan.findOneAndUpdate(
-          {sku: boxScan.sku, name: boxScan.name},
-          {...boxScan, $inc: { quantity: parseInt(boxScan.quantity) }},
-          {upsert: true},
-        )
+        let foundBoxScan = await db.BoxScan.findOne({sku: boxScan.sku, name: boxScan.name})
+        if (foundBoxScan) {
+          foundBoxScan.quantity += parseInt(boxScan.quantity)
+          foundBoxScan.save()
+        } else {
+          updatedBoxScan = await db.BoxScan.create(boxScan)
+        }
         break;
       }
+    }
+    if (!updatedPoRef) {
+      return next({
+        status: 400,
+        message: 'Item not found on current POs',
+      }) 
     }
     return res.status(200).json({
       updatedPoProduct,

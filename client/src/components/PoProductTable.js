@@ -325,7 +325,12 @@ class PoProductTable extends Component {
     }
 
     handleScan = (scan) => {
-      this.props.addBoxScan(scan, this.state.poRefs, this.props.currentUser.user.company)
+      scan = {
+        ...scan,
+        user: this.props.currentUser.user.id,
+      }
+      let poRefs = this.state.poRefs.map(pr=>pr[1])
+      this.props.addBoxScan(scan, poRefs, this.props.currentUser.user.company)
     }
 
     render() {

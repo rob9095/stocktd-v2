@@ -121,7 +121,7 @@ class ScanForm extends Component {
             <Row gutter={24}>
               <Col s={24} md={8}>
               <FormItem label="Box Name">
-                {getFieldDecorator('boxName', {
+                {getFieldDecorator('name', {
                   rules: [{
                     required: true,
                     message: 'Box Name Required',
@@ -133,7 +133,7 @@ class ScanForm extends Component {
               </Col>
               <Col s={24} md={10}>
               <FormItem label="Scan ID">
-                {getFieldDecorator('scanId', {
+                {getFieldDecorator('barcode', {
                   rules: [{
                     required: true,
                     message: 'Scan ID Required',
@@ -145,7 +145,7 @@ class ScanForm extends Component {
               </Col>
               <Col s={24} md={4}>
               <FormItem label="Quantity">
-                {getFieldDecorator('scanQuantity', {initialValue: '1' }, {
+                {getFieldDecorator('quantity', {initialValue: '1' }, {
                   rules: [{
                     required: true,
                     message: 'Scan Quantity Required',
