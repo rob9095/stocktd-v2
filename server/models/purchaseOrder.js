@@ -13,6 +13,9 @@ const purchaseOrderSchema = new mongoose.Schema({
     type: String,
     default: 'complete',
   },
+  scanned: {
+    type: Boolean,
+  },
   quantity: {
     type: Number,
     default: 0,

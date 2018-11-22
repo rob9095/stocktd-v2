@@ -7,7 +7,10 @@ rew.body.scan has user, quantity, barcode, name
 
 exports.upsertBoxScan = async (req,res,next) => {
   try {
-    let [product,...products] = await db.Product.find({barcode: { $regex : new RegExp(req.body.scan.barcode, "i") }})
+    let [product,...products] = await db.Product.find({
+      company: req.body.company,
+      barcode: { $regex : new RegExp(req.body.scan.barcode, "i") }
+    })
     if (!product) {
       return next({
         status: 400,
@@ -24,7 +27,8 @@ exports.upsertBoxScan = async (req,res,next) => {
     let updatedPoRef = ''
     let boxScan = {
       ...req.body.scan,
-      sku: product.skuCompany,
+      skuCompany: product.skuCompany,
+      sku: product.sku,
       company: req.body.company,
     }
     let updatedBoxScan = {}
@@ -36,16 +40,17 @@ exports.upsertBoxScan = async (req,res,next) => {
       if (poProduct) {
         // product found
         updatedPoRef = poRef
-        let markComplete = poProduct.complete ? true : poProduct.scannedQuantity + req.body.scan.quantity === poProduct.quantity ? true : false
+        let markComplete =  poProduct.scannedQuantity + req.body.scan.quantity === poProduct.quantity ? true : false
         updatedPoProduct = await db.PoProduct.findByIdAndUpdate(poProduct._id,{
           $inc: { scannedQuantity: parseInt(req.body.scan.quantity) },
           status: markComplete ? 'complete' : 'processing',
         })
         if (markComplete) {
-          let notComplete = poProducts.filter(p=>p.poRef === poRef && poProduct._id !== p._id && p.status === 'processing')
+          let notComplete = poProducts.filter(p=>p.poRef === poRef && p.quantity === scannedQuantity)
           if (notComplete.length === 0) {
             let updatedPo = await db.PurchaseOrder.find({poRef: poRef})
             updatedPo.status = 'complete'
+            updatedPo.scanned = true
             updatedPo.save();
           }
         }
@@ -54,7 +59,7 @@ exports.upsertBoxScan = async (req,res,next) => {
           poRef,
           createdOn: new Date(),
         }
-        let foundBoxScan = await db.BoxScan.findOne({sku: boxScan.sku, name: boxScan.name})
+        let foundBoxScan = await db.BoxScan.findOne({skuCompany: boxScan.skuCompany, name: boxScan.name})
         if (foundBoxScan) {
           foundBoxScan.quantity += parseInt(boxScan.quantity)
           foundBoxScan.save()

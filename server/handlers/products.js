@@ -20,7 +20,12 @@ exports.processProductImport = async (req, res, next) => {
 				return {
 					updateOne: {
 						filter: { skuCompany: `${p.sku}-${req.body.company}`},
-						update: { ...p, skuCompany: `${p.sku}-${req.body.company}`, company: req.body.company },
+						update: {
+							...p,
+							barcodeCompany: product.barcode ? product.barcode : product.sku  + "-" + req.body.company,
+							skuCompany: `${p.sku}-${req.body.company}`,
+							company: req.body.company
+						},
 						upsert: true,
 						$setOnInsert: { createdOn: new Date(), quantityToShip: 0, },
 					}
@@ -87,7 +92,7 @@ exports.processProductImport = async (req, res, next) => {
 	} catch(err) {
 		if(err.code === 11000) {
 			console.log(err)
-			err.message = 'Duplicate SKUs found. Please update instead.'
+			err.message = 'Duplicate SKUs or Barcodes found. Please update instead.'
 		}
 		return next(err);
 	}

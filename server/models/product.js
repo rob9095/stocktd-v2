@@ -13,6 +13,11 @@ const productSchema = new mongoose.Schema({
   barcode: {
     type: String,
   },
+  barcodeCompany: {
+    type: String,
+    required: true,
+    unique: true,
+  },
   title: {
     type: String,
   },
@@ -39,10 +44,6 @@ const productSchema = new mongoose.Schema({
   weightType: {
     type: String,
   },
-  boxScans: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Box',
-  }],
   company: {
     type: String,
     required: true,

@@ -10,7 +10,7 @@ export function importPurchaseOrder(json, currentUser){
 			})
 			.catch(err => {
 				dispatch(addError(err.message));
-				reject();
+				reject(err);
 			})
 		});
 	}
@@ -25,7 +25,7 @@ export function updatePurchaseOrders(updates, currentUser){
 			})
 			.catch(err => {
 				dispatch(addError(err.message));
-				reject();
+				reject(err);
 			})
 		});
 	}
@@ -40,7 +40,7 @@ export function removePurchaseOrders(data, currentUser){
 			})
 			.catch(err => {
 				dispatch(addError(err.message));
-				reject();
+				reject(err);
 			})
 		});
 	}

@@ -39,6 +39,7 @@ exports.handlePOImport = async (req, res, next) => {
     let poUpdates = [];
     let poProductUpdates = [];
     let productUpdates = [];
+    let productQtyUpdates = [];
     for (let po of Object.entries(groupedPOs)) {
       let poRef = po[0]
       let poArr = po[1]
@@ -84,8 +85,9 @@ exports.handlePOImport = async (req, res, next) => {
             update: {
               company,
               sku: product.sku,
+              barcodeCompany: product.barcode ? product.barcode : product.sku  + "-" + company,
               skuCompany: currentSku,
-              $setOnInsert: { createdOn: new Date(), quantityToShip: 0, },
+              $setOnInsert: { createdOn: new Date(), quantityToShip: 0},
               $inc: product.type === 'outbound' ?
                 { quantity: parseInt(-skuSum) }
                 :

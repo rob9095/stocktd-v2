@@ -9,6 +9,10 @@ const boxScanSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  skuCompany: {
+    type: String,
+    required: true,
+  },
   sku: {
     type: String,
     required: true,
