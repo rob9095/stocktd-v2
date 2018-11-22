@@ -56,7 +56,7 @@ class DrawerForm extends Component {
     this.props.form.validateFields((err, inputs) => {
       console.log('Received values of form: ', inputs);
       for (let input of this.props.inputs) {
-        if (inputs[input.id] === undefined || inputs[input.id] === '' || inputs[input.id] === null) {
+        if (input.required === true && inputs[input.id] === undefined || inputs[input.id] === '' || inputs[input.id] === null) {
           this.handleAlert(`${input.text} cannot be blank`, 'error')
           return
         }
