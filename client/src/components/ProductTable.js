@@ -424,6 +424,7 @@ class ProductTable extends Component {
                 {id: 'weight', text: 'Weight', type: 'number', span: 8, className: 'no-wrap', required: false},
                 {id: 'brand', text: 'Brand', span: 8, type: 'text', required: false},
                 {id: 'supplier', text: 'Supplier', span: 8, type: 'text', required: false},
+                {id: 'barcode', text: 'Barcode', span: 8, type: 'text', required: false},
                 {id: 'description', text: 'Description', span: 24, type: 'textarea', required: false, textRows: 4},
               ]}
               item={this.state.itemDrawerProduct}

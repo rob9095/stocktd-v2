@@ -68,7 +68,7 @@ class FilterForm extends Component {
   }
 
   handleScan = (scan) => {
-    this.props.onScan(scan)
+    return this.props.onScan(scan)
   }
 
   render() {

@@ -325,12 +325,34 @@ class PoProductTable extends Component {
     }
 
     handleScan = (scan) => {
-      scan = {
-        ...scan,
-        user: this.props.currentUser.user.id,
-      }
-      let poRefs = this.state.poRefs.map(pr=>pr[1])
-      this.props.addBoxScan(scan, poRefs, this.props.currentUser.user.company)
+      return new Promise((resolve,reject) => {
+        scan = {
+          ...scan,
+          user: this.props.currentUser.user.id,
+        }
+        let poRefs = this.state.poRefs.map(pr=>pr[1])
+        this.props.addBoxScan(scan, poRefs, this.props.currentUser.user.company)
+        .then(res => {
+          let data = this.state.data.map(p => {
+            if (p._id === res.updatedPoProduct._id) {
+              return {
+                ...res.updatedPoProduct,
+              }
+            } else {
+              return {
+                ...p,
+              }
+            }
+          })
+          this.setState({
+            data,
+          })
+          resolve(res)
+        })
+        .catch(err => {
+          reject(err);
+        })
+      })
     }
 
     render() {

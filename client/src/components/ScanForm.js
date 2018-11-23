@@ -85,6 +85,12 @@ class ScanForm extends Component {
       console.log('Received values of form: ', values);
       if (!err) {
         this.props.onScan(values)
+        .then(res=>{
+          console.log(res)
+        })
+        .catch(err=>{
+          console.log(err)
+        })
       }
     });
   } 

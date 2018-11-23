@@ -40,11 +40,12 @@ exports.upsertBoxScan = async (req,res,next) => {
       if (poProduct) {
         // product found
         updatedPoRef = poRef
-        let markComplete =  poProduct.scannedQuantity + req.body.scan.quantity === poProduct.quantity ? true : false
-        updatedPoProduct = await db.PoProduct.findByIdAndUpdate(poProduct._id,{
+        let markComplete =  poProduct.scannedQuantity + req.body.scan.quantity >= poProduct.quantity ? true : false
+        await db.PoProduct.findByIdAndUpdate(poProduct._id,{
           $inc: { scannedQuantity: parseInt(req.body.scan.quantity) },
           status: markComplete ? 'complete' : 'processing',
         })
+        updatedPoProduct = await db.PoProduct.findOne({_id: poProduct._id})
         if (markComplete) {
           let notComplete = poProducts.filter(p=>p.poRef === poRef && p.quantity === scannedQuantity)
           if (notComplete.length === 0) {
@@ -63,6 +64,7 @@ exports.upsertBoxScan = async (req,res,next) => {
         if (foundBoxScan) {
           foundBoxScan.quantity += parseInt(boxScan.quantity)
           foundBoxScan.save()
+          updatedBoxScan = foundBoxScan
         } else {
           updatedBoxScan = await db.BoxScan.create(boxScan)
         }
