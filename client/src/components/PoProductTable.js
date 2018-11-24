@@ -260,7 +260,7 @@ class PoProductTable extends Component {
       this.handleDataFetch()
     }
 
-    handleProductUpdate = (updates) => {
+    handleProductUpdate = (updates, id) => {
       return new Promise((resolve,reject) => {
         let data = this.state.data.map(p=>{
           let update = updates.find(u=>u.id === p._id)
@@ -279,6 +279,7 @@ class PoProductTable extends Component {
         .then((res)=>{
           this.setState({
             data,
+            itemDrawerProduct: id ? {...data.find(i=>i._id === id)} : this.state.itemDrawerProduct,
           })
           resolve(res)
         })
@@ -508,7 +509,7 @@ class PoProductTable extends Component {
               inputs={[
                 {id: 'sku', text: 'SKU', span: 8, required: true, type: 'text', disabled: true,},
                 {id: 'quantity', text: 'Quantity', span: 8, required: true, type: 'number'},
-                {id: 'scannedQuantity', text: 'Scanned', span: 8, required: true, type: 'number'},
+                {id: 'scannedQuantity', text: 'Scanned', span: 8, required: true, type: 'number',disabled: true,},
                 {id: 'name', text: 'PO Name', span: 16, className: 'no-wrap', required: true, type: 'text', message: 'Name cannot be blank', disabled: true,},
                 {id: 'createdOn', text: 'Date Created', span: 8, className: 'full-width', required: true, type: 'date', disabled: true,},
                 {id: 'type', text: 'PO Type', span: 12, className: 'no-wrap', required: true, type: 'dropdown', values: [{id:'inbound',text:'Inbound'},{id:'outbound',text:'Outbound'}], disabled: true,},

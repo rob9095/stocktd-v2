@@ -11,7 +11,9 @@ exports.updatePoProducts = async (req, res, next) => {
       return ({
         updateOne: {
           filter: {_id: p.id},
-          update: {...p},
+          update: {
+            ...p,
+          },
         }
         })
     })

@@ -39,7 +39,6 @@ exports.handlePOImport = async (req, res, next) => {
     let poUpdates = [];
     let poProductUpdates = [];
     let productUpdates = [];
-    let productQtyUpdates = [];
     for (let po of Object.entries(groupedPOs)) {
       let poRef = po[0]
       let poArr = po[1]

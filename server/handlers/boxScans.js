@@ -32,27 +32,37 @@ exports.upsertBoxScan = async (req,res,next) => {
       company: req.body.company,
     }
     let updatedBoxScan = {}
+    let completedPoProducts = []
     for (let poRef of req.body.poRefs) {
-      console.log(poProducts)
-      console.log(poRef)
       let poProduct = poProducts.find(p=>p.skuCompany === product.skuCompany && poRef === p.poRef)
       console.log(poProduct)
       if (poProduct) {
         // product found
         updatedPoRef = poRef
-        let markComplete =  poProduct.scannedQuantity + req.body.scan.quantity >= poProduct.quantity ? true : false
         await db.PoProduct.findByIdAndUpdate(poProduct._id,{
           $inc: { scannedQuantity: parseInt(req.body.scan.quantity) },
-          status: markComplete ? 'complete' : 'processing',
         })
         updatedPoProduct = await db.PoProduct.findOne({_id: poProduct._id})
+        let markComplete = updatedPoProduct.scannedQuantity >= updatedPoProduct.quantity 
+        console.log(updatedPoProduct)
+        console.log(markComplete)
         if (markComplete) {
-          let notComplete = poProducts.filter(p=>p.poRef === poRef && p.quantity === scannedQuantity)
+          let notComplete = poProducts.filter(p=>p.poRef === poRef && p.quantity < p.scannedQuantity && p._id != updatedPoProduct._id)
+          console.log(notComplete)
           if (notComplete.length === 0) {
-            let updatedPo = await db.PurchaseOrder.find({poRef: poRef})
+            updatedPoProduct.status = 'complete'
+            // find and update the po status
+            let updatedPo = await db.PurchaseOrder.findOne({poRef})
             updatedPo.status = 'complete'
-            updatedPo.scanned = true
-            updatedPo.save();
+            updatedPo.save()
+            // update all poProducts
+            let poProductUpdates = poProducts.filter(p=>p.poRef === poRef).map(p=>({
+              updateOne: {
+                filter: {_id: p._id},
+                update: {status: 'complete'}
+              }
+            }))
+            completedPoProducts = await db.PoProduct.bulkWrite(poProductUpdates)
           }
         }
         boxScan = {
@@ -74,13 +84,14 @@ exports.upsertBoxScan = async (req,res,next) => {
     if (!updatedPoRef) {
       return next({
         status: 400,
-        message: 'Item not found on current POs',
+        message: 'Product not found on current POs',
       }) 
     }
     return res.status(200).json({
       updatedPoProduct,
       updatedPoRef,
       updatedBoxScan,
+      completedPoProducts,
     })
   } catch(err) {
     return next(err);

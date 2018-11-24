@@ -62,7 +62,7 @@ class DrawerForm extends Component {
         }
       }
       // fitler out any empty entries or values that are the same
-      const values = Object.entries(inputs).filter(val=>val[1] !== undefined && val[1] !== this.props.item[val[0]])
+      const values = Object.entries(inputs).filter(val=>val[1] !== undefined)
       if (values.length === 0) {
         this.handleAlert('No Updates Found','warning');
         return
@@ -71,6 +71,7 @@ class DrawerForm extends Component {
         id: this.props.item._id,
         poRef: this.props.item.poRef,
         oldQty: this.props.item.quantity,
+        ...this.state.selects,
       }
       for (let val of values) {
         update = {
@@ -79,7 +80,7 @@ class DrawerForm extends Component {
         }
       }
       console.log(update)
-      this.props.onSave(this.props.create ? [inputs] : [update])
+      this.props.onSave(this.props.create ? [inputs] : [update],this.props.item._id)
       .then(res=>{
         this.handleAlert('Changes Saved','success')
       })

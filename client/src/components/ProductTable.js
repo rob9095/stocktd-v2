@@ -243,7 +243,7 @@ class ProductTable extends Component {
       this.handleDataFetch()
     }
 
-    handleProductUpdate = (updates) => {
+    handleProductUpdate = (updates, id) => {
       return new Promise((resolve,reject) => {
         let data = this.state.data.map(p=>{
           let update = updates.find(u=>u.id === p._id)
@@ -262,6 +262,7 @@ class ProductTable extends Component {
         .then((res)=>{
           this.setState({
             data,
+            itemDrawerProduct: id ? {...data.find(i=>i._id === id)} : this.state.itemDrawerProduct,
           })
           resolve(res)
         })
