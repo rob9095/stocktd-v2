@@ -9,7 +9,7 @@ exports.upsertBoxScan = async (req,res,next) => {
   try {
     let [product,...products] = await db.Product.find({
       company: req.body.company,
-      barcode: { $regex : new RegExp(req.body.scan.barcode, "i") }
+      barcode: { $regex : new RegExp(["^", req.body.scan.barcode, "$"].join(""), "i") }
     })
     if (!product) {
       return next({
@@ -20,9 +20,9 @@ exports.upsertBoxScan = async (req,res,next) => {
     let andQuery = req.body.poRefs.map(poRef=>({poRef}))
     console.log(andQuery)
     let poProducts = await db.PoProduct.find({
-      skuCompany: product.skuCompany,
       $and: [{$or: andQuery}],
     })
+    console.log(poProducts)
     let updatedPoProduct = {}
     let updatedPoRef = ''
     let boxScan = {
@@ -32,7 +32,7 @@ exports.upsertBoxScan = async (req,res,next) => {
       company: req.body.company,
     }
     let updatedBoxScan = {}
-    let completedPoProducts = []
+    let completedPoProducts = {}
     for (let poRef of req.body.poRefs) {
       let poProduct = poProducts.find(p=>p.skuCompany === product.skuCompany && poRef === p.poRef)
       console.log(poProduct)
@@ -47,7 +47,7 @@ exports.upsertBoxScan = async (req,res,next) => {
         console.log(updatedPoProduct)
         console.log(markComplete)
         if (markComplete) {
-          let notComplete = poProducts.filter(p=>p.poRef === poRef && p.quantity < p.scannedQuantity && p._id != updatedPoProduct._id)
+          let notComplete = poProducts.filter(p=>p.poRef === poRef && p.quantity > p.scannedQuantity && p.skuCompany !== updatedPoProduct.skuCompany)
           console.log(notComplete)
           if (notComplete.length === 0) {
             updatedPoProduct.status = 'complete'

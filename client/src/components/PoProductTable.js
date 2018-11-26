@@ -29,7 +29,7 @@ class PoProductTable extends Component {
       direction: 'descending',
       query: [],
       poRefs: [],
-      poNames: [],
+      currentPOs: [],
       showEditItemDrawer: false,
       showCreateItemDrawer: false,
       itemDrawerProduct: {},
@@ -106,7 +106,7 @@ class PoProductTable extends Component {
       if (this.props.history.location.poRefs) {
         await this.setState({
           poRefs: this.props.history.location.poRefs.map(p=>(['poRef',p.poRef])),
-          poNames: this.props.history.location.poRefs,
+          currentPOs: this.props.history.location.poRefs,
         })
       }
       this.handleDataFetch();
@@ -147,7 +147,7 @@ class PoProductTable extends Component {
       console.log(e.target.id)
     }
 
-    showConfirm(title, action, items) {
+    showConfirm(title, action, items, question) {
       return new Promise((resolve,reject) => {
         const end = items.length > 1 ? 'items?' : 'item?';
         const content = `${action} ${items.length} ${end}`;
@@ -155,7 +155,7 @@ class PoProductTable extends Component {
           okText: 'Yes',
           okType: 'primary',
           title: title === null ? content : title,
-          content: title !== null ? content : null,
+          content: question ? question : title !== null ? content : null,
           onOk() {
             resolve(items);
           },
@@ -310,17 +310,21 @@ class PoProductTable extends Component {
 
     updatePoRefs = async (poRef,fetch) => {
       let poRefs = this.state.poRefs
+      let currentPOs = this.state.currentPOs
       let foundRef = poRefs.find(arr => arr[1] === poRef)
       if (foundRef) {
         console.log('filtering')
         poRefs = poRefs.filter(arr=>arr[1] !== poRef)
+        currentPOs = currentPOs.filter(po=>po.poRef !== poRef)
       } else {
         console.log('pushing')
         poRefs.push(poRef)
+        currentPOs.push({poRef: poRef})
       }
       console.log(poRefs)
       await this.setState({
         poRefs,
+        currentPOs,
       })
       fetch && this.handleDataFetch();
     }
@@ -331,7 +335,7 @@ class PoProductTable extends Component {
           ...scan,
           user: this.props.currentUser.user.id,
         }
-        let poRefs = this.state.poRefs.map(pr=>pr[1])
+        let poRefs = this.state.currentPOs.sort((a,b)=>(b.quantity - a.quantity)).map(po=>po.poRef)
         this.props.addBoxScan(scan, poRefs, this.props.currentUser.user.company)
         .then(res => {
           let data = this.state.data.map(p => {
@@ -348,6 +352,9 @@ class PoProductTable extends Component {
           this.setState({
             data,
           })
+          if (res.completedPoProducts.nMatched) {
+            this.handlePoComplete(res.updatedPoProduct)
+          }
           resolve(res)
         })
         .catch(err => {
@@ -356,8 +363,17 @@ class PoProductTable extends Component {
       })
     }
 
+    handlePoComplete = (poProduct) => {
+      this.showConfirm('PO Completed',null, [], `All units for PO "${poProduct.name}" were scanned, remove it from current purchase orders?`)
+      .then((res)=>{
+        if (res !== 'cancel') {
+          this.updatePoRefs(poProduct.poRef,true)
+        }
+      })
+    }
+
     render() {
-      let poTags = this.state.poNames.map(po=>{
+      let poTags = this.state.currentPOs.map(po=>{
         return(
           <Tag key={po.poRef} closable onClose={()=>this.updatePoRefs(po.poRef,true)}>{po.name}</Tag>
         )

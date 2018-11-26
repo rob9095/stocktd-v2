@@ -8,7 +8,7 @@ const FormItem = Form.Item;
 
 class ScanForm extends Component {
   state = {
-    showDataModal: false,
+    showBoxPrefixModal: false,
     boxPrefixList: [
       {value: 'Add New', id: 'Add New'}, 
     ],
@@ -25,7 +25,7 @@ class ScanForm extends Component {
       }))
       this.setState({
         boxPrefixList: [...userPrefixList, ...this.state.boxPrefixList],
-        currentPrefix: userPrefixList[0].value,
+        currentPrefix: userPrefixList[0] ? userPrefixList[0].value : this.props.currentUser.email.split('@')[0],
       })
     })
     .catch(err=>{
@@ -52,7 +52,7 @@ class ScanForm extends Component {
   handlePrefixSelect = (value, option) => {
     if (value === "Add New") {
       this.setState({
-        showDataModal: true,
+        showBoxPrefixModal: true,
       })
     } else {
       this.setState({
@@ -90,10 +90,19 @@ class ScanForm extends Component {
         })
         .catch(err=>{
           console.log(err)
+          if (err[0] === 'Barcode not found') {
+            this.setState({
+              showBarcodeModal: true,
+            })
+          }
         })
       }
     });
   } 
+
+  handleNewBarcode = (barcode) => {
+    console.log(barcode)
+  }
 
   render() {
     const { getFieldDecorator } = this.props.form;
@@ -107,7 +116,7 @@ class ScanForm extends Component {
     );
     return (
       <div>
-        {this.state.showDataModal && (
+        {this.state.showBoxPrefixModal && (
           <InsertDataModal
             currentUser={this.props.currentUser}
             title={'Add Box Prefix'}
@@ -116,8 +125,21 @@ class ScanForm extends Component {
             ]}
             okText={'Save'}
             cancelText={'Cancel'}
-            onClose={this.toggle('showDataModal')}
+            onClose={this.toggle('showBoxPrefixModal')}
             onSave={this.handleNewBoxPrefix}
+          />
+        )}
+        {this.state.showBarcodeModal && (
+          <InsertDataModal
+            currentUser={this.props.currentUser}
+            title={'Add Barcode'}
+            inputs={[
+              {span: 24, id: 'name', text: 'Box Prefix', required: true, message: 'Box Prefix is required'},
+            ]}
+            okText={'Save'}
+            cancelText={'Cancel'}
+            onClose={this.toggle('showBarcodeModal')}
+            onSave={this.handleNewBarcode}
           />
         )}
         <Form
