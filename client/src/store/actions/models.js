@@ -31,9 +31,9 @@ export function deleteModelDocuments(model, data, currentUser){
 	}
 }
 
-export function getAllModelDocuments(model, documentRef, company){
+export function getAllModelDocuments(model, documentRef, company, regex){
   return new Promise((resolve,reject) => {
-		return apiCall('post', '/api/models/get-all', {model, documentRef, company})
+		return apiCall('post', '/api/models/get-all', {model, documentRef, company, regex})
 		.then((res) => {
 			resolve(res);
 		})

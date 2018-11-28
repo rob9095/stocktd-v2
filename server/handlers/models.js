@@ -117,7 +117,17 @@ exports.upsertModelDocuments = async (req,res,next) => {
 */
 exports.getAllModelDocuments = async (req,res,next) => {
 	try {
-		let data = await db[req.body.model].find(req.body.documentRef)
+		let query = {...req.body.documentRef}
+		if (req.body.regex === true) {
+			query = {}
+			for (let val of Object.entries(req.body.documentRef)) {
+				query = {
+					...query,
+					[val[0]]: { $regex : new RegExp(val[1], "i") },
+				}
+			}
+		}
+		let data = await db[req.body.model].find(query)
 		return res.status(200).json({data})
 	} catch(err) {
 		return next(err)

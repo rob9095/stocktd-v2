@@ -134,7 +134,8 @@ class ScanForm extends Component {
             currentUser={this.props.currentUser}
             title={'Add Barcode'}
             inputs={[
-              {span: 24, id: 'name', text: 'Box Prefix', required: true, message: 'Box Prefix is required'},
+              {span: 24, id: 'sku', text: 'SKU', required: true, message: 'SKU is required', autoComplete: true, queryModel: 'Product'},
+              {span: 24, id: 'barcode', text: 'Barcode', required: true, message: 'Barcode is required'},
             ]}
             okText={'Save'}
             cancelText={'Cancel'}

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Alert, Modal, Form, Row, Col, Input } from 'antd';
+import AutoCompleteInput from './AutoCompleteInput';
 
 const FormItem = Form.Item;
 
@@ -52,6 +53,31 @@ class ModalForm extends Component {
   render() {
     const { getFieldDecorator } = this.props.form;
     let inputs = this.props.inputs.map(i=>{
+      if (i.autoComplete) {
+        return (
+          <Col xs={i.span*3} md={i.span} key={i.id}>
+            <FormItem key={i.id} label={`${i.text}`}>
+              {getFieldDecorator(i.id, {
+                 rules: [{
+                  required: i.required,
+                  message: i.message,
+                 }],
+               })(
+                <AutoCompleteInput
+                  currentUser={this.props.currentUser}
+                  queryModel={i.queryModel}
+                  key={i.id}
+                >
+                 <Input
+                   placeholder={i.text}
+                   type={i.type}
+                 />
+                </AutoCompleteInput>
+               )}
+            </FormItem>
+          </Col>
+        )
+      } else {
         return (
           <Col xs={i.span*3} md={i.span} key={i.id}>
             <FormItem key={i.id} label={`${i.text}`}>
@@ -69,6 +95,7 @@ class ModalForm extends Component {
             </FormItem>
           </Col>
         )
+      }
     })
     return (
       <div>
