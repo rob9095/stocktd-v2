@@ -50,6 +50,12 @@ class ModalForm extends Component {
     })
   }
 
+  handleAutoUpdate = (value, id) => {
+    this.setState({
+      [id]: value,
+    })
+  }
+
   render() {
     const { getFieldDecorator } = this.props.form;
     let inputs = this.props.inputs.map(i=>{
@@ -57,7 +63,7 @@ class ModalForm extends Component {
         return (
           <Col xs={i.span*3} md={i.span} key={i.id}>
             <FormItem key={i.id} label={`${i.text}`}>
-              {getFieldDecorator(i.id, {
+              {getFieldDecorator(i.id, { setFieldsValue: this.state[i.id] }, {
                  rules: [{
                   required: i.required,
                   message: i.message,
@@ -67,12 +73,9 @@ class ModalForm extends Component {
                   currentUser={this.props.currentUser}
                   queryModel={i.queryModel}
                   key={i.id}
-                >
-                 <Input
-                   placeholder={i.text}
-                   type={i.type}
-                 />
-                </AutoCompleteInput>
+                  placeholder={"SKU"}
+                  onUpdate={this.handleAutoUpdate}
+                />
                )}
             </FormItem>
           </Col>

@@ -24,6 +24,10 @@ class AutoCompleteInput extends Component {
     })
   }
 
+  handleChange = (value) => {
+    this.props.onUpdate(value,this.props.key)
+  }
+
   render() {
     const { data } = this.state;
     return (
@@ -31,7 +35,8 @@ class AutoCompleteInput extends Component {
         dataSource={data}
         onSelect={onSelect}
         onSearch={this.handleDataFetch}
-        placeholder="SKU"
+        placeholder={this.props.placeholder}
+        onChange={this.handleChange}
       />
     );
   }

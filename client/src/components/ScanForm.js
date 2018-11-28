@@ -100,8 +100,17 @@ class ScanForm extends Component {
     });
   } 
 
-  handleNewBarcode = (barcode) => {
-    console.log(barcode)
+  handleNewBarcode = (update) => {
+    return new Promise((resolve,reject) => {
+      upsertModelDocuments('Product', [{...update, skuCompany: update.sku + "-" + this.props.currentUser.company}], this.props.currentUser.company, 'skuCompany')
+      .then(res => {
+        resolve({text:'Barcode Updated!', status:'success'})
+      })
+      .catch(err => {
+        console.log(err)
+        reject({text:'Failed to Update Barcode',status:'error'})
+      })
+    })
   }
 
   render() {
