@@ -22,7 +22,7 @@ exports.processProductImport = async (req, res, next) => {
 						filter: { skuCompany: `${p.sku}-${req.body.company}`},
 						update: {
 							...p,
-							barcodeCompany: product.barcode ? product.barcode : product.sku  + "-" + req.body.company,
+							barcodeCompany: p.barcode ? p.barcode : p.sku  + "-" + req.body.company,
 							skuCompany: `${p.sku}-${req.body.company}`,
 							company: req.body.company
 						},

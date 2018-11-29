@@ -117,7 +117,8 @@ exports.upsertModelDocuments = async (req,res,next) => {
 */
 exports.getAllModelDocuments = async (req,res,next) => {
 	try {
-		let query = {...req.body.documentRef}
+		let limit = req.body.limit ? req.body.limit > 100 ? 100 : 100 : 100
+		let query = {...req.body.documentRef, company: req.body.company}
 		if (req.body.regex === true) {
 			query = {}
 			for (let val of Object.entries(req.body.documentRef)) {
@@ -127,7 +128,7 @@ exports.getAllModelDocuments = async (req,res,next) => {
 				}
 			}
 		}
-		let data = await db[req.body.model].find(query)
+		let data = await db[req.body.model].find(query).limit(limit)
 		return res.status(200).json({data})
 	} catch(err) {
 		return next(err)

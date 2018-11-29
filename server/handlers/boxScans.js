@@ -7,6 +7,12 @@ rew.body.scan has user, quantity, barcode, name
 
 exports.upsertBoxScan = async (req,res,next) => {
   try {
+    if (req.body.poRefs.length === 0) {
+      return next({
+        status: 400,
+        message:  'No Purchase Order Provided'
+      })
+    }
     let [product,...products] = await db.Product.find({
       company: req.body.company,
       barcode: { $regex : new RegExp(["^", req.body.scan.barcode, "$"].join(""), "i") }

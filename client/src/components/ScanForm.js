@@ -96,6 +96,10 @@ class ScanForm extends Component {
             })
           }
         })
+        // clear scan id
+        setTimeout(()=> {
+          this.props.form.setFieldsValue({barcode: ''})
+        }, 250)        
       }
     });
   } 
