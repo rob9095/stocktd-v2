@@ -12,9 +12,9 @@ class AutoCompleteInput extends Component {
   }
 
   handleDataFetch = (value) => {
-    getAllModelDocuments(this.props.queryModel,{sku: value},this.props.currentUser.company, true, 5)
+    getAllModelDocuments(this.props.queryModel,{[this.props.id]: value},this.props.currentUser.company, true, 5)
     .then((res)=>{
-      let data = res.data.map(p => (p.sku)).filter((p,i)=>i<=4)
+      let data = res.data.map(p => (p[this.props.id]))
       this.setState({
         data,
       })

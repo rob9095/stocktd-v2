@@ -5,7 +5,7 @@ import { importProducts } from '../store/actions/products';
 import { updatePoProducts, removePoProducts } from '../store/actions/poProducts';
 import { queryModelData, deleteModelDocuments } from '../store/actions/models';
 import { addBoxScan } from '../store/actions/boxScans';
-import { Button, Pagination, Divider, Icon, Spin, Form, Switch, Dropdown, Menu, Modal, message, Row, Col, Tag } from 'antd';
+import { Button, Pagination, Divider, Icon, Spin, Form, Dropdown, Menu, Modal, message, Tag } from 'antd';
 import WrappedFilterForm from './FilterForm';
 import EditItemDrawer from './EditItemDrawer';
 import ImportModal from './ImportModal';
@@ -519,7 +519,20 @@ class PoProductTable extends Component {
               onScan={this.handleScan}
             />
           </div>
-          <div>Current POs: {poTags}</div>
+          <div style={{padding: '0px 0px 10px'}}>
+          {this.state.currentPOs.length > 0 ?
+            <span>Current POs: {poTags}</span>
+          :
+            <span>
+              <Tag
+                style={{ background: '#fff', borderStyle: 'dashed' }}
+              >
+                <Icon type="plus" style={{marginRight: 4}} />
+                Add Purchase Order
+              </Tag>
+            </span>
+          }
+          </div>
           {this.state.showEditItemDrawer && (
             <EditItemDrawer
               inputs={[

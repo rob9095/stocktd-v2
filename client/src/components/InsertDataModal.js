@@ -75,6 +75,7 @@ class ModalForm extends Component {
                   key={i.id}
                   placeholder={"SKU"}
                   onUpdate={this.handleAutoUpdate}
+                  data={this.props.data}
                 />
                )}
             </FormItem>

@@ -90,7 +90,8 @@ exports.upsertBoxScan = async (req,res,next) => {
     if (!updatedPoRef) {
       return next({
         status: 400,
-        message: 'Product not found on current POs',
+        message: 'Product not found on PO',
+        product,
       }) 
     }
     return res.status(200).json({
