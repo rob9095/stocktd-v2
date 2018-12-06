@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import { Form, Row, Col, Input, Button, Select } from 'antd';
 import { getAllModelDocuments, upsertModelDocuments } from '../store/actions/models';
 import InsertDataModal from './InsertDataModal';
@@ -156,6 +157,16 @@ class ScanForm extends Component {
             onSave={this.handleNewBarcode}
           />
         )}
+        {this.props.currentPOs.length === 0 && this.props.requirePo ? 
+          <div className="centered-container col">
+            <h3>Please add a Purcase Order to start scanning</h3>
+            <Link to='/app/purchase-orders'>
+            <Button type="primary">
+              Add Purchase Order
+            </Button>
+            </Link>
+          </div>
+        :
         <Form
             className="scan-form"
             onSubmit={this.handleSubmit}
@@ -211,7 +222,8 @@ class ScanForm extends Component {
                 </Button>
               </Col>
             </Row>
-          </Form>       
+          </Form>
+        }       
       </div>
     );
   }

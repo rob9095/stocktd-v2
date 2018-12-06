@@ -515,6 +515,7 @@ class PoProductTable extends Component {
               currentUser={this.props.currentUser.user}
               inputs={this.state.headers.filter(h=>h.noSort !== true)}
               onFilterSearch={this.handleFilterSearch}
+              currentPOs={this.state.currentPOs}
               showScannerForm
               onScan={this.handleScan}
             />
@@ -524,12 +525,12 @@ class PoProductTable extends Component {
             <span>Current POs: {poTags}</span>
           :
             <span>
-              <Tag
+              {/* <Tag
                 style={{ background: '#fff', borderStyle: 'dashed' }}
               >
                 <Icon type="plus" style={{marginRight: 4}} />
                 Add Purchase Order
-              </Tag>
+              </Tag> */}
             </span>
           }
           </div>
