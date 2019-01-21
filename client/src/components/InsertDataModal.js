@@ -7,7 +7,10 @@ const FormItem = Form.Item;
 class ModalForm extends Component {
   constructor(props) {
     super(props)
-    this.state = { visible: true}
+    this.state = {
+      visible: true,
+      values: {},
+    }
   }
 
   close = () => {
@@ -20,11 +23,12 @@ class ModalForm extends Component {
   handleSubmit = (e) => {
     e.preventDefault();
     this.props.form.validateFields((err, data) => {
-      console.log('Received values of form: ', data);
+      console.log(this.state.values)
+      console.log('Received values of form: ', {...data,...this.state.values});
       if (err) {
         return
       } else {
-        this.props.onSave(data)
+        this.props.onSave({...data,...this.state.values})
         .then(res =>{
           this.handleAlert(res.text, res.status)
         })
@@ -52,7 +56,9 @@ class ModalForm extends Component {
 
   handleAutoUpdate = (value, id) => {
     this.setState({
-      [id]: value,
+      values: {
+        [id]: value,
+      }
     })
   }
 
@@ -63,7 +69,7 @@ class ModalForm extends Component {
         return (
           <Col xs={i.span*3} md={i.span} key={i.id}>
             <FormItem key={i.id} label={`${i.text}`}>
-              {getFieldDecorator(i.id, { setFieldsValue: this.state[i.id] }, {
+              {getFieldDecorator(i.id, { setFieldsValue: this.state.values[i.id] }, {
                  rules: [{
                   required: i.required,
                   message: i.message,
@@ -74,7 +80,7 @@ class ModalForm extends Component {
                   queryModel={i.queryModel}
                   key={i.id}
                   placeholder={"SKU"}
-                  onUpdate={this.handleAutoUpdate}
+                  onUpdate={(val)=>this.handleAutoUpdate(val,i.id)}
                   data={this.props.data}
                 />
                )}
