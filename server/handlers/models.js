@@ -99,7 +99,10 @@ exports.upsertModelDocuments = async (req,res,next) => {
 		let updates = req.body.data.map(doc=>({
 			updateOne: {
 				filter: {[req.body.filterRef]: doc[req.body.filterRef]},
-				update: {...doc},
+				update: {
+          ...doc,
+          company: req.body.company,
+        },
 				upsert: true,
 			}
 		}))

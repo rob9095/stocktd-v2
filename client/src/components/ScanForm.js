@@ -64,6 +64,9 @@ class ScanForm extends Component {
 
   handleNewBoxPrefix = (data) => {
     return new Promise((resolve,reject) => {
+      if (this.state.boxPrefixList.some((pf)=>(pf.value === data.name))) {
+        reject({text: 'Prefix already exists',status:'error'})
+      }
       upsertModelDocuments('BoxPrefix', [{...data, user: this.props.currentUser.id}], this.props.currentUser.company, 'name')
       .then(res => {
         resolve({text:'Box Prefix Added',status:'success'})

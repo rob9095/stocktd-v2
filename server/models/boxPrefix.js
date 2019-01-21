@@ -8,6 +8,10 @@ const boxPrefixSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
+  },
+  company: {
+    type: String,
+    required: true,
   }
 })
 
