@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Form, Row, Col, Input, Button, Select } from 'antd';
+import { Form, Row, Col, Input, Button, Select, Skeleton, Spin } from 'antd';
 import { getAllModelDocuments, upsertModelDocuments } from '../store/actions/models';
 import InsertDataModal from './InsertDataModal';
 
@@ -8,10 +8,11 @@ const Option = Select.Option;
 const FormItem = Form.Item;
 
 class ScanForm extends Component {
+  _isMounted = false 
   state = {
     showBoxPrefixModal: false,
     boxPrefixList: [
-      {value: 'Add New', id: 'Add New'}, 
+      {value: 'Add New', id: 'Add New'},
     ],
   };
 
@@ -24,22 +25,27 @@ class ScanForm extends Component {
         value: pf.name,
         id: pf._id,
       }))
-      this.setState({
+      this._isMounted && this.setState({
         boxPrefixList: [...userPrefixList, ...this.state.boxPrefixList],
         currentPrefix: userPrefixList[0] ? userPrefixList[0].value : this.props.currentUser.email.split('@')[0],
       })
     })
     .catch(err=>{
       console.log(err)
-      this.setState({
+      this._isMounted && this.setState({
         boxPrefixList: [{value: this.props.currentUser.email.split('@')[0], id: this.props.currentUser.id}, {value: 'Add New', id: 'Add New'}],
         currentPrefix: this.props.currentUser.email.split('@')[0],
       })
-    })    
+    })
   }
 
   componentDidMount() {
+    this._isMounted = true;
     this.getBoxPrefixes()
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
   }
 
   toggle = (prop) => {
@@ -127,7 +133,7 @@ class ScanForm extends Component {
       <Option value={pf.value} key={pf.id}>{pf.value}</Option>
     ))
     let boxSelect = (
-      <Select onSelect={this.handlePrefixSelect} style={{minWidth: 105}} value={this.state.currentPrefix} >
+      <Select onSelect={this.handlePrefixSelect} style={{ minWidth: 105 }} value={this.state.currentPrefix} >
         {preFixOptions}
       </Select>
     );
@@ -170,62 +176,59 @@ class ScanForm extends Component {
             </Link>
           </div>
         :
-        <Form
-            className="scan-form"
-            onSubmit={this.handleSubmit}
-          >
-            <Row gutter={24}>
-              <Col s={24} md={8}>
-              <FormItem label="Box Name">
-                {getFieldDecorator('name', {
-                  rules: [{
-                    required: true,
-                    message: 'Box Name Required',
-                  }],
-                })(
-                  <Input addonBefore={boxSelect} placeholder="Box Name" />
-                )}
-              </FormItem>
-              </Col>
-              <Col s={24} md={10}>
-              <FormItem label="Scan ID">
-                {getFieldDecorator('barcode', {
-                  rules: [{
-                    required: true,
-                    message: 'Scan ID Required',
-                  }],
-                })(
-                  <Input placeholder="Scan ID" />
-                )}
-              </FormItem>
-              </Col>
-              <Col s={24} md={4}>
-              <FormItem label="Quantity">
-                {getFieldDecorator('quantity', {initialValue: '1' }, {
-                  rules: [{
-                    required: true,
-                    message: 'Scan Quantity Required',
-                  }],
-                })(
-                  <Input type="number" />
-                )}
-              </FormItem>
-              </Col>
-              <Col s={24} md={2} style={{
+          <Spin spinning={!this.state.currentPrefix}>
+            <Form
+              className="scan-form"
+              onSubmit={this.handleSubmit}
+            >
+              <Row gutter={24}>
+                <Col s={24} md={8}>
+                  <FormItem label="Box Name">
+                    {getFieldDecorator('name', {
+                      rules: [{
+                        required: true,
+                        message: 'Box Name Required',
+                      }],
+                    })(
+                      <Input addonBefore={boxSelect} placeholder="Box Name" />
+                    )}
+                  </FormItem>
+                </Col>
+                <Col s={24} md={10}>
+                  <FormItem label="Scan ID">
+                    {getFieldDecorator('barcode', {
+                      rules: [{
+                        required: true,
+                        message: 'Scan ID Required',
+                      }],
+                    })(
+                      <Input placeholder="Scan ID" />
+                    )}
+                  </FormItem>
+                </Col>
+                <Col s={24} md={4}>
+                  <FormItem label="Quantity">
+                    {getFieldDecorator('quantity', { initialValue: '1' }, {
+                      rules: [{
+                        required: true,
+                        message: 'Scan Quantity Required',
+                      }],
+                    })(
+                      <Input type="number" />
+                    )}
+                  </FormItem>
+                </Col>
+                <Col s={24} md={2} style={{
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
                   height: 113,
                 }}>
-                <Button
-                type="primary"
-                htmlType="submit"
-                >
-                  Scan
-                </Button>
-              </Col>
-            </Row>
-          </Form>
+                  <Button type="primary" htmlType="submit">Scan</Button>
+                </Col>
+              </Row>
+            </Form>
+        </Spin>
         }       
       </div>
     );

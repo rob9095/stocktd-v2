@@ -47,37 +47,40 @@ exports.handlePOImport = async (req, res, next) => {
       let poProductsObj = groupBy(poArr, 'skuCompany')
       poUpdates.push({
         updateOne: {
-    					filter: { poRef, },
-    					update: {
-                name: poArr[0].name,
-                type: poArr[0].type,
-                status: poArr[0].status,
-                poRef,
-                company: poArr[0].company,
-                quantity: sum,
-                $setOnInsert: { createdOn: new Date() }
-              },
-    					upsert: true,
-    				}
-          })
+          filter: { poRef },
+          update: {
+            name: poArr[0].name,
+            type: poArr[0].type,
+            status: poArr[0].status,
+            poRef,
+            company: poArr[0].company,
+            $inc: { quantity: parseInt(sum) },
+            $setOnInsert: { createdOn: new Date() }
+          },
+          upsert: true
+        }
+      });
       for (let skuRef of Object.entries(poProductsObj)) {
         let skuArr = skuRef[1]
         let currentSku = skuRef[0]
         let skuQtyArr = skuArr.map(sku => parseInt(sku.quantity))
         let skuSum = skuQtyArr.reduce((acc, cv) => (acc + cv), 0)
         let product = skuArr[0]
+        delete product.quantity
         poProductUpdates.push({
-    				updateOne: {
-    					filter: { skuCompany: currentSku, poRef},
-    					update: {
-                ...product,
-                quantity: skuSum,
-                $setOnInsert: { createdOn: new Date(), scannedQuantity: 0 }
+          updateOne: {
+            filter: { skuCompany: currentSku, poRef },
+            update: {
+              ...product,
+              $inc: { quantity: parseInt(skuSum) },
+              $setOnInsert: {
+                createdOn: new Date(),
+                scannedQuantity: 0
               }
-              ,
-    					upsert: true,
-    				}
-    			})
+            },
+            upsert: true
+          }
+        });
         productUpdates.push({
           updateOne: {
             filter: {skuCompany: currentSku},
