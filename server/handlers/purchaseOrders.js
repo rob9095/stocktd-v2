@@ -120,29 +120,55 @@ exports.handlePOImport = async (req, res, next) => {
 */
 exports.updatePurchaseOrder = async (req, res, next) => {
   try {
-    let poUpdates = req.body.updates.map(po=>({
-      updateOne: {
-        filter: { _id: po.id},
-        update: {...po},
-      }
-    }))
+    //basic update for each po
+    let poUpdates = req.body.updates.map(po=>{
+      delete po.oldQty, po.selectType;
+      return ({
+        updateOne: {
+          filter: { _id: po.id},
+          update: {
+            ...po
+          },
+        }
+      })
+    })
     let poProductUpdates = []
+    let productUpdates = []
+    //loop each po and find poProducts for po
     for (let po of req.body.updates) {
+      delete po.oldQty, po.selectType;
       let products = await db.PoProduct.find({poRef: po.poRef})
-      let updates = products.map(poLine => ({
+      //poProduct updates
+      let ppUpdates = products.map(poLine => ({
         updateOne: {
           filter: { skuCompany: poLine.skuCompany, poRef: poLine.poRef},
           update: {...po},
         }
       }))
-      poProductUpdates.push(...updates)
+      poProductUpdates.push(...ppUpdates);
+      //update quantity on main product if new po.type is different than current poProduct type
+      let pUpdates = products.filter(p=>p.type !== po.type).map(poLine => ({
+        updateOne: {
+          filter: {skuCompany: poLine.skuCompany},
+          update: {
+            $inc: po.type === 'outbound' ?
+              { quantity: parseInt(-poLine.quantity) }
+              :
+              { quantity: parseInt(poLine.quantity) }
+            }
+          }
+        })
+      )
+      productUpdates.push(...pUpdates)
     }
     let updatedPurchaseOrders = await db.PurchaseOrder.bulkWrite(poUpdates)
     let updatedPoProducts = await db.PoProduct.bulkWrite(poProductUpdates)
+    let updatedProducts = productUpdates.length > 0 && await db.Product.bulkWrite(productUpdates);
     return res.status(200).json({
       updatedPurchaseOrders,
       updatedPoProducts,
-    })
+      updatedProducts,
+    });
   } catch(err) {
     return next(err)
   }
