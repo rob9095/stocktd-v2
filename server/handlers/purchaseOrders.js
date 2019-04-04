@@ -26,14 +26,14 @@ exports.handlePOImport = async (req, res, next) => {
 		}
     const company = req.body.company
     let poData = req.body.json.map((po,i)=>({
-      name: po['po name'],
-      type: po['po type'],
-      status: po['status'] ? po['status'] : 'complete',
+      name: po['name'],
+      type: po['type'],
+      status: po['status'] || 'complete',
       sku: po['sku'],
-      quantity: po['quantity'],
+      quantity: po['quantity'] || 0,
       company: company,
       skuCompany: `${po['sku']}-${company}`,
-      poRef: `${company}-${po['po name']}-${po['po type']}-${po['status'] ? po['status'] : 'complete'}`,
+      poRef: `${company}-${po['name']}-${po['type']}-${po['status'] || 'complete'}`,
     }))
     let groupedPOs = groupBy(poData, 'poRef');
     let poUpdates = [];

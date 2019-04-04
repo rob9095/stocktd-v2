@@ -46,7 +46,10 @@ class DrawerForm extends Component {
 
   handleSelect = (value, select) => {
     this.setState({
-      selects: {[select.props.id]: value},
+      selects: {
+        ...this.state.selects,
+        [select.props.id]: value
+      },
     })
   }
 
@@ -86,7 +89,7 @@ class DrawerForm extends Component {
       })
       .catch(err=>{
         console.log(err)
-        this.handleAlert(err[0],'error')
+        this.handleAlert(err.message[0],'error')
       })
     });
   }

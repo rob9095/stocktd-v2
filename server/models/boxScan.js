@@ -5,6 +5,10 @@ const boxScanSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  prefix: {
+    type: String,
+    required: true,
+  },
   quantity: {
     type: Number,
     required: true,

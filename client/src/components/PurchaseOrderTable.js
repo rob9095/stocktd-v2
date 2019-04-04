@@ -31,7 +31,6 @@ class PurchaseOrderTable extends Component {
       showFilters: false,
       showEditItemDrawer: false,
       showCreateItemDrawer: false,
-      drawerItem: {},
       showImportModal: false,
       headers: [
         {id: 'select-all', text: '', width: 75, noSort: true},
@@ -190,7 +189,7 @@ class PurchaseOrderTable extends Component {
       switch(key) {
         case 'add':
         this.setState({
-          showCreateItemDrawer: true,
+          drawerItem: {},
         })
           break;
         case 'import':
@@ -287,6 +286,7 @@ class PurchaseOrderTable extends Component {
       return new Promise((resolve,reject) => {
         this.props.importPurchaseOrder(json, this.props.currentUser)
         .then(res=>{
+          this.handleDataFetch()
           resolve(res)
         })
         .catch(err=>{
@@ -457,22 +457,22 @@ class PurchaseOrderTable extends Component {
             inputs={this.state.headers.filter(h=>h.noSort !== true)}
             onFilterSearch={this.handleFilterSearch}
           />
-          {this.state.showEditItemDrawer && (
+          {this.state.drawerItem && (
             <EditItemDrawer
               inputs={[
-                {id: 'name', text: 'Name', span: 16, className: 'no-wrap', required: true, type: 'text', message: 'Name cannot be blank'},
+                {id: 'name', text: 'PO Name', span: 16, className: 'no-wrap', required: true, type: 'text', message: 'Name cannot be blank'},
                 {id: 'createdOn', text: 'Date Created', span: 8, className: 'full-width', required: true, type: 'date'},
                 {id: 'type', text: 'PO Type', span: 12, className: 'no-wrap', required: true, type: 'dropdown', values: [{id:'inbound',text:'Inbound'},{id:'outbound',text:'Outbound'}]},
                 {id: 'status', text: 'PO Status', span: 12, className: 'no-wrap', required: true, type: 'dropdown', values: [{id:'complete',text:'Complete'},{id:'processing',text:'Processing'}]},
               ]}
               item={this.state.drawerItem}
-              title={'Edit Purchase Order'}
-              onClose={this.toggle('showEditItemDrawer')}
-              onSave={this.handlePOUpdate}
-              create={false}
+              title={`${this.state.drawerItem._id ? 'Edit' : 'Create'} Purchase Order`}
+              onClose={()=>this.setState({drawerItem: null})}
+              onSave={(data)=>this.state.drawerItem._id ? this.handlePOUpdate(data) : this.handleImport(data)}
+              create={this.state.drawerItem._id ? false : true}
             />
           )}
-          {this.state.showCreateItemDrawer && (
+          {/* {this.state.showCreateItemDrawer && (
             <EditItemDrawer
               inputs={[
                 {id: 'name', text: 'Name', span: 16, className: 'no-wrap', required: true, type: 'text', message: 'Name cannot be blank'},
@@ -486,15 +486,15 @@ class PurchaseOrderTable extends Component {
               onSave={this.handleImport}
               create={true}
             />
-          )}
+          )} */}
           {this.state.showImportModal && (
             <ImportModal
               title="Import Purchase Orders"
               onClose={this.toggle('showImportModal')}
               headers={[
                 {value:'sku', required: true},
-                {value:'po type', required: true},
-                {value:'po name', required: true},
+                {value:'type', required: true},
+                {value:'name', required: true},
                 {value:'quantity', required: true},
                 {value:'status'},
                 {value:'title'},
@@ -506,13 +506,13 @@ class PurchaseOrderTable extends Component {
               ]}
               validInputs={[
                 {value:'sku', required: true},
-                {value:'po name', required: true},
-                {value:'po type', required: true, type: 'array', validValues: ['inbound','outbound']},
+                {value:'name', required: true},
+                {value:'type', required: true, type: 'array', validValues: ['inbound','outbound']},
                 {value:'quantity', type: 'number', required: true},
-                {value:'po status', type: 'array', validValues: ['complete','processing']},
+                {value:'status', type: 'array', validValues: ['complete','processing']},
                 {value:'title'},
                 {value:'barcode'},
-                {price:'price', type: 'number'},
+                {value:'price', type: 'number'},
                 {value:'supplier'},
                 {value:'brand'},
                 {value:'weight', type: 'number'},

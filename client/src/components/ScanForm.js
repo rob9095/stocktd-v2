@@ -94,7 +94,10 @@ class ScanForm extends Component {
     this.props.form.validateFields((err, values) => {
       console.log('Received values of form: ', values);
       if (!err) {
-        this.props.onScan(values)
+        this.props.onScan({
+          ...values,
+          prefix: this.state.currentPrefix,
+        })
         .then(res=>{
           console.log(res)
         })
