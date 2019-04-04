@@ -335,6 +335,16 @@ input.ant-input.no-border {
   box-shadow: 0 0 0 2px transparent !important;
 }
 
+.ant-select-selection {
+  padding: 4px 11px;
+  min-height: 40px;
+}
+
+.ant-select-selection .ant-select-selection__rendered {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
 /* Not Found (404) page */
 .not-found h1 {
   font-size: 3em;

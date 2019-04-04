@@ -76,12 +76,10 @@ class ModalForm extends Component {
                  }],
                })(
                 <AutoCompleteInput
-                  currentUser={this.props.currentUser}
                   queryModel={i.queryModel}
-                  key={i.id}
+                  id={i.id}
                   placeholder={"SKU"}
                   onUpdate={(val)=>this.handleAutoUpdate(val,i.id)}
-                  data={this.props.data}
                 />
                )}
             </FormItem>

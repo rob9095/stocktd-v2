@@ -120,7 +120,19 @@ exports.upsertModelDocuments = async (req,res,next) => {
 */
 exports.getAllModelDocuments = async (req,res,next) => {
 	try {
-		let limit = req.body.limit ? req.body.limit > 100 ? 100 : 100 : 100
+		if (req.body.limit > 100) {
+			return next({
+				status: 404,
+				message: ['Request to large']
+			})
+		}
+		let limit = req.body.limit || 10
+		//remove empty strings from documentRef to allow for searchAll type query
+		for (let ref of Object.entries(req.body.documentRef)) {
+			if (!ref[1]) {
+				delete req.body.documentRef[ref[0]]
+			}
+		}
 		let query = {...req.body.documentRef, company: req.body.company}
 		if (req.body.regex === true) {
 			query = {}

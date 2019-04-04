@@ -1,23 +1,33 @@
 import React, { Component } from 'react';
-import { AutoComplete } from 'antd';
+import { AutoComplete, Select, Avatar } from 'antd';
 import { getAllModelDocuments } from '../store/actions/models';
+import { connect } from "react-redux";
 
-function onSelect(value) {
-  console.log('onSelect', value);
-}
+const Option = Select.Option;
 
 class AutoCompleteInput extends Component {
-  state = {
-    data: [],
+  _isMounted = false 
+  constructor(props) {
+    super(props)
+    this.state = {
+      data: []
+    }
+  }
+
+  componentDidMount() {
+    this._isMounted = true;
+    this.handleDataFetch('')
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
   }
 
   handleDataFetch = (value) => {
     getAllModelDocuments(this.props.queryModel,{[this.props.id]: value},this.props.currentUser.company, true, 5)
     .then((res)=>{
-      let data = res.data.map(p => (p[this.props.id]))
-      this.setState({
-        data,
-      })
+      let data = res.data
+      this._isMounted && this.setState({data})
     })
     .catch(err=>{
       console.log(err)
@@ -25,21 +35,47 @@ class AutoCompleteInput extends Component {
   }
 
   handleChange = (value) => {
-    this.props.onUpdate(value,this.props.key)
+    this.props.onUpdate(value,this.props.id)
   }
 
   render() {
-    const { data } = this.state;
+    // const { data } = this.state;
+    // return (
+    //   <AutoComplete
+    //     dataSource={data}
+    //     onSelect={onSelect}
+    //     onSearch={this.handleDataFetch}
+    //     placeholder={this.props.placeholder}
+    //     onChange={this.handleChange}
+    //   />
+    const children = this.state.data.map(item => (
+      <Option key={item._id} value={item[this.props.id]} data={{ ...item }}>
+        <span>{item[this.props.id]}</span>
+      </Option>
+    ));
     return (
-      <AutoComplete
-        dataSource={data}
-        onSelect={onSelect}
-        onSearch={this.handleDataFetch}
+      <Select
+        style={{minWidth: 250}}
+        showSearch
         placeholder={this.props.placeholder}
-        onChange={this.handleChange}
-      />
+        notFoundContent={this.props.notFound || null}
+        filterOption={false}
+        onSearch={this.handleDataFetch}
+        onChange={this.onChange}
+        onSelect={this.onChange}
+      >
+        {children}
+      </Select>
     );
   }
 }
 
-export default AutoCompleteInput;
+function mapStateToProps(state) {
+  return {
+    currentUser: state.currentUser,
+    errors: state.errors
+  };
+}
+
+
+export default connect(mapStateToProps, {})(AutoCompleteInput);
