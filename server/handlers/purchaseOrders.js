@@ -67,42 +67,44 @@ exports.handlePOImport = async (req, res, next) => {
         let skuSum = skuQtyArr.reduce((acc, cv) => (acc + cv), 0)
         let product = skuArr[0]
         delete product.quantity
-        poProductUpdates.push({
-          updateOne: {
-            filter: { skuCompany: currentSku, poRef },
-            update: {
-              ...product,
-              $inc: { quantity: parseInt(skuSum) },
-              $setOnInsert: {
-                createdOn: new Date(),
-                scannedQuantity: 0
-              }
-            },
-            upsert: true
-          }
-        });
-        productUpdates.push({
-          updateOne: {
-            filter: {skuCompany: currentSku},
-            update: {
-              company,
-              sku: product.sku,
-              barcodeCompany: product.barcode ? product.barcode : product.sku  + "-" + company,
-              skuCompany: currentSku,
-              $setOnInsert: { createdOn: new Date(), quantityToShip: 0},
-              $inc: product.type === 'outbound' ?
-                { quantity: parseInt(-skuSum) }
-                :
-                { quantity: parseInt(skuSum) }
-            },
-            upsert: true,
-          }
-        })
+        if (product.sku) {
+          poProductUpdates.push({
+            updateOne: {
+              filter: { skuCompany: currentSku, poRef },
+              update: {
+                ...product,
+                $inc: { quantity: parseInt(skuSum) },
+                $setOnInsert: {
+                  createdOn: new Date(),
+                  scannedQuantity: 0
+                }
+              },
+              upsert: true
+            }
+          });
+          productUpdates.push({
+            updateOne: {
+              filter: { skuCompany: currentSku },
+              update: {
+                company,
+                sku: product.sku,
+                barcodeCompany: product.barcode ? product.barcode : product.sku + "-" + company,
+                skuCompany: currentSku,
+                $setOnInsert: { createdOn: new Date(), quantityToShip: 0 },
+                $inc: product.type === 'outbound' ?
+                  { quantity: parseInt(-skuSum) }
+                  :
+                  { quantity: parseInt(skuSum) }
+              },
+              upsert: true,
+            }
+          })
+        }
       }
     }
     let updatedPOs = await db.PurchaseOrder.bulkWrite(poUpdates)
-    let updatedPoProducts = await db.PoProduct.bulkWrite(poProductUpdates)
-    let updatedProducts = await db.Product.bulkWrite(productUpdates)
+    let updatedPoProducts = poProductUpdates.length > 0 && await db.PoProduct.bulkWrite(poProductUpdates)
+    let updatedProducts = productUpdates.length > 0 && await db.Product.bulkWrite(productUpdates)
     return res.status(200).json({
       updatedPOs,
       updatedPoProducts,
