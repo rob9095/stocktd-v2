@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Form, Row, Col, Input, Button, Select, Skeleton, Spin } from 'antd';
 import { getAllModelDocuments, upsertModelDocuments } from '../store/actions/models';
 import InsertDataModal from './InsertDataModal';
+import { connect } from "react-redux";
 
 const Option = Select.Option;
 const FormItem = Form.Item;
@@ -18,7 +19,7 @@ class ScanForm extends Component {
 
   getBoxPrefixes = async () => {
     // get the box prefixes for this user
-    await getAllModelDocuments('BoxPrefix',{user: this.props.currentUser.id},this.props.currentUser.company)
+    await getAllModelDocuments('BoxPrefix',{user: this.props.currentUser.user.id},this.props.currentUser.user.company)
     .then(res=>{
       console.log(res)
       let userPrefixList = res.data.map(pf => ({
@@ -27,14 +28,14 @@ class ScanForm extends Component {
       }))
       this._isMounted && this.setState({
         boxPrefixList: [...userPrefixList, ...this.state.boxPrefixList],
-        currentPrefix: userPrefixList[0] ? userPrefixList[0].value : this.props.currentUser.email.split('@')[0],
+        currentPrefix: userPrefixList[0] ? userPrefixList[0].value : this.props.currentUser.user.email.split('@')[0],
       })
     })
     .catch(err=>{
       console.log(err)
       this._isMounted && this.setState({
-        boxPrefixList: [{value: this.props.currentUser.email.split('@')[0], id: this.props.currentUser.id}, {value: 'Add New', id: 'Add New'}],
-        currentPrefix: this.props.currentUser.email.split('@')[0],
+        boxPrefixList: [{value: this.props.currentUser.user.email.split('@')[0], id: this.props.currentUser.user.id}, {value: 'Add New', id: 'Add New'}],
+        currentPrefix: this.props.currentUser.user.email.split('@')[0],
       })
     })
   }
@@ -73,7 +74,7 @@ class ScanForm extends Component {
       if (this.state.boxPrefixList.some((pf)=>(pf.value === data.name))) {
         reject({text: 'Prefix already exists',status:'error'})
       }
-      upsertModelDocuments('BoxPrefix', [{...data, user: this.props.currentUser.id}], this.props.currentUser.company, 'name')
+      upsertModelDocuments('BoxPrefix', [{...data, user: this.props.currentUser.user.id}], this.props.currentUser.user.company, 'name')
       .then(res => {
         resolve({text:'Box Prefix Added',status:'success'})
         this.setState({
@@ -109,9 +110,10 @@ class ScanForm extends Component {
             })
           }
         })
-        // clear scan id
+        // clear scan id and reset focus
         setTimeout(()=> {
           this.props.form.setFieldsValue({barcode: ''})
+          this.barcodeInput.focus()
         }, 250)        
       }
     });
@@ -119,7 +121,7 @@ class ScanForm extends Component {
 
   handleNewBarcode = (update) => {
     return new Promise((resolve,reject) => {
-      upsertModelDocuments('Product', [{...update, skuCompany: update.sku + "-" + this.props.currentUser.company}], this.props.currentUser.company, 'skuCompany')
+      upsertModelDocuments('Product', [{...update, skuCompany: update.sku + "-" + this.props.currentUser.user.company}], this.props.currentUser.user.company, 'skuCompany')
       .then(res => {
         resolve({text:'Barcode Updated!', status:'success'})
       })
@@ -144,7 +146,7 @@ class ScanForm extends Component {
       <div>
         {this.state.showBoxPrefixModal && (
           <InsertDataModal
-            currentUser={this.props.currentUser}
+            currentUser={this.props.currentUser.user}
             title={'Add Box Prefix'}
             inputs={[
               {span: 24, id: 'name', text: 'Box Prefix', required: true, message: 'Box Prefix is required'},
@@ -157,7 +159,7 @@ class ScanForm extends Component {
         )}
         {this.state.showBarcodeModal && (
           <InsertDataModal
-            currentUser={this.props.currentUser}
+            currentUser={this.props.currentUser.user}
             title={'Add Barcode'}
             inputs={[
               {span: 24, id: 'sku', text: 'SKU', required: true, message: 'SKU is required', autoComplete: true, queryModel: 'Product'},
@@ -205,7 +207,7 @@ class ScanForm extends Component {
                         message: 'Scan ID Required',
                       }],
                     })(
-                      <Input placeholder="Scan ID" />
+                      <Input ref={node => this.barcodeInput = node} placeholder="Scan ID" />
                     )}
                   </FormItem>
                 </Col>
@@ -239,4 +241,12 @@ class ScanForm extends Component {
 }
 
 const WrappedScanForm = Form.create()(ScanForm);
-export default WrappedScanForm
+
+function mapStateToProps(state) {
+  return {
+    currentUser: state.currentUser,
+    errors: state.errors
+  };
+}
+
+export default connect(mapStateToProps, {})(WrappedScanForm);

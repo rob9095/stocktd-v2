@@ -3,46 +3,50 @@ const mongoose = require('mongoose');
 const boxScanSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
+    required: true
   },
   prefix: {
     type: String,
-    required: true,
+    required: true
   },
   quantity: {
     type: Number,
-    required: true,
+    required: true
   },
   skuCompany: {
     type: String,
-    required: true,
+    required: true
   },
   sku: {
     type: String,
-    required: true,
+    required: true
   },
   company: {
     type: String,
-    required: true,
+    required: true
   },
   poRef: {
-    type: String,
+    type: String
+  },
+  poId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "PurchaseOrder"
   },
   barcode: {
-    type: String,
+    type: String
   },
   location: {
-    type: String,
+    type: String
   },
   createdOn: {
     type: Date,
-    default: Date.now,
+    default: Date.now
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-  },
-})
+    ref: "User"
+  }
+});
 
 const BoxScan = mongoose.model("BoxScan", boxScanSchema);
 

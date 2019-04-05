@@ -335,7 +335,8 @@ class PoProductTable extends Component {
           ...scan,
           user: this.props.currentUser.user.id,
         }
-        let poRefs = this.state.currentPOs.sort((a,b)=>(b.quantity - a.quantity)).map(po=>po.poRef)
+        let poRefs = this.state.currentPOs.sort((a,b)=>(b.quantity - a.quantity))
+        console.log(poRefs)
         this.props.addBoxScan(scan, poRefs, this.props.currentUser.user.company)
         .then(res => {
           let data = this.state.data.map(p => {
@@ -373,6 +374,7 @@ class PoProductTable extends Component {
     }
 
     render() {
+      console.log(this.state.currentPOs[0])
       let poTags = this.state.currentPOs.map(po=>{
         return(
           <Tag key={po.poRef} closable onClose={()=>this.updatePoRefs(po.poRef,true)}>{po.name}</Tag>

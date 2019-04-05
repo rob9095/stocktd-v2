@@ -54,10 +54,10 @@ class ModalForm extends Component {
     })
   }
 
-  handleAutoUpdate = (value, id) => {
+  handleAutoUpdate = (clicked, id) => {
     this.setState({
       values: {
-        [id]: value,
+        [id]: clicked.value,
       }
     })
   }
@@ -77,9 +77,9 @@ class ModalForm extends Component {
                })(
                 <AutoCompleteInput
                   queryModel={i.queryModel}
-                  id={i.id}
+                  searchKey={i.id}
                   placeholder={"SKU"}
-                  onUpdate={(val)=>this.handleAutoUpdate(val,i.id)}
+                  onUpdate={(clicked)=>this.handleAutoUpdate(clicked,i.id)}
                 />
                )}
             </FormItem>

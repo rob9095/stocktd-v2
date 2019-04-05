@@ -166,7 +166,6 @@ class FilterForm extends Component {
         )}
         {this.state.showScannerForm && (
           <WrappedScanForm
-            currentUser={this.props.currentUser}
             currentPOs={this.props.currentPOs}
             requirePo={true}
             onScan={this.handleScan}

@@ -404,7 +404,7 @@ class PurchaseOrderTable extends Component {
             <td key={`${p._id}-${col.id}`} className={col.className}>
               <Link to={{
                   pathname: '/app/po-products',
-                  poRefs: [{name:p.name,poRef:p.poRef}],
+                  poRefs: [{...p}],
                 }}
               >
                 {p[col.id]}

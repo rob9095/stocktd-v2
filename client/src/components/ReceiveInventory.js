@@ -1,5 +1,12 @@
 import React, { Component } from 'react';
 import AutoCompleteInput from './AutoCompleteInput';
+import WrappedScanForm from './ScanForm';
+import { Button, Form } from 'antd'
+import { connect } from "react-redux";
+import { addBoxScan } from "../store/actions/boxScans";
+
+const FormItem = Form.Item;
+
 
 class ReceiveInventory extends Component {
   constructor(props) {
@@ -9,27 +16,60 @@ class ReceiveInventory extends Component {
     };
   }
 
-  handleAutoUpdate = (value, id) => {
+  handleAutoUpdate = (clicked, id) => {
     this.setState({
       values: {
         ...this.state.values,
-        [id]: value
+        [id]: {...clicked.data}
       }
     });
   };
 
+  handleScan = (scan) => {
+    return new Promise((resolve, reject) => {
+      scan = {
+        ...scan,
+        user: this.props.currentUser.user.id,
+        scanToPo: true,
+      };
+      this.props.addBoxScan(scan, [this.state.values.currentPO || {}], this.props.currentUser.user.company)
+        .then(res => {
+          resolve(res)
+        })
+        .catch(err => {
+          reject(err);
+        })
+    })
+  }
+
   render() {
     return (
       <div className="stkd-content">
-        <AutoCompleteInput
-          queryModel={"PurchaseOrder"}
-          id={"name"}
-          placeholder={"Search by PO Name"}
-          onUpdate={val => this.handleAutoUpdate(val,'poName')}
+        <FormItem key={'currentPo'} label={"Purchase Order (Optional)"}>
+          <AutoCompleteInput
+            queryModel={"PurchaseOrder"}
+            searchKey={"name"}
+            placeholder={"Search by PO Name"}
+            onUpdate={clicked => this.handleAutoUpdate(clicked, 'currentPO')}
+          />
+        </FormItem>
+        <WrappedScanForm
+          currentPOs={[this.state.currentPO]}
+          requirePo={false}
+          onScan={this.handleScan}
         />
+        <Button onClick={()=>console.log(this.state.values.currentPO.data)}></Button>
       </div>
     );
   }
 }
 
-export default ReceiveInventory
+
+function mapStateToProps(state) {
+  return {
+    currentUser: state.currentUser,
+    errors: state.errors
+  };
+}
+
+export default connect(mapStateToProps, {addBoxScan})(ReceiveInventory);
