@@ -55,9 +55,11 @@ class ModalForm extends Component {
   }
 
   handleAutoUpdate = (clicked, id) => {
+    this.props.form.setFieldsValue({[id]: clicked.data[id] || ''})
     this.setState({
       values: {
-        [id]: clicked.data[id],
+        ...this.state.values,
+        [id]: clicked.data[id] || '',
       }
     })
   }
@@ -69,7 +71,7 @@ class ModalForm extends Component {
         return (
           <Col xs={i.span*3} md={i.span} key={i.id}>
             <FormItem key={i.id} label={`${i.text}`}>
-              {getFieldDecorator(i.id, { setFieldsValue: this.state.values[i.id] }, {
+              {getFieldDecorator(i.id, {
                  rules: [{
                   required: i.required,
                   message: i.message,
@@ -80,7 +82,9 @@ class ModalForm extends Component {
                   searchKey={i.id}
                   placeholder={"SKU"}
                   onUpdate={(clicked)=>this.handleAutoUpdate(clicked,i.id)}
-                />
+                >
+                  <Input style={{display: 'none'}} />
+                </AutoCompleteInput>
                )}
             </FormItem>
           </Col>
