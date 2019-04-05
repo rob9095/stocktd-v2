@@ -57,7 +57,7 @@ class ModalForm extends Component {
   handleAutoUpdate = (clicked, id) => {
     this.setState({
       values: {
-        [id]: clicked.value,
+        [id]: clicked.data[id],
       }
     })
   }

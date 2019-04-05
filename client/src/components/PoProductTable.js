@@ -374,7 +374,6 @@ class PoProductTable extends Component {
     }
 
     render() {
-      console.log(this.state.currentPOs[0])
       let poTags = this.state.currentPOs.map(po=>{
         return(
           <Tag key={po.poRef} closable onClose={()=>this.updatePoRefs(po.poRef,true)}>{po.name}</Tag>

@@ -34,9 +34,9 @@ class AutoCompleteInput extends Component {
     })
   }
 
-  handleChange = (value,e) => {
-    console.log({value,e})
-    this.props.onUpdate({value,data: e.props.data})
+  handleChange = (id,e) => {
+    console.log({id,e})
+    this.props.onUpdate({id,data: e.props.data})
   }
 
   render() {
@@ -52,7 +52,7 @@ class AutoCompleteInput extends Component {
     const children = this.state.data.map(item => (
       <Option
         key={item._id}
-        value={item[this.props.searchKey]}
+        value={item._id}
         data={{ ...item }}
       >
         <span>{item[this.props.searchKey]}</span>
