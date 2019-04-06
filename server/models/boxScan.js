@@ -28,10 +28,6 @@ const boxScanSchema = new mongoose.Schema({
   poRef: {
     type: String
   },
-  poId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "PurchaseOrder"
-  },
   barcode: {
     type: String
   },
@@ -45,7 +41,12 @@ const boxScanSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User"
+  },
+  scanToPo: {
+    type: Boolean,
+    required: true,
   }
+
 });
 
 const BoxScan = mongoose.model("BoxScan", boxScanSchema);

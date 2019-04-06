@@ -28,10 +28,16 @@ exports.upsertBoxScan = async (req,res,next) => {
       sku: product.sku,
       company: req.body.company,
     }
+    const scanQty = parseInt(req.body.scan.quantity)
+    let updatedPoProduct,
+      updatedProduct,
+      updatedPo,
+      updatedBoxScan,
+      completedPoProducts = {};
     // add the scanned product to PO instead of scan from PO
     if (req.body.scan.scanToPo === true) {
       const genericInboundPo = await db.PurchaseOrder.findOne({ poRef: `${boxScan.company}-genericReceiving` }) || {
-        name: 'Scanned Inventory Recieved',
+        name: 'Scanned Inventory Received',
         type: 'inbound',
         status: 'processing',
         poRef: `${boxScan.company}-genericReceiving`,
@@ -39,7 +45,6 @@ exports.upsertBoxScan = async (req,res,next) => {
       }
       //check if a po was provided as first po in poRefs array
       let foundPo = await db.PurchaseOrder.findOne({poRef: req.body.poRefs[0].poRef}) || genericInboundPo
-      let updatedPoProduct, updatedProduct, updatedPo, updatedBoxScan = {}
       //upsert poProduct, update Product, upsert Purchase Order, upsert boxScan
       await db.PoProduct.update({ poRef: foundPo.poRef, skuCompany: boxScan.skuCompany }, {
         $setOnInsert: {
@@ -53,12 +58,12 @@ exports.upsertBoxScan = async (req,res,next) => {
           poRef: foundPo.poRef,
           company: boxScan.company,
         },
-        $inc: { quantity: parseInt(req.body.scan.quantity) },
+        $inc: { quantity: scanQty },
       }, { upsert: true });
       updatedPoProduct = await db.PoProduct.findOne({ poRef: foundPo.poRef, skuCompany: boxScan.skuCompany })
 
       updatedProduct = await db.Product.findOneAndUpdate({ skuCompany: boxScan.skuCompany }, {
-        $inc: { quantity: parseInt(req.body.scan.quantity) }
+        $inc: { quantity: scanQty }
       });
       updatedPo = await db.PurchaseOrder.update({poRef: foundPo.poRef}, {
         $setOnInsert: {
@@ -69,15 +74,14 @@ exports.upsertBoxScan = async (req,res,next) => {
           poRef: foundPo.poRef,
           company: boxScan.company,
         },
-        $inc: { quantity: parseInt(req.body.scan.quantity) },
+        $inc: { quantity: scanQty },
       }, {upsert: true});
       delete boxScan.quantity
       updatedBoxScan = await db.BoxScan.update({ skuCompany: boxScan.skuCompany, name: boxScan.name }, {
         ...boxScan,
-        poRef: updatedPo.poRef,
-        poId: updatedPo._id,
+        poRef: foundPo.poRef,
         createdOn: new Date(),
-        $inc: { quantity: parseInt(req.body.scan.quantity) },
+        $inc: { quantity: scanQty },
       }, { upsert: true });
       return res.status(200).json({
         updatedPoProduct,
@@ -91,25 +95,18 @@ exports.upsertBoxScan = async (req,res,next) => {
     let poProducts = await db.PoProduct.find({
       $and: [{$or: andQuery}],
     })
-    let updatedPoProduct = {}
-    let updatedPo = {}
-    let updatedBoxScan = {}
-    let completedPoProducts = {}
     for (let po of req.body.poRefs) {
       let poProduct = poProducts.find(p=>p.skuCompany === product.skuCompany && po.poRef === p.poRef)
       if (poProduct) {
         // product found
         updatedPo = po
         await db.PoProduct.findByIdAndUpdate(poProduct._id,{
-          $inc: { scannedQuantity: parseInt(req.body.scan.quantity) },
+          $inc: { scannedQuantity: scanQty },
         })
         updatedPoProduct = await db.PoProduct.findOne({_id: poProduct._id})
         let markComplete = updatedPoProduct.scannedQuantity >= updatedPoProduct.quantity 
-        console.log(updatedPoProduct)
-        console.log(markComplete)
         if (markComplete) {
           let notComplete = poProducts.filter(p=>p.poRef === po.poRef && p.quantity > p.scannedQuantity && p.skuCompany !== updatedPoProduct.skuCompany)
-          console.log(notComplete)
           if (notComplete.length === 0) {
             updatedPoProduct.status = 'complete'
             // find and update the po status
@@ -129,12 +126,12 @@ exports.upsertBoxScan = async (req,res,next) => {
         boxScan = {
           ...boxScan,
           poRef: po.poRef,
-          poId: po._id,
           createdOn: new Date(),
+          scanToPo: false,
         }
         let foundBoxScan = await db.BoxScan.findOne({skuCompany: boxScan.skuCompany, name: boxScan.name})
         if (foundBoxScan) {
-          foundBoxScan.quantity += parseInt(boxScan.quantity)
+          foundBoxScan.quantity += scanQty
           foundBoxScan.save()
           updatedBoxScan = foundBoxScan
         } else {
