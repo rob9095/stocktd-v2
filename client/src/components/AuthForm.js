@@ -7,6 +7,7 @@ import { Alert, Form, Icon, Input, Button, Checkbox, Spin } from 'antd';
 const FormItem = Form.Item;
 
 class AuthForm extends Component {
+  _isMounted = false
   constructor(props) {
     super(props)
     this.state = {
@@ -18,21 +19,28 @@ class AuthForm extends Component {
     this.setState({
       loading: true,
     })
-    this.props.form.validateFields((err, values) => {
+    this.props.form.validateFields( async (err, values) => {
       if (!err) {
         console.log('Received values of form: ', values);
         const authType = this.props.signUp ? 'signup' : 'signin';
-        this.props.onAuth(authType, values).then(() => {
+        await this.props.onAuth(authType, values).then(() => {
           this.props.history.push('/app');
         })
         .catch(() => {
-          return;
         });
       }
+      this._isMounted && this.setState({
+        loading: false,
+      })
     })
-    this.setState({
-      loading: false,
-    })
+  }
+
+  componentDidMount() {
+    this._isMounted = true
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false
   }
 
   clearErrors = () => {
@@ -47,11 +55,12 @@ class AuthForm extends Component {
     });
     return (
       <div className="centered-container">
-        <Spin spinning={this.state.loading} delay={100}>
+        <Spin spinning={this.state.loading}>
           <Form onSubmit={this.handleSubmit} className="auth-form">
             <h1>{heading}</h1>
             {errors.message && (
               <Alert
+                style={{marginBottom: '1em'}}
                 message={errors.message}
                 type="error"
                 closable
