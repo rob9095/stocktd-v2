@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import AutoCompleteInput from './AutoCompleteInput';
 import WrappedScanForm from './ScanForm';
-import { Button, Form } from 'antd'
+import { Button, Form, Badge } from 'antd'
 import { connect } from "react-redux";
 import { addBoxScan } from "../store/actions/boxScans";
 
@@ -45,12 +45,20 @@ class ReceiveInventory extends Component {
   render() {
     return (
       <div className="stkd-content">
-        <FormItem key={'currentPo'} label={"Purchase Order (Optional)"}>
+        <FormItem key={"currentPo"} label={"Purchase Order (Optional)"}>
           <AutoCompleteInput
             queryModel={"PurchaseOrder"}
             searchKey={"name"}
             placeholder={"Search by PO Name"}
-            onUpdate={clicked => this.handleAutoUpdate(clicked, 'currentPO')}
+            renderOption={item => (
+              <div style={{maxHeight: 40, overflow: 'hidden'}}>
+                <div style={{fontSize: "small"}}>{item["name"]}</div>
+                <div style={{fontSize: 9, color: 'grey'}}>{item["type"]}</div>
+              </div>
+            )}
+            onUpdate={clicked =>
+              this.handleAutoUpdate(clicked, "currentPO")
+            }
           />
         </FormItem>
         <WrappedScanForm
@@ -58,7 +66,9 @@ class ReceiveInventory extends Component {
           requirePo={false}
           onScan={this.handleScan}
         />
-        <Button onClick={()=>console.log(this.state.values.currentPO.data)}></Button>
+        <Button
+          onClick={() => console.log(this.state.values.currentPO.data)}
+        />
       </div>
     );
   }

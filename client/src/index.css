@@ -197,6 +197,30 @@ i.xl svg {
   font-weight: 500;
 }
 
+.flex {
+  display: flex;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.justify-content-center {
+  justify-content: center;
+}
+
+.space-bewteen {
+  justify-content: space-between;
+}
+
+.space-around {
+  justify-content: space-around;
+}
+
 .right-a {
   text-align: right;
 }

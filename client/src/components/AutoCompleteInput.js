@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { AutoComplete, Select, Avatar, Skeleton } from 'antd';
+import { AutoComplete, Select, Avatar, Form, Skeleton } from 'antd';
 import { getAllModelDocuments } from '../store/actions/models';
 import { connect } from "react-redux";
 
 const Option = Select.Option;
 
-class AutoCompleteInput extends Component {
+class AutoCompleteInputForm extends Component {
   _isMounted = false 
   constructor(props) {
     super(props)
@@ -17,6 +17,9 @@ class AutoCompleteInput extends Component {
   componentDidMount() {
     this._isMounted = true;
     this.handleDataFetch('')
+    if (this.props.selected) {
+      this.props.form.setFieldsValue(({ selected: this.props.selected }));
+    }
   }
 
   componentWillUnmount() {
@@ -61,33 +64,38 @@ class AutoCompleteInput extends Component {
     //     placeholder={this.props.placeholder}
     //     onChange={this.handleChange}
     //   />
+    const { getFieldDecorator } = this.props.form;
     const children = this.state.data.map(item => (
       <Option
         key={item._id}
         value={item._id}
         data={{ ...item }}
       >
-        <span>{item[this.props.searchKey]}</span>
+       {this.props.renderOption(item) || item[this.props.searchKey]}
       </Option>
     ));
     return (
-      <Select
-        allowClear
-        style={{ minWidth: 250 }}
-        showSearch
-        showArrow
-        placeholder={this.props.placeholder}
-        notFoundContent={this.state.loading ? <Skeleton active loading paragraph={false} /> : this.props.notFound || null}
-        filterOption={false}
-        onSearch={this.handleDataFetch}
-        onChange={this.handleChange}
-        mode={this.props.mode || "default"}
-      >
-        {children}
-      </Select>
+      getFieldDecorator("selected")(
+        <Select
+          allowClear
+          style={{ minWidth: 250 }}
+          showSearch
+          showArrow
+          placeholder={this.props.placeholder}
+          notFoundContent={this.state.loading ? <Skeleton active loading paragraph={false} /> : this.props.notFound || null}
+          filterOption={false}
+          onSearch={this.handleDataFetch}
+          onChange={this.handleChange}
+          mode={this.props.mode || "default"}
+        >
+          {children}
+        </Select>
+      )
     );
   }
 }
+
+const AutoCompleteInput = Form.create()(AutoCompleteInputForm);
 
 function mapStateToProps(state) {
   return {

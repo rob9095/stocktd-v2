@@ -33,7 +33,7 @@ exports.handlePOImport = async (req, res, next) => {
       quantity: po['quantity'] || 0,
       company: company,
       skuCompany: `${po['sku']}-${company}`,
-      poRef: `${company}-${po['name']}-${po['type']}-${po['status'] || 'complete'}`,
+      poRef: `${company}-${po['name']}-${po['type']}}`,
     }))
     let groupedPOs = groupBy(poData, 'poRef');
     let poUpdates = [];
