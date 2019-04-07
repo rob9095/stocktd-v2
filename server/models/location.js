@@ -5,22 +5,21 @@ const locationSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  boxes: [{
+  boxId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'BoxScan',
-  }],
+  },
   pullCount: {
     type: Number,
     default: 0,
   },
-  companyName: {
+  company: {
     type: String,
     required: true,
   },
   companyId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Company',
-    required: true,
   },
   isDefault: {
     type: Boolean,
