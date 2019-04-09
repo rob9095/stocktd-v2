@@ -308,6 +308,12 @@ class PoProductTable extends Component {
       this.handleDataFetch()
     }
 
+    handleCurrentPOUpdate = (currentPOs) => {
+      console.log(currentPOs)
+      this.setState({currentPOs: [...currentPOs.data]})
+      this.handleDataFetch();
+    }
+
     updatePoRefs = async (poRef,fetch) => {
       let poRefs = this.state.poRefs
       let currentPOs = this.state.currentPOs
@@ -518,6 +524,7 @@ class PoProductTable extends Component {
               currentPOs={this.state.currentPOs}
               showScannerForm
               onScan={this.handleScan}
+              onCurrentPOUpdate={this.handleCurrentPOUpdate}
             />
           </div>
           <div style={{padding: '0px 0px 10px'}}>

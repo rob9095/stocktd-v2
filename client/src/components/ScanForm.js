@@ -133,15 +133,16 @@ class ScanForm extends Component {
     })
   }
 
-  handleAutoUpdate = (clicked, id) => {
-    //this.props.form.setFieldsValue({ [id]: clicked.data[id] || '' })
+  handleAutoUpdate = (clicked, valKey) => {
+    this.props.form.setFieldsValue({ [valKey]: clicked.data || '' })
     console.log(clicked)
-    // this.setState({
-    //   values: {
-    //     ...this.state.values,
-    //     [id]: clicked.data[id] || '',
-    //   }
-    // })
+    this.setState({
+      values: {
+        ...this.state.values,
+        [valKey]: clicked.data || '',
+      }
+    })
+    this.props.onCurrentPOUpdate(clicked)
   }
 
   render() {
@@ -205,7 +206,7 @@ class ScanForm extends Component {
         )}
         <Spin spinning={!this.state.currentPrefix}>
           <Form className="scan-form" onSubmit={this.handleSubmit}>
-            <Row gutter={24}>
+            <Row gutter={24} style={{ minHeight: 90 }}>
               <Col s={24} md={8}>
                 <FormItem label="Purchase Order">
                   {getFieldDecorator("currentPOs", {
@@ -221,18 +222,22 @@ class ScanForm extends Component {
                       searchKey={"name"}
                       placeholder={"Search by PO Name"}
                       renderOption={item => (
-                        <div style={{ maxHeight: 40, overflow: 'hidden' }}>
-                          <div style={{ fontSize: "small" }}>{item["name"]}</div>
-                          <div style={{ fontSize: 9, color: 'grey' }}>{item["type"]}</div>
+                        <div style={{ maxHeight: 40, overflow: "hidden" }}>
+                          <div style={{ fontSize: "small" }}>
+                            {item["name"]}
+                          </div>
+                          <div style={{ fontSize: 10, color: "grey" }}>
+                            {item["type"]}
+                          </div>
                         </div>
                       )}
                       mode={this.props.poMode || "default"}
                       selected={this.props.currentPOs}
                       onUpdate={clicked =>
-                        this.handleAutoUpdate(clicked, "currentPO")
+                        this.handleAutoUpdate(clicked, "currentPOs")
                       }
                     >
-                      <Input style={{ display: 'none' }} />
+                      <Input style={{ display: "none" }} />
                     </AutoCompleteInput>
                   )}
                 </FormItem>
@@ -249,10 +254,7 @@ class ScanForm extends Component {
                       }
                     ]
                   })(
-                    <Input
-                      addonBefore={boxSelect}
-                      placeholder="Box Name"
-                    />
+                    <Input addonBefore={boxSelect} placeholder="Box Name" />
                   )}
                 </FormItem>
               </Col>
@@ -301,7 +303,7 @@ class ScanForm extends Component {
               >
                 <Button type="primary" htmlType="submit">
                   Scan
-                  </Button>
+                </Button>
               </Col>
             </Row>
           </Form>

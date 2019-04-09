@@ -50,8 +50,8 @@ class AutoCompleteInputForm extends Component {
       this.props.onUpdate({id:'', data:{}})
       return
     }
-    let data = Array.isArray(e) ? e[0].props.data : e.props.data
-    id = Array.isArray(id) ? id[0] : id
+    let data = Array.isArray(e) ? e.map(d=>({...d.props.data})) : e.props.data
+    id = Array.isArray(id) ? id.map(i=>({id:i.key})) : id
     this.props.onUpdate({id,data})
   }
 
@@ -59,8 +59,8 @@ class AutoCompleteInputForm extends Component {
     const { getFieldDecorator } = this.props.form;
     const children = this.state.data.map(item => (
       <Option key={item._id} value={item._id} data={{ ...item }}>
-        {/* <Skeleton active loading paragraph={false} style={{minWidth: 250}} /> */}
-        {this.state.loading ? 'loading' : this.props.renderOption(item) || item[this.props.searchKey]}
+        {this.props.renderOption ? this.props.renderOption(item) 
+        : item[this.props.searchKey]}
       </Option>
     ));
     return (
