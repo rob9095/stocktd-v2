@@ -6,11 +6,12 @@ rew.body.scan has user, quantity, barcode, name
 */
 exports.upsertBoxScan = async (req,res,next) => {
   try {
-    if (req.body.poRefs.length === 0) {
+    // if no po os provided or we are not scanning to a po
+    if (req.body.scan.currentPOs.length === 0 && req.body.scan.scanToPo === false) {
       return next({
         status: 400,
-        message:  'No Purchase Order Provided'
-      })
+        message: "No Purchase Order Provided"
+      });
     }
     let [product,...products] = await db.Product.find({
       company: req.body.company,
@@ -44,7 +45,7 @@ exports.upsertBoxScan = async (req,res,next) => {
         company: boxScan.company,
       }
       //check if a po was provided as first po in poRefs array
-      let foundPo = await db.PurchaseOrder.findOne({poRef: req.body.poRefs[0].poRef}) || genericInboundPo
+      let foundPo = await db.PurchaseOrder.findOne({poRef: req.body.scan.currentPOs[0].poRef}) || genericInboundPo
       //upsert poProduct, update Product, upsert Purchase Order, upsert boxScan
       await db.PoProduct.update({ poRef: foundPo.poRef, skuCompany: boxScan.skuCompany }, {
         $setOnInsert: {
@@ -91,11 +92,11 @@ exports.upsertBoxScan = async (req,res,next) => {
       })
     }
     // continue to scan from PO
-    let andQuery = req.body.poRefs.map(p=>({poRef: p.poRef}))
+    let andQuery = req.body.scan.currentPOs.map(p=>({poRef: p.poRef}))
     let poProducts = await db.PoProduct.find({
       $and: [{$or: andQuery}],
     })
-    for (let po of req.body.poRefs) {
+    for (let po of req.body.scan.currentPOs) {
       let poProduct = poProducts.find(p=>p.skuCompany === product.skuCompany && po.poRef === p.poRef)
       if (poProduct) {
         // product found
