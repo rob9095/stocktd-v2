@@ -142,7 +142,7 @@ class ScanForm extends Component {
         [valKey]: clicked.data || '',
       }
     })
-    this.props.onCurrentPOUpdate(clicked)
+    valKey === 'currentPOs' && this.props.onCurrentPOUpdate(clicked)
   }
 
   render() {
@@ -207,7 +207,7 @@ class ScanForm extends Component {
         <Spin spinning={!this.state.currentPrefix}>
           <Form className="scan-form" onSubmit={this.handleSubmit}>
             <Row gutter={24} style={{ minHeight: 90 }}>
-              <Col s={24} md={8}>
+              <Col s={24} md={12}>
                 <FormItem label="Purchase Order">
                   {getFieldDecorator("currentPOs", {
                     rules: [
@@ -240,6 +240,21 @@ class ScanForm extends Component {
                       <Input style={{ display: "none" }} />
                     </AutoCompleteInput>
                   )}
+                </FormItem>
+              </Col>
+              <Col s={24} md={12}>
+                <FormItem label="Location">
+                {getFieldDecorator("location")(
+                  <AutoCompleteInput
+                    queryModel={"Location"}
+                    searchKey={"name"}
+                    placeholder={"Location"}
+                    mode={"tags"}
+                    onUpdate={clicked => this.handleAutoUpdate(clicked, "Location")}
+                  >
+                    <Input style={{ display: "none" }} />
+                  </AutoCompleteInput>
+                )}
                 </FormItem>
               </Col>
             </Row>

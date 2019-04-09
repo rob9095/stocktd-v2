@@ -28,7 +28,6 @@ class PoProductTable extends Component {
       column: 'createdOn',
       direction: 'descending',
       query: [],
-      poRefs: [],
       currentPOs: [],
       showEditItemDrawer: false,
       showCreateItemDrawer: false,
@@ -73,7 +72,8 @@ class PoProductTable extends Component {
     })
     requestedPage === undefined ? requestedPage = this.state.activePage : null;
     requestedRowsPerPage === undefined ? requestedRowsPerPage = this.state.rowsPerPage : null;
-    let query = this.state.poRefs ? [...this.state.poRefs,...this.state.query] : this.state.query
+    let poRefs = this.state.currentPOs.map(p => (['poRef', p.poRef]))
+    let query = poRefs ? [...poRefs,...this.state.query] : this.state.query
     this.props.queryModelData('PoProduct',query,this.state.column, this.state.direction, requestedPage, requestedRowsPerPage, this.props.currentUser.user.company)
     .then(({data, activePage, totalPages, rowsPerPage, skip})=>{
       data = data.map(po => ({
@@ -105,7 +105,6 @@ class PoProductTable extends Component {
     async componentDidMount() {
       if (this.props.history.location.poRefs) {
         await this.setState({
-          poRefs: this.props.history.location.poRefs.map(p=>(['poRef',p.poRef])),
           currentPOs: this.props.history.location.poRefs,
         })
       }
@@ -314,27 +313,6 @@ class PoProductTable extends Component {
       this.handleDataFetch();
     }
 
-    updatePoRefs = async (poRef,fetch) => {
-      let poRefs = this.state.poRefs
-      let currentPOs = this.state.currentPOs
-      let foundRef = poRefs.find(arr => arr[1] === poRef)
-      if (foundRef) {
-        console.log('filtering')
-        poRefs = poRefs.filter(arr=>arr[1] !== poRef)
-        currentPOs = currentPOs.filter(po=>po.poRef !== poRef)
-      } else {
-        console.log('pushing')
-        poRefs.push(poRef)
-        currentPOs.push({poRef: poRef})
-      }
-      console.log(poRefs)
-      await this.setState({
-        poRefs,
-        currentPOs,
-      })
-      fetch && this.handleDataFetch();
-    }
-
     handleScan = (scan) => {
       return new Promise((resolve,reject) => {
         scan = {
@@ -374,7 +352,9 @@ class PoProductTable extends Component {
       this.showConfirm('PO Completed',null, [], `All units for PO "${poProduct.name}" were scanned, remove it from current purchase orders?`)
       .then((res)=>{
         if (res !== 'cancel') {
-          this.updatePoRefs(poProduct.poRef,true)
+          this.setState({
+            currentPOs: this.state.currentPOs.filter(po=>po.poRef !== poProduct.poRef)
+          })
         }
       })
     }
@@ -382,7 +362,15 @@ class PoProductTable extends Component {
     render() {
       let poTags = this.state.currentPOs.map(po=>{
         return(
-          <Tag key={po.poRef} closable onClose={()=>this.updatePoRefs(po.poRef,true)}>{po.name}</Tag>
+          <Tag
+            key={po._id}
+            closable
+            onClose={() => this.setState({
+              currentPOs: this.state.currentPOs.filter(po => po._id !== po._id)
+            })}
+            >
+              {po.name}
+            </Tag>
         )
       })
       const bulkMenu = (
