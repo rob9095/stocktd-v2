@@ -370,7 +370,7 @@ input.ant-input.no-border {
 
 .ant-select-selection, .ant-select-selection--multiple, .ant-select-selection--single {
   padding: 4px 11px;
-  height: 40px !important;
+  min-height: 40px !important;
   padding-bottom: 0px;
 }
 

@@ -4,6 +4,7 @@ import { Form, Row, Col, Input, Button, Select, Skeleton, Spin } from 'antd';
 import { getAllModelDocuments, upsertModelDocuments } from '../store/actions/models';
 import InsertDataModal from './InsertDataModal';
 import { connect } from "react-redux";
+import AutoCompleteInput from './AutoCompleteInput';
 
 const Option = Select.Option;
 const FormItem = Form.Item;
@@ -132,6 +133,17 @@ class ScanForm extends Component {
     })
   }
 
+  handleAutoUpdate = (clicked, id) => {
+    //this.props.form.setFieldsValue({ [id]: clicked.data[id] || '' })
+    console.log(clicked)
+    // this.setState({
+    //   values: {
+    //     ...this.state.values,
+    //     [id]: clicked.data[id] || '',
+    //   }
+    // })
+  }
+
   render() {
     const { getFieldDecorator } = this.props.form;
     let preFixOptions = this.state.boxPrefixList.map(pf => (
@@ -147,94 +159,153 @@ class ScanForm extends Component {
         {this.state.showBoxPrefixModal && (
           <InsertDataModal
             currentUser={this.props.currentUser.user}
-            title={'Add Box Prefix'}
+            title={"Add Box Prefix"}
             inputs={[
-              {span: 24, id: 'name', text: 'Box Prefix', required: true, message: 'Box Prefix is required'},
+              {
+                span: 24,
+                id: "name",
+                text: "Box Prefix",
+                required: true,
+                message: "Box Prefix is required"
+              }
             ]}
-            okText={'Save'}
-            cancelText={'Cancel'}
-            onClose={this.toggle('showBoxPrefixModal')}
+            okText={"Save"}
+            cancelText={"Cancel"}
+            onClose={this.toggle("showBoxPrefixModal")}
             onSave={this.handleNewBoxPrefix}
           />
         )}
         {this.state.showBarcodeModal && (
           <InsertDataModal
             currentUser={this.props.currentUser.user}
-            title={'Add Barcode'}
+            title={"Add Barcode"}
             inputs={[
-              {span: 24, id: 'sku', text: 'SKU', required: true, message: 'SKU is required', autoComplete: true, queryModel: 'Product'},
-              {span: 24, id: 'barcode', text: 'Barcode', required: true, message: 'Barcode is required'},
+              {
+                span: 24,
+                id: "sku",
+                text: "SKU",
+                required: true,
+                message: "SKU is required",
+                autoComplete: true,
+                queryModel: "Product"
+              },
+              {
+                span: 24,
+                id: "barcode",
+                text: "Barcode",
+                required: true,
+                message: "Barcode is required"
+              }
             ]}
-            okText={'Save'}
-            cancelText={'Cancel'}
-            onClose={this.toggle('showBarcodeModal')}
+            okText={"Save"}
+            cancelText={"Cancel"}
+            onClose={this.toggle("showBarcodeModal")}
             onSave={this.handleNewBarcode}
           />
         )}
-        {this.props.currentPOs.length === 0 && this.props.requirePo ? 
-          <div className="centered-container col">
-            <h3>Please add a Purcase Order to start scanning</h3>
-            <Link to='/app/purchase-orders'>
-            <Button type="primary">
-              Add Purchase Order
-            </Button>
-            </Link>
-          </div>
-        :
-          <Spin spinning={!this.state.currentPrefix}>
-            <Form
-              className="scan-form"
-              onSubmit={this.handleSubmit}
-            >
-              <Row gutter={24}>
-                <Col s={24} md={8}>
-                  <FormItem label="Box Name">
-                    {getFieldDecorator('name', {
-                      rules: [{
+        <Spin spinning={!this.state.currentPrefix}>
+          <Form className="scan-form" onSubmit={this.handleSubmit}>
+            <Row gutter={24}>
+              <Col s={24} md={8}>
+                <FormItem label="Purchase Order">
+                  {getFieldDecorator("currentPOs", {
+                    rules: [
+                      {
+                        required: this.props.requirePO,
+                        message: "Purchase Order Required"
+                      }
+                    ]
+                  })(
+                    <AutoCompleteInput
+                      queryModel={"PurchaseOrder"}
+                      searchKey={"name"}
+                      placeholder={"Search by PO Name"}
+                      renderOption={item => (
+                        <div style={{ maxHeight: 40, overflow: 'hidden' }}>
+                          <div style={{ fontSize: "small" }}>{item["name"]}</div>
+                          <div style={{ fontSize: 9, color: 'grey' }}>{item["type"]}</div>
+                        </div>
+                      )}
+                      mode={this.props.poMode || "default"}
+                      selected={this.props.currentPOs}
+                      onUpdate={clicked =>
+                        this.handleAutoUpdate(clicked, "currentPO")
+                      }
+                    >
+                      <Input style={{ display: 'none' }} />
+                    </AutoCompleteInput>
+                  )}
+                </FormItem>
+              </Col>
+            </Row>
+            <Row gutter={24}>
+              <Col s={24} md={8}>
+                <FormItem label="Box Name">
+                  {getFieldDecorator("name", {
+                    rules: [
+                      {
                         required: true,
-                        message: 'Box Name Required',
-                      }],
-                    })(
-                      <Input addonBefore={boxSelect} placeholder="Box Name" />
-                    )}
-                  </FormItem>
-                </Col>
-                <Col s={24} md={10}>
-                  <FormItem label="Scan ID">
-                    {getFieldDecorator('barcode', {
-                      rules: [{
+                        message: "Box Name Required"
+                      }
+                    ]
+                  })(
+                    <Input
+                      addonBefore={boxSelect}
+                      placeholder="Box Name"
+                    />
+                  )}
+                </FormItem>
+              </Col>
+              <Col s={24} md={10}>
+                <FormItem label="Scan ID">
+                  {getFieldDecorator("barcode", {
+                    rules: [
+                      {
                         required: true,
-                        message: 'Scan ID Required',
-                      }],
-                    })(
-                      <Input ref={node => this.barcodeInput = node} placeholder="Scan ID" />
-                    )}
-                  </FormItem>
-                </Col>
-                <Col s={24} md={4}>
-                  <FormItem label="Quantity">
-                    {getFieldDecorator('quantity', { initialValue: '1' }, {
-                      rules: [{
-                        required: true,
-                        message: 'Scan Quantity Required',
-                      }],
-                    })(
-                      <Input type="number" />
-                    )}
-                  </FormItem>
-                </Col>
-                <Col s={24} md={2} style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  height: 113,
-                }}>
-                  <Button type="primary" htmlType="submit">Scan</Button>
-                </Col>
-              </Row>
-            </Form>
+                        message: "Scan ID Required"
+                      }
+                    ]
+                  })(
+                    <Input
+                      ref={node => (this.barcodeInput = node)}
+                      placeholder="Scan ID"
+                    />
+                  )}
+                </FormItem>
+              </Col>
+              <Col s={24} md={4}>
+                <FormItem label="Quantity">
+                  {getFieldDecorator(
+                    "quantity",
+                    { initialValue: "1" },
+                    {
+                      rules: [
+                        {
+                          required: true,
+                          message: "Scan Quantity Required"
+                        }
+                      ]
+                    }
+                  )(<Input type="number" />)}
+                </FormItem>
+              </Col>
+              <Col
+                s={24}
+                md={2}
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: 113
+                }}
+              >
+                <Button type="primary" htmlType="submit">
+                  Scan
+                  </Button>
+              </Col>
+            </Row>
+          </Form>
         </Spin>
-        }       
       </div>
     );
   }

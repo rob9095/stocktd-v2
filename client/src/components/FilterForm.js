@@ -168,6 +168,7 @@ class FilterForm extends Component {
           <WrappedScanForm
             currentPOs={this.props.currentPOs}
             requirePo={true}
+            poMode={'tags'}
             onScan={this.handleScan}
           />
         )}

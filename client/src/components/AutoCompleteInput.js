@@ -18,7 +18,8 @@ class AutoCompleteInputForm extends Component {
     this._isMounted = true;
     this.handleDataFetch('')
     if (this.props.selected) {
-      this.props.form.setFieldsValue(({ selected: this.props.selected }));
+      const selected = this.props.selected.map(item=>({key:item._id, label: item[this.props.searchKey]}))
+      this.props.form.setFieldsValue(({ selected, data: this.props.selected }));
     }
   }
 
@@ -36,7 +37,7 @@ class AutoCompleteInputForm extends Component {
     .catch(err=>{
       console.log(err)
     })
-    this.setState({loading: false})
+    this._isMounted && this.setState({ loading: false });
   }
 
   handleChange = (id,e) => {
@@ -55,23 +56,11 @@ class AutoCompleteInputForm extends Component {
   }
 
   render() {
-    // const { data } = this.state;
-    // return (
-    //   <AutoComplete
-    //     dataSource={data}
-    //     onSelect={onSelect}
-    //     onSearch={this.handleDataFetch}
-    //     placeholder={this.props.placeholder}
-    //     onChange={this.handleChange}
-    //   />
     const { getFieldDecorator } = this.props.form;
     const children = this.state.data.map(item => (
-      <Option
-        key={item._id}
-        value={item._id}
-        data={{ ...item }}
-      >
-       {this.props.renderOption(item) || item[this.props.searchKey]}
+      <Option key={item._id} value={item._id} data={{ ...item }}>
+        {/* <Skeleton active loading paragraph={false} style={{minWidth: 250}} /> */}
+        {this.state.loading ? 'loading' : this.props.renderOption(item) || item[this.props.searchKey]}
       </Option>
     ));
     return (
@@ -87,6 +76,8 @@ class AutoCompleteInputForm extends Component {
           onSearch={this.handleDataFetch}
           onChange={this.handleChange}
           mode={this.props.mode || "default"}
+          labelInValue
+          ref={node => (this.selectRef = node)}
         >
           {children}
         </Select>

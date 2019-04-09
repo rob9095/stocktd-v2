@@ -513,7 +513,6 @@ class PoProductTable extends Component {
           )}
           <div className="filter-group">
             <WrappedFilterForm
-              currentUser={this.props.currentUser.user}
               inputs={this.state.headers.filter(h=>h.noSort !== true)}
               onFilterSearch={this.handleFilterSearch}
               currentPOs={this.state.currentPOs}
