@@ -32,6 +32,7 @@ class ReceiveInventory extends Component {
         user: this.props.currentUser.user.id,
         scanToPo: true,
       };
+      console.log(scan)
       this.props.addBoxScan(scan, this.props.currentUser.user.company)
         .then(res => {
           resolve(res)
@@ -46,7 +47,7 @@ class ReceiveInventory extends Component {
     return (
       <div className="stkd-content">
         <WrappedScanForm
-          requirePO={true}
+          requirePO={false}
           onScan={this.handleScan}
         />
         <Button

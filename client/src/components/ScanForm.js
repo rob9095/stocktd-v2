@@ -134,6 +134,8 @@ class ScanForm extends Component {
   }
 
   handleAutoUpdate = (clicked, valKey) => {
+    clicked.data = valKey === 'locations' ? [...clicked.id].map(l=>l.id) : clicked.data
+    console.log(clicked)
     this.props.form.setFieldsValue({ [valKey]: clicked.data || '' })
     console.log(clicked)
     this.setState({
@@ -142,7 +144,7 @@ class ScanForm extends Component {
         [valKey]: clicked.data || '',
       }
     })
-    valKey === 'currentPOs' && this.props.onCurrentPOUpdate(clicked)
+    this.props.onCurrentPOUpdate && this.props.onCurrentPOUpdate(clicked);
   }
 
   render() {
@@ -244,13 +246,13 @@ class ScanForm extends Component {
               </Col>
               <Col s={24} md={12}>
                 <FormItem label="Location">
-                {getFieldDecorator("location")(
+                {getFieldDecorator("locations")(
                   <AutoCompleteInput
                     queryModel={"Location"}
                     searchKey={"name"}
                     placeholder={"Location"}
                     mode={"tags"}
-                    onUpdate={clicked => this.handleAutoUpdate(clicked, "Location")}
+                    onUpdate={clicked => this.handleAutoUpdate(clicked, "locations")}
                   >
                     <Input style={{ display: "none" }} />
                   </AutoCompleteInput>
