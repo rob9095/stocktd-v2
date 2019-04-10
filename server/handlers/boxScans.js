@@ -5,11 +5,9 @@ const upsertScanLocation = (scan, filterRef) => {
   return new Promise( async (resolve,reject) => {
     try {
       const locations = Array.isArray(scan.locations) ? scan.locations : [scan.locations]
-      locations.forEach(l=>{
-        if (typeof l !== 'string') {
-          reject('Invalid locations array, please provide string array')
-        }
-      })
+      if (locations.filter(l => typeof l === 'string').length > 0) {
+        throw 'Invalid locations array, please provide string array'
+      }
       filterRef = filterRef || 'name'
       let updates = locations.map(l => ({
         updateOne: {
@@ -27,9 +25,8 @@ const upsertScanLocation = (scan, filterRef) => {
       }))
       let result = await db.Location.bulkWrite(updates)
       resolve({ result })
-    } catch(error) {
-      console.log(error)
-      reject({ error })
+    } catch(err) {
+      reject({ err })
     }
   })
 }
@@ -95,10 +92,6 @@ const scanToPO = (boxScan,scanQty) => {
           createdOn: new Date(),
         })
       }
-      if (boxScan.locations) {
-        //upsert the locations
-        await upsertScanLocation({...updatedBoxScan, locations: boxScan.locations}, 'name')
-      }
       resolve({
         updatedPoProduct,
         updatedProduct,
@@ -141,6 +134,10 @@ exports.upsertBoxScan = async (req,res,next) => {
     // add the scanned product to PO instead of scan from PO
     if (req.body.scan.scanToPo === true) {
       let result = await scanToPO(boxScan, scanQty)
+      if (boxScan.locations) {
+        //upsert the locations
+        await upsertScanLocation({ ...result.updatedBoxScan, locations: boxScan.locations }, 'name')
+      }
       return res.status(200).json({
         ...result
       })
@@ -219,6 +216,7 @@ exports.upsertBoxScan = async (req,res,next) => {
       completedPoProducts,
     })
   } catch(err) {
+    console.log('final catch hit')
     return next(err);
   }
 }
