@@ -5,10 +5,6 @@ const locationSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  boxId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'BoxScan',
-  },
   pullCount: {
     type: Number,
     default: 0,
@@ -27,7 +23,7 @@ const locationSchema = new mongoose.Schema({
   }
 })
 
-locationSchema.index({ name: 1, boxId: 1, company: 1, }, { unique: true });
+locationSchema.index({ name: 1, company: 1, }, { unique: true });
 
 const Location = mongoose.model("Location", locationSchema);
 

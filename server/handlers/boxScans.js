@@ -2,7 +2,7 @@ const db = require('../models');
 
 //accepts string array and upserts locations based on filterRef which is name by default 
 const upsertScanLocation = (upsertData) => {
-  let { scan, locations, filterRef } = upsertData
+  let { company, locations, filterRef } = upsertData
   return new Promise( async (resolve,reject) => {
     try {
       locations = Array.isArray(locations) ? locations : [locations]
@@ -10,17 +10,15 @@ const upsertScanLocation = (upsertData) => {
         throw 'Invalid locations array, please provide string array'
       }
       filterRef = filterRef || 'name'
-      let updates = locations.map(l => ({
+      let updates = locations.map(name => ({
         updateOne: {
           filter: { 
-            [filterRef]: { $regex: new RegExp(["^", l, "$"].join(""), "i") },
-            company: scan.company,
-            boxId: scan._id,
+            [filterRef]: { $regex: new RegExp(["^", name, "$"].join(""), "i") },
+            company,
           },
           update: {
-            name: l,
-            boxId: scan._id,
-            company: scan.company,
+            name,
+            company,
           },
           upsert: true,
         }
@@ -46,6 +44,10 @@ const scanToPO = (boxScan,scanQty) => {
         status: 'processing',
         poRef: `${boxScan.company}-genericInbound`,
         company: boxScan.company,
+      }
+      //upsert the locations if neccessary
+      if (boxScan.locations && boxScan.locations.length > 0) {
+        await upsertScanLocation({ ...boxScan, filterRef: 'name' })
       }
       //define the current po, first array item if array, otherwise find in boxScan, if undefined in boxScan set to generic inbound po
       const currentPO = Array.isArray(boxScan.currentPOs) ? boxScan.currentPOs[0] : boxScan.currentPOs || genericInboundPo
@@ -94,10 +96,6 @@ const scanToPO = (boxScan,scanQty) => {
           createdOn: new Date(),
         })
       }
-      //upsert the locations if neccessary
-      if (boxScan.locations) {
-        await upsertScanLocation({ scan: updatedBoxScan, locations: boxScan.locations, filterRef: 'name' })
-      }
       resolve({
         updatedPoProduct,
         updatedProduct,
@@ -126,6 +124,10 @@ const scanFromPO = (scan, scanQty, product) => {
         if (poProduct) {
           // product found
           updatedPo = po
+          //update locations if neccesary
+          if (scan.locations && scan.locations.length > 0) {
+            await upsertScanLocation({ ...scan, filterRef: 'name' })
+          }
           await db.PoProduct.findByIdAndUpdate(poProduct._id, {
             $inc: { scannedQuantity: scanQty },
           })
@@ -149,7 +151,7 @@ const scanFromPO = (scan, scanQty, product) => {
               completedPoProducts = await db.PoProduct.bulkWrite(poProductUpdates)
             }
           }
-          boxScan = {
+          let boxScan = {
             ...scan,
             poRef: po.poRef,
             createdOn: new Date(),
@@ -162,11 +164,6 @@ const scanFromPO = (scan, scanQty, product) => {
             updatedBoxScan = foundBoxScan
           } else {
             updatedBoxScan = await db.BoxScan.create(boxScan)
-          }
-          //update locations if neccesary
-          if (boxScan.locations) {
-            //upsert the locations
-            await upsertScanLocation({ scan: updatedBoxScan, locations: boxScan.locations, filterRef: 'name' })
           }
           break;
         }
@@ -232,10 +229,10 @@ exports.upsertBoxScan = async (req,res,next) => {
     })
     
   } catch(message) {
-    console.log(message)
+    console.log(message.stack)
     return next({
       status: 404,
-      message,
+      message: message.toString(),
     })
   }
 }

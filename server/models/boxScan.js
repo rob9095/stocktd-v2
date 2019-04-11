@@ -30,11 +30,11 @@ const boxScanSchema = new mongoose.Schema({
     required: true,
   },
   barcode: {
-    type: String
+    type: String,
   },
-  location: {
-    type: String
-  },
+  locations: [{
+    type: String,
+  }],
   createdOn: {
     type: Date,
     default: Date.now
