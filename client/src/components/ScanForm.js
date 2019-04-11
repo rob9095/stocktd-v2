@@ -143,7 +143,7 @@ class ScanForm extends Component {
         [valKey]: clicked.data || '',
       }
     })
-    this.props.onCurrentPOUpdate && this.props.onCurrentPOUpdate(clicked);
+    this.props.onCurrentPOUpdate && this.props.onCurrentPOUpdate(clicked.data);
   }
 
   render() {

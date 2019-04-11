@@ -307,9 +307,9 @@ class PoProductTable extends Component {
       this.handleDataFetch()
     }
 
-    handleCurrentPOUpdate = (currentPOs) => {
+    handleCurrentPOUpdate = async (currentPOs) => {
       console.log(currentPOs)
-      this.setState({currentPOs: [...currentPOs.data]})
+      await this.setState({currentPOs})
       this.handleDataFetch();
     }
 
@@ -361,17 +361,19 @@ class PoProductTable extends Component {
 
     render() {
       let poTags = this.state.currentPOs.map(po=>{
-        return(
+        return (
           <Tag
             key={po._id}
             closable
-            onClose={() => this.setState({
-              currentPOs: this.state.currentPOs.filter(po => po._id !== po._id)
-            })}
-            >
-              {po.name}
-            </Tag>
-        )
+            onClose={() =>
+              this.handleCurrentPOUpdate(
+                this.state.currentPOs.filter(p => p._id !== po._id)
+              )
+            }
+          >
+            {po.name}
+          </Tag>
+        );
       })
       const bulkMenu = (
         <Menu onClick={this.handleBulkMenuClick}>
