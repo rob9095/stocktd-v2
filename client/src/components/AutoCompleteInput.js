@@ -14,12 +14,13 @@ class AutoCompleteInputForm extends Component {
     }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this._isMounted = true;
     this.handleDataFetch('')
     if (this.props.selected) {
-      const selected = this.props.selected.map(item=>({key:item._id, label: item[this.props.searchKey]}))
-      this.props.form.setFieldsValue(({ selected, data: this.props.selected }));
+      const selected = this.props.selected.map(item=>({props: {data: {...item}}, key:item._id, label: item[this.props.searchKey]}))
+      this.setState({selected})
+      this.handleChange(selected,selected)
     }
   }
 
@@ -30,7 +31,7 @@ class AutoCompleteInputForm extends Component {
   handleDataFetch = async (value) => {
     const searchKey = this.props.searchKey;
     this.setState({loading: true})
-    await getAllModelDocuments(this.props.queryModel,{[searchKey]: value},this.props.currentUser.user.company, true, 15)
+    await getAllModelDocuments({model: this.props.queryModel, documentRef: {[searchKey]: value},groupBy: searchKey, company: this.props.currentUser.user.company, regex:true, limit: 15})
     .then((res)=>{
       //remove duplicates based on searchKey if in tags mode
       let data =
@@ -72,7 +73,7 @@ class AutoCompleteInputForm extends Component {
       </Option>
     ));
     return (
-      getFieldDecorator("selected")(
+      getFieldDecorator("selected", { initialValue: this.props.selected && this.state.selected})(
         <Select
           allowClear
           style={{ minWidth: 250 }}

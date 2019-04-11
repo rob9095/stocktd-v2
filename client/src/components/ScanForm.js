@@ -20,7 +20,7 @@ class ScanForm extends Component {
 
   getBoxPrefixes = async () => {
     // get the box prefixes for this user
-    await getAllModelDocuments('BoxPrefix',{user: this.props.currentUser.user.id},this.props.currentUser.user.company)
+    await getAllModelDocuments({model: 'BoxPrefix', documentRef: {user: this.props.currentUser.user.id}, company: this.props.currentUser.user.company})
     .then(res=>{
       console.log(res)
       let userPrefixList = res.data.map(pf => ({
@@ -143,7 +143,7 @@ class ScanForm extends Component {
         [valKey]: clicked.data || '',
       }
     })
-    this.props.onCurrentPOUpdate && this.props.onCurrentPOUpdate(clicked.data);
+    this.props.onCurrentPOUpdate && valKey === 'currentPOs' && this.props.onCurrentPOUpdate(clicked.data);
   }
 
   render() {
@@ -210,7 +210,7 @@ class ScanForm extends Component {
             <Row gutter={24} style={{ minHeight: 90 }}>
               <Col s={24} md={12}>
                 <FormItem label="Purchase Order">
-                  {getFieldDecorator("currentPOs", {
+                  {getFieldDecorator("currentPOs",{
                     rules: [
                       {
                         required: this.props.requirePO,
