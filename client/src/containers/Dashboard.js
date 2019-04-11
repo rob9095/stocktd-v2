@@ -152,7 +152,7 @@ class Dashboard extends Component {
               />
             }
           </div>
-          <div className="bottom">
+          <div className="app-body" className="full-pad">
             <Switch>
               <Route exact path="/app/po-products" render={props => (
                 <PoProductTable showHeader {...props} />
@@ -172,7 +172,7 @@ class Dashboard extends Component {
                     <Breadcrumb.Item>User</Breadcrumb.Item>
                     <Breadcrumb.Item>Bill</Breadcrumb.Item>
                   </Breadcrumb>
-                  <Row>
+                  <Row gutter={16}>
                     <Col lg={24} xl={8}>
                       <div className="stkd-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
                         Bill is a cat.

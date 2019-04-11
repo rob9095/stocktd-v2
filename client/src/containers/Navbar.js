@@ -32,7 +32,7 @@ class Navbar extends Component {
         <div>
           <Icon
             className="sidebar-trigger"
-            type={this.state.collapsed ? 'double-right' : 'double-left'}
+            type={'menu'}
             onClick={this.toggle}
           />
         </div>
