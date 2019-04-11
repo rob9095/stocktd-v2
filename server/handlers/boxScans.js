@@ -128,11 +128,11 @@ exports.upsertBoxScan = async (req,res,next) => {
       sku: product.sku,
       company: req.body.company,
     }
-    const scanQty = parseInt(req.body.scan.quantity)
-    let updatedPoProduct,
-      updatedPo,
-      updatedBoxScan,
-      completedPoProducts = {};
+    const scanQty = parseInt(req.body.scan.quantity);
+    let updatedPoProduct = {};
+    let updatedBoxScan = {};
+    let completedPoProducts = {};
+    let updatedPo = {};
     // add the scanned product to PO instead of scan from PO
     if (req.body.scan.scanToPo === true) {
       let result = await scanToPO(boxScan, scanQty)
@@ -170,7 +170,7 @@ exports.upsertBoxScan = async (req,res,next) => {
           if (notComplete.length === 0) {
             updatedPoProduct.status = 'complete'
             // find and update the po status
-            let updatedPo = await db.PurchaseOrder.findOne({poRef: po.poRef})
+            updatedPo = await db.PurchaseOrder.findOne({poRef: po.poRef})
             updatedPo.status = 'complete'
             updatedPo.save()
             // update all poProducts
@@ -199,7 +199,7 @@ exports.upsertBoxScan = async (req,res,next) => {
         }
         if (boxScan.locations) {
           //upsert the locations
-          await upsertScanLocation({ scan: result.updatedBoxScan, locations: boxScan.locations, filterRef: 'name' })
+          await upsertScanLocation({ scan: updatedBoxScan, locations: boxScan.locations, filterRef: 'name' })
         }
         break;
       }
@@ -218,6 +218,7 @@ exports.upsertBoxScan = async (req,res,next) => {
       completedPoProducts,
     })
   } catch(message) {
+    console.log(message)
     return next({
       status: 404,
       message,
