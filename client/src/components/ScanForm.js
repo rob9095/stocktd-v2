@@ -103,9 +103,9 @@ class ScanForm extends Component {
         .then(res=>{
           console.log(res)
         })
-        .catch(err=>{
-          console.log(err)
-          if (err[0] === 'Barcode not found') {
+        .catch(error=>{
+          console.log(error)
+          if (error[0] === 'Barcode not found') {
             this.setState({
               showBarcodeModal: true,
             })

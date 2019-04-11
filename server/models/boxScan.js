@@ -26,7 +26,8 @@ const boxScanSchema = new mongoose.Schema({
     required: true
   },
   poRef: {
-    type: String
+    type: String,
+    required: true,
   },
   barcode: {
     type: String

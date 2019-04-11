@@ -1,11 +1,12 @@
 const db = require('../models');
 
 //accepts string array and upserts locations based on filterRef which is name by default 
-const upsertScanLocation = (scan, filterRef) => {
+const upsertScanLocation = (upsertData) => {
+  let { scan, locations, filterRef } = upsertData
   return new Promise( async (resolve,reject) => {
     try {
-      const locations = Array.isArray(scan.locations) ? scan.locations : [scan.locations]
-      if (locations.filter(l => typeof l === 'string').length > 0) {
+      locations = Array.isArray(locations) ? locations : [locations]
+      if (locations.filter(l => typeof l !== 'string').length > 0) {
         throw 'Invalid locations array, please provide string array'
       }
       filterRef = filterRef || 'name'
@@ -13,7 +14,8 @@ const upsertScanLocation = (scan, filterRef) => {
         updateOne: {
           filter: { 
             [filterRef]: { $regex: new RegExp(["^", l, "$"].join(""), "i") },
-            company: scan.company
+            company: scan.company,
+            boxId: scan._id,
           },
           update: {
             name: l,
@@ -26,7 +28,7 @@ const upsertScanLocation = (scan, filterRef) => {
       let result = await db.Location.bulkWrite(updates)
       resolve({ result })
     } catch(err) {
-      reject({ err })
+      reject(err)
     }
   })
 }
@@ -136,7 +138,7 @@ exports.upsertBoxScan = async (req,res,next) => {
       let result = await scanToPO(boxScan, scanQty)
       if (boxScan.locations) {
         //upsert the locations
-        await upsertScanLocation({ ...result.updatedBoxScan, locations: boxScan.locations }, 'name')
+        await upsertScanLocation({scan: result.updatedBoxScan, locations: boxScan.locations, filterRef: 'name'})
       }
       return res.status(200).json({
         ...result
@@ -197,7 +199,7 @@ exports.upsertBoxScan = async (req,res,next) => {
         }
         if (boxScan.locations) {
           //upsert the locations
-          await upsertScanLocation({ ...updatedBoxScan, locations: boxScan.locations },'name')
+          await upsertScanLocation({ scan: result.updatedBoxScan, locations: boxScan.locations, filterRef: 'name' })
         }
         break;
       }
@@ -215,8 +217,10 @@ exports.upsertBoxScan = async (req,res,next) => {
       updatedBoxScan,
       completedPoProducts,
     })
-  } catch(err) {
-    console.log('final catch hit')
-    return next(err);
+  } catch(message) {
+    return next({
+      status: 404,
+      message,
+    })
   }
 }

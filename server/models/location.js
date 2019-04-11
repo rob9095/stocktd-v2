@@ -27,6 +27,8 @@ const locationSchema = new mongoose.Schema({
   }
 })
 
+locationSchema.index({ name: 1, boxId: 1, company: 1, }, { unique: true });
+
 const Location = mongoose.model("Location", locationSchema);
 
 module.exports = Location;
