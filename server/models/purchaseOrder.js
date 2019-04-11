@@ -41,6 +41,10 @@ const purchaseOrderSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Company',
   },
+  allowExcess: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const PurchaseOrder = mongoose.model("PurchaseOrder", purchaseOrderSchema);

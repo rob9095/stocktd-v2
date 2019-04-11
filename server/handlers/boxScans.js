@@ -101,6 +101,7 @@ const scanToPO = (boxScan,scanQty) => {
         updatedProduct,
         updatedPo,
         updatedBoxScan,
+        scanQty,
       })
     } catch(err) {
       reject(err)
@@ -119,6 +120,7 @@ const scanFromPO = (scan, scanQty, product) => {
       let poProducts = await db.PoProduct.find({
         $and: [{ $or: andQuery }],
       })
+      let poIndex = 0
       for (let po of scan.currentPOs) {
         let poProduct = poProducts.find(p => p.skuCompany === product.skuCompany && po.poRef === p.poRef)
         if (poProduct) {
@@ -128,15 +130,22 @@ const scanFromPO = (scan, scanQty, product) => {
           if (scan.locations && scan.locations.length > 0) {
             await upsertScanLocation({ ...scan, filterRef: 'name' })
           }
-          await db.PoProduct.findByIdAndUpdate(poProduct._id, {
-            $inc: { scannedQuantity: scanQty },
-          })
-          updatedPoProduct = await db.PoProduct.findOne({ _id: poProduct._id })
+          //find the poProduct and throw error if we overscanned and allowExcess is not enabled for po
+          updatedPoProduct = await db.PoProduct.findOne({_id: poProduct._id})
+          if (updatedPoProduct.scannedQuantity + scanQty > updatedPoProduct.quantity && !po.allowExcess) {
+            // if there are more POs to check skip this iteration and continue, otherwise throw overscan error
+            if (poIndex + 1 < scan.currentPOs.length) {
+              continue
+            }
+            resolve({error: 'Scanned Quantity exceeds PO Product Quantity'})
+          }
+          //update scanQty on poProduct
+          updatedPoProduct.scannedQuantity += scanQty
+          updatedPoProduct.save()
           let markComplete = updatedPoProduct.scannedQuantity >= updatedPoProduct.quantity
           if (markComplete) {
             let notComplete = poProducts.filter(p => p.poRef === po.poRef && p.quantity > p.scannedQuantity && p.skuCompany !== updatedPoProduct.skuCompany)
             if (notComplete.length === 0) {
-              updatedPoProduct.status = 'complete'
               // find and update the po status
               updatedPo = await db.PurchaseOrder.findOne({ poRef: po.poRef })
               updatedPo.status = 'complete'
@@ -167,6 +176,7 @@ const scanFromPO = (scan, scanQty, product) => {
           }
           break;
         }
+        poIndex++
       }
       //if we looped all current POs and didn't find a PO to update in the result
       if (!updatedPo._id) {
@@ -177,6 +187,7 @@ const scanFromPO = (scan, scanQty, product) => {
         updatedPo,
         updatedBoxScan,
         completedPoProducts,
+        scanQty,
       })
     }  catch(err) {
       reject(err)
@@ -229,7 +240,7 @@ exports.upsertBoxScan = async (req,res,next) => {
     })
     
   } catch(message) {
-    console.log(message.stack)
+    console.log(message)
     return next({
       status: 404,
       message: message.toString(),
