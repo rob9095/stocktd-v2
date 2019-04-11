@@ -28,10 +28,17 @@ class AutoCompleteInputForm extends Component {
   }
 
   handleDataFetch = async (value) => {
+    const searchKey = this.props.searchKey;
     this.setState({loading: true})
-    await getAllModelDocuments(this.props.queryModel,{[this.props.searchKey]: value},this.props.currentUser.user.company, true, 15)
+    await getAllModelDocuments(this.props.queryModel,{[searchKey]: value},this.props.currentUser.user.company, true, 15)
     .then((res)=>{
-      let data = res.data
+      //remove duplicates based on searchKey if in tags mode
+      let data =
+        this.props.mode === "tags"
+          ? res.data.filter(function (a) {
+            return !this[a[searchKey]] && (this[a[searchKey]] = true);
+          }, Object.create(null))
+          : res.data;
       this._isMounted && this.setState({data})
     })
     .catch(err=>{
@@ -58,7 +65,8 @@ class AutoCompleteInputForm extends Component {
   render() {
     const { getFieldDecorator } = this.props.form;
     const children = this.state.data.map(item => (
-      <Option key={item._id} value={item._id} data={{ ...item }}>
+      // use item._id as value if not in tags mode
+      <Option key={item._id} value={this.props.mode === 'tags' ? item[this.props.searchKey] : item._id} data={{ ...item }}>
         {this.props.renderOption ? this.props.renderOption(item) 
         : item[this.props.searchKey]}
       </Option>
