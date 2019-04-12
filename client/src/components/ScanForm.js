@@ -51,11 +51,9 @@ class ScanForm extends Component {
   }
 
   toggle = (prop) => {
-    return () => {
-      this.setState({
-        [prop]: !this.state[prop],
-      })
-    }
+    this.setState({
+      [prop]: !this.state[prop],
+    })
   }
 
   handlePrefixSelect = (value, option) => {
@@ -126,6 +124,9 @@ class ScanForm extends Component {
     this.props.form.validateFields((err, values) => {
       console.log('Received values of form: ', values);
       if (!err) {
+        if (values.locations && values.locations.length === 0) {
+          delete values.locations
+        }
         this.props.onScan({
           ...values,
           prefix: this.state.currentPrefix,
@@ -172,6 +173,9 @@ class ScanForm extends Component {
       default:
         console.log({error: 'unknown error', errors})      
     }
+    setTimeout(() => {
+      this.barcodeInput.focus()
+    }, 550)
   }
 
   handleNewBarcode = (update) => {
@@ -227,7 +231,7 @@ class ScanForm extends Component {
             ]}
             okText={"Save"}
             cancelText={"Cancel"}
-            onClose={this.toggle("showBoxPrefixModal")}
+            onClose={()=>this.toggle("showBoxPrefixModal")}
             onSave={this.handleNewBoxPrefix}
           />
         )}
@@ -262,7 +266,12 @@ class ScanForm extends Component {
             ]}
             okText={"Save"}
             cancelText={"Cancel"}
-            onClose={this.toggle("showBarcodeModal")}
+            onClose={()=>{
+              this.toggle("showBarcodeModal")
+              setTimeout(() => {
+                this.barcodeInput.focus()
+              },550)
+            }}
             onSave={this.handleNewBarcode}
           />
         )}
