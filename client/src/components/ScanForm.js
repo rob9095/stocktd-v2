@@ -8,7 +8,6 @@ import AutoCompleteInput from './AutoCompleteInput';
 
 const Option = Select.Option;
 const FormItem = Form.Item;
-const confirm = Modal.confirm;
 
 class ScanForm extends Component {
   _isMounted = false 
@@ -91,21 +90,32 @@ class ScanForm extends Component {
     })
   }
 
-  showConfirm(config) {
-    let { title, action, list, buttons, okText, okType } = config
-    return new Promise((resolve, reject) => {
-      list = list.map((str,i)=><li key={i}>{str}</li>)
-      buttons = buttons.map((btn,i)=><Button type={btn.type} style={{...btn.styles}} key={i}>{btn.text}</Button>)
-      confirm({
-        okText: okText || 'Ok',
-        okType: okType || 'primary',
-        title: title || 'Scan Error',
-        content: (
-        <div>
-          <ul>{list}</ul>
-          {buttons}
-        </div>
-        ),
+  showErrorModal = (config) => {
+    let { title, action, list, buttons, okText, okType, maskClosable } = config
+    return new Promise((resolve,reject) => {
+      list = Array.isArray(list) && list.map((str, i) => <li key={i}>{str}</li>)
+      buttons = Array.isArray(buttons) && buttons.map((btn, i) => 
+      <Button onClick={()=>resolve(btn.text)} {...btn} key={i}>{btn.text}</Button>)
+      this.setState({
+        errorModalConfig: {
+          title: title || "Scan Error",
+          content: (
+            <div>
+              <ul>{list}</ul>
+              <div>
+                {buttons}
+              </div>
+              <div className="flex justify-flex-end">
+                <Button type="primary" onClick={()=>resolve('ok')}>
+                  {okText || "Ok"}
+                </Button>
+              </div>
+            </div>
+          ),
+          footer: null,
+          onCancel: ()=>this.setState({errorModalConfig: null}),
+          maskClosable: maskClosable || false
+        }
       });
     })
   }
@@ -123,21 +133,9 @@ class ScanForm extends Component {
         .then(res=>{
           console.log(res)
         })
-        .catch(error=>{
+        .catch((error)=>{
           console.log(error)
-          if (error[0] === 'Barcode not found') {
-            this.setState({
-              showBarcodeModal: true,
-            })
-          } else {
-            this.showConfirm({
-              list: error,
-              buttons: [
-                {text: `Add Quantity`},
-                {text: `Allow Excess`},
-              ]
-            })
-          }
+          this.handleError(error)
           
         })
         // clear scan id and reset focus
@@ -147,7 +145,34 @@ class ScanForm extends Component {
         }, 250)        
       }
     });
-  } 
+  }
+
+  handleError = async (errors) => {
+    let [message, ...rest] = errors
+    switch(message) {
+      case 'Barcode not found':
+        this.setState({showBarcodeModal: true})
+        break
+      case 'Scanned Quantity exceeds PO Product Quantity':
+        let result = await this.showErrorModal({
+          list: errors,
+          buttons: [{ text: 'Add Quantity', size: 'small' }, { text: 'Allow Excess', size: 'small' }, { text: 'Remove PO', size: 'small'}],
+        })
+        this.setState({ errorModalConfig: null })
+        console.log(result)
+        break
+      case 'Product not found on provided POs':
+        result = await this.showErrorModal({
+          list: errors,
+          buttons: [{ text: 'Add PO', size: 'small'}],
+        })
+        this.setState({ errorModalConfig: null })
+        console.log(result)
+        break
+      default:
+        console.log({error: 'unknown error', errors})      
+    }
+  }
 
   handleNewBarcode = (update) => {
     return new Promise((resolve,reject) => {
@@ -206,6 +231,13 @@ class ScanForm extends Component {
             onSave={this.handleNewBoxPrefix}
           />
         )}
+        <Modal
+          visible={this.state.errorModalConfig ? true : false}
+          {...this.state.errorModalConfig}
+        >
+          {this.state.errorModalConfig &&
+            this.state.errorModalConfig.content}
+        </Modal>
         {this.state.showBarcodeModal && (
           <InsertDataModal
             currentUser={this.props.currentUser.user}
@@ -239,7 +271,7 @@ class ScanForm extends Component {
             <Row gutter={24} style={{ minHeight: 90 }}>
               <Col s={24} md={12}>
                 <FormItem label="Purchase Order">
-                  {getFieldDecorator("currentPOs",{
+                  {getFieldDecorator("currentPOs", {
                     rules: [
                       {
                         required: this.props.requirePO,
@@ -274,17 +306,19 @@ class ScanForm extends Component {
               </Col>
               <Col s={24} md={12}>
                 <FormItem label="Location">
-                {getFieldDecorator("locations")(
-                  <AutoCompleteInput
-                    queryModel={"Location"}
-                    searchKey={"name"}
-                    placeholder={"Location"}
-                    mode={"tags"}
-                    onUpdate={clicked => this.handleAutoUpdate(clicked, "locations")}
-                  >
-                    <Input style={{ display: "none" }} />
-                  </AutoCompleteInput>
-                )}
+                  {getFieldDecorator("locations")(
+                    <AutoCompleteInput
+                      queryModel={"Location"}
+                      searchKey={"name"}
+                      placeholder={"Location"}
+                      mode={"tags"}
+                      onUpdate={clicked =>
+                        this.handleAutoUpdate(clicked, "locations")
+                      }
+                    >
+                      <Input style={{ display: "none" }} />
+                    </AutoCompleteInput>
+                  )}
                 </FormItem>
               </Col>
             </Row>

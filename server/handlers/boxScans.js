@@ -137,7 +137,9 @@ const scanFromPO = (scan, scanQty, product) => {
             if (poIndex + 1 < scan.currentPOs.length) {
               continue
             }
-            resolve({error: 'Scanned Quantity exceeds PO Product Quantity'})
+            resolve({
+              error: 'Scanned Quantity exceeds PO Product Quantity',
+            })
           }
           //update scanQty on poProduct
           updatedPoProduct.scannedQuantity += scanQty
@@ -180,7 +182,9 @@ const scanFromPO = (scan, scanQty, product) => {
       }
       //if we looped all current POs and didn't find a PO to update in the result
       if (!updatedPo._id) {
-        resolve({error: 'Product not found on provided POs'})
+        resolve({
+          error: 'Product not found on provided POs'
+        })
       }
       resolve({
         updatedPoProduct,
