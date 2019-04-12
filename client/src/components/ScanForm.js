@@ -377,7 +377,7 @@ class ScanForm extends Component {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  height: 113
+                  height: 115
                 }}
               >
                 <Button type="primary" htmlType="submit">

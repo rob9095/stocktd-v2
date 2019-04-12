@@ -103,7 +103,7 @@ class PoProductTable extends Component {
     })
   }
     async componentDidMount() {
-      if (this.props.history.location.poRefs) {
+      if (Array.isArray(this.props.history.location.poRefs)) {
         await this.setState({
           currentPOs: this.props.history.location.poRefs,
         })
@@ -309,7 +309,7 @@ class PoProductTable extends Component {
 
     handleCurrentPOUpdate = async (currentPOs) => {
       console.log(currentPOs)
-      await this.setState({currentPOs})
+      await this.setState({currentPOs: Array.isArray(currentPOs) ? currentPOs : []})
       this.handleDataFetch();
     }
 
@@ -360,21 +360,19 @@ class PoProductTable extends Component {
     }
 
     render() {
-      let poTags = this.state.currentPOs.map(po=>{
-        return (
-          <Tag
-            key={po._id}
-            closable
-            onClose={() =>
-              this.handleCurrentPOUpdate(
-                this.state.currentPOs.filter(p => p._id !== po._id)
-              )
-            }
-          >
-            {po.name}
-          </Tag>
-        );
-      })
+      const poTags = this.state.currentPOs.map(po => (
+        <Tag
+          key={po._id}
+          closable
+          onClose={() =>
+            this.handleCurrentPOUpdate(
+              this.state.currentPOs.filter(p => p._id !== po._id)
+            )
+          }
+        >
+          {po.name}
+        </Tag>
+      ))
       const bulkMenu = (
         <Menu onClick={this.handleBulkMenuClick}>
           <Menu.Item name="order" key="order">Create new Order</Menu.Item>
