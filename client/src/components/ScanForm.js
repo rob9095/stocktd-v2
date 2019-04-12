@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Form, Row, Col, Input, Button, Select, Skeleton, Spin } from 'antd';
+import { Alert, Form, Row, Col, Input, Button, Select, Skeleton, Spin, Modal } from 'antd';
 import { getAllModelDocuments, upsertModelDocuments } from '../store/actions/models';
 import InsertDataModal from './InsertDataModal';
 import { connect } from "react-redux";
@@ -8,6 +8,7 @@ import AutoCompleteInput from './AutoCompleteInput';
 
 const Option = Select.Option;
 const FormItem = Form.Item;
+const confirm = Modal.confirm;
 
 class ScanForm extends Component {
   _isMounted = false 
@@ -90,6 +91,25 @@ class ScanForm extends Component {
     })
   }
 
+  showConfirm(config) {
+    let { title, action, list, buttons, okText, okType } = config
+    return new Promise((resolve, reject) => {
+      list = list.map((str,i)=><li key={i}>{str}</li>)
+      buttons = buttons.map((btn,i)=><Button type={btn.type} style={{...btn.styles}} key={i}>{btn.text}</Button>)
+      confirm({
+        okText: okText || 'Ok',
+        okType: okType || 'primary',
+        title: title || 'Scan Error',
+        content: (
+        <div>
+          <ul>{list}</ul>
+          {buttons}
+        </div>
+        ),
+      });
+    })
+  }
+
  
   handleSubmit = (e) => {
     e.preventDefault();
@@ -109,7 +129,16 @@ class ScanForm extends Component {
             this.setState({
               showBarcodeModal: true,
             })
+          } else {
+            this.showConfirm({
+              list: error,
+              buttons: [
+                {text: `Add Quantity`},
+                {text: `Allow Excess`},
+              ]
+            })
           }
+          
         })
         // clear scan id and reset focus
         setTimeout(()=> {
