@@ -138,7 +138,12 @@ const scanFromPO = (scan, scanQty, product) => {
               continue
             }
             resolve({
-              error: 'Scanned Quantity exceeds PO Product Quantity',
+              error: {
+                message: 'Scanned Quantity exceeds PO Product Quantity',
+                options: ['Add Quantity', 'Allow Excess', 'Remove PO'],
+                poProduct: updatedPoProduct,
+                po,
+              }
             })
           }
           //update scanQty on poProduct
@@ -183,7 +188,11 @@ const scanFromPO = (scan, scanQty, product) => {
       //if we looped all current POs and didn't find a PO to update in the result
       if (!updatedPo._id) {
         resolve({
-          error: 'Product not found on provided POs'
+          error: {
+            message: 'Product not found on provided POs',
+            options: ['Add PO'],
+            product,
+          }
         })
       }
       resolve({
@@ -235,8 +244,7 @@ exports.upsertBoxScan = async (req,res,next) => {
     if (result.error) {
       return next({
         status: 400,
-        message: result.error,
-        product,
+        ...result.error
       }) 
     }
     return res.status(200).json({

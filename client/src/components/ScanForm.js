@@ -148,30 +148,30 @@ class ScanForm extends Component {
     });
   }
 
-  handleError = async (errors) => {
-    let [message, ...rest] = errors
+  handleError = async (error) => {
+    let [message, ...rest] = error.message
     switch(message) {
       case 'Barcode not found':
         this.setState({showBarcodeModal: true})
         break
       case 'Scanned Quantity exceeds PO Product Quantity':
         let result = await this.showErrorModal({
-          list: errors,
-          buttons: [{ text: 'Add Quantity', size: 'small' }, { text: 'Allow Excess', size: 'small' }, { text: 'Remove PO', size: 'small'}],
+          list: error.message,
+          buttons: error.options.map(text=>({text, size: "small",})) || [],
         })
         this.setState({ errorModalConfig: null })
         console.log(result)
         break
       case 'Product not found on provided POs':
         result = await this.showErrorModal({
-          list: errors,
-          buttons: [{ text: 'Add PO', size: 'small'}],
+          list: error.message,
+          buttons: error.options.map(text => ({ text, size: "small", })) || [],
         })
         this.setState({ errorModalConfig: null })
         console.log(result)
         break
       default:
-        console.log({error: 'unknown error', errors})      
+        console.log({error: 'unknown error', data: {...error}})      
     }
     setTimeout(() => {
       this.barcodeInput.focus()

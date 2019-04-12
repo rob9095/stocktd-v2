@@ -8,7 +8,7 @@ export function addBoxScan(scan, company){
 				resolve(res);
 			})
 			.catch(err => {
-				reject(err.message);
+				reject({...err});
 			})
 		});
 	}
