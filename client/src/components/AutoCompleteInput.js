@@ -24,6 +24,10 @@ class AutoCompleteInputForm extends Component {
     }
   }
 
+  setFocus = () => {
+    this.selectRef.focus()
+  }
+
   componentWillUnmount() {
     this._isMounted = false;
   }

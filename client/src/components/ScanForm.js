@@ -19,7 +19,6 @@ class ScanForm extends Component {
         { value: 'Add New', id: 'Add New' },
       ],
     }
-    this.poInputRef = React.createRef();
   }
 
   getBoxPrefixes = async () => {
@@ -155,7 +154,7 @@ class ScanForm extends Component {
   handleErrorOption = (option) => {
     switch(option) {
       case "Add PO":
-
+        console.log(this.poInputRef);
       break
       default:
       console.log('unkown option', option) 
@@ -175,6 +174,7 @@ class ScanForm extends Component {
         })
         this.setState({ errorModalConfig: null })
         console.log(result)
+        this.handleErrorOption(result)
         break
       case 'Product not found on provided POs':
         result = await this.showErrorModal({
@@ -183,10 +183,12 @@ class ScanForm extends Component {
         })
         this.setState({ errorModalConfig: null })
         console.log(result)
+        this.handleErrorOption(result);
         break
       default:
         console.log({error: 'unknown error', data: {...error}})      
     }
+
     setTimeout(() => {
       this.barcodeInput.focus()
     }, 550)
@@ -208,6 +210,7 @@ class ScanForm extends Component {
   handleAutoUpdate = (clicked, valKey) => {
     console.log(clicked)
     clicked.data = valKey === 'locations' ? [...clicked.id].map(l=>l.id) : clicked.data
+    clicked.data = Object.keys(clicked.data).length > 0 ? clicked.data : ''
     this.props.form.setFieldsValue({ [valKey]: clicked.data || '' })
     this.setState({
       values: {
@@ -321,7 +324,7 @@ class ScanForm extends Component {
                       onUpdate={clicked =>
                         this.handleAutoUpdate(clicked, "currentPOs")
                       }
-                      ref={this.poInputRef}
+                      ref={(node)=>this.poInputRef = node}
                     >
                       <Input style={{ display: "none" }} />
                     </AutoCompleteInput>
