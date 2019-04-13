@@ -11,12 +11,16 @@ const FormItem = Form.Item;
 
 class ScanForm extends Component {
   _isMounted = false 
-  state = {
-    showBoxPrefixModal: false,
-    boxPrefixList: [
-      {value: 'Add New', id: 'Add New'},
-    ],
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      showBoxPrefixModal: false,
+      boxPrefixList: [
+        { value: 'Add New', id: 'Add New' },
+      ],
+    }
+    this.poInputRef = React.createRef();
+  }
 
   getBoxPrefixes = async () => {
     // get the box prefixes for this user
@@ -146,6 +150,16 @@ class ScanForm extends Component {
         }, 250)        
       }
     });
+  }
+
+  handleErrorOption = (option) => {
+    switch(option) {
+      case "Add PO":
+
+      break
+      default:
+      console.log('unkown option', option) 
+    }
   }
 
   handleError = async (error) => {
@@ -307,6 +321,7 @@ class ScanForm extends Component {
                       onUpdate={clicked =>
                         this.handleAutoUpdate(clicked, "currentPOs")
                       }
+                      ref={this.poInputRef}
                     >
                       <Input style={{ display: "none" }} />
                     </AutoCompleteInput>
