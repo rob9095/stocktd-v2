@@ -142,6 +142,7 @@ const scanFromPO = (scan, scanQty, product) => {
                 message: 'Scanned Quantity exceeds PO Product Quantity',
                 options: ['Add Quantity', 'Allow Excess', 'Remove PO'],
                 poProduct: updatedPoProduct,
+                barcode: product.barcode,
                 po,
               }
             })
@@ -189,11 +190,12 @@ const scanFromPO = (scan, scanQty, product) => {
       if (!updatedPo._id) {
         resolve({
           error: {
-            message: 'Product not found on provided POs',
-            options: ['Add PO'],
+            message: "Product not found on provided POs",
+            options: ["Add PO"],
             product,
+            barcode: product.barcode,
           }
-        })
+        });
       }
       resolve({
         updatedPoProduct,

@@ -26,10 +26,20 @@ class AutoCompleteInputForm extends Component {
 
   setFocus = () => {
     this.selectRef.focus()
+    this.selectRef.rcSelect.state.open = true
   }
 
   componentWillUnmount() {
     this._isMounted = false;
+  }
+
+  componentDidUpdate(prevProps) {
+    // Typical usage (don't forget to compare props):
+    if (this.props.setFocus === true && prevProps.setFocus === false) {
+      console.log('setting focus!')
+      this.handleDataFetch('')
+      this.setFocus()
+    }
   }
 
   handleDataFetch = async (value) => {

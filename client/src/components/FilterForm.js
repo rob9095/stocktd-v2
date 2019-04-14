@@ -171,6 +171,7 @@ class FilterForm extends Component {
             poMode={'multiple'}
             onScan={this.handleScan}
             onCurrentPOUpdate={this.props.onCurrentPOUpdate}
+            onAddQuantity={this.props.onAddQuantity}
           />
         )}
       </div>

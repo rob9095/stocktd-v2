@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Alert, Form, Row, Col, Input, Button, Select, Skeleton, Spin, Modal } from 'antd';
+import { Alert, Form, Row, Col, Input, Button, Select, Skeleton, Spin, Modal, Table } from 'antd';
 import { getAllModelDocuments, upsertModelDocuments } from '../store/actions/models';
 import InsertDataModal from './InsertDataModal';
 import { connect } from "react-redux";
@@ -92,21 +92,59 @@ class ScanForm extends Component {
   }
 
   showErrorModal = (config) => {
-    let { title, action, list, buttons, okText, okType, maskClosable } = config
+    let { title, action, list, buttons, okText, okType, maskClosable, error } = config
     return new Promise((resolve,reject) => {
       list = Array.isArray(list) && list.map((str, i) => <li key={i}>{str}</li>)
       buttons = Array.isArray(buttons) && buttons.map((btn, i) => 
       <Button onClick={()=>resolve(btn.text)} {...btn} key={i}>{btn.text}</Button>)
+      let sku = error.poProduct ? error.poProduct.sku : error.product && error.product.sku
+      let po = error.po || {}
       this.setState({
         errorModalConfig: {
           title: title || "Scan Error",
           content: (
             <div>
               <ul>{list}</ul>
-              <div>
+              <div className="flex space-evenly align-items-center" style={{padding: 5}}>
                 {buttons}
               </div>
-              <div className="flex justify-flex-end">
+              {sku && (
+                <div>
+                  <strong>Scan Details</strong>
+                  <Table
+                    pagination={false}
+                    size="small"
+                    columns={[
+                      {
+                        title: "SKU",
+                        dataIndex: "sku",
+                      },
+                      {
+                        title: "Barcode",
+                        dataIndex: "barcode",
+                      },
+                      {
+                        title: 'PO Name',
+                        dataIndex: 'name',
+                      },
+                      {
+                        title: 'PO Type',
+                        dataIndex: 'type',
+                      },
+                    ].filter(col=> po._id ? col : !col.title.includes("PO"))}
+                    dataSource={[
+                      {
+                        key: sku,
+                        sku,
+                        barcode: error.barcode,
+                        ...po,
+                        ...config.error,
+                      },
+                    ]}
+                  />
+                </div>
+              )}
+              <div className="flex justify-flex-end" style={{marginTop: 10}}>
                 <Button type="primary" onClick={()=>resolve('ok')}>
                   {okText || "Ok"}
                 </Button>
@@ -140,22 +178,32 @@ class ScanForm extends Component {
         .catch((error)=>{
           console.log(error)
           this.handleError(error)
-          
         })
         // clear scan id and reset focus
         setTimeout(()=> {
           this.props.form.setFieldsValue({barcode: ''})
           this.barcodeInput.focus()
-        }, 250)        
+        }, 250)
       }
     });
   }
 
-  handleErrorOption = (option) => {
+  handleErrorOption = (option,error) => {
     switch(option) {
       case "Add PO":
-        console.log(this.poInputRef);
+        console.log(option)
+        setTimeout(() => { this.setState({ poFocus: true })},600)
       break
+      case "Add Quantity":
+        //show modal with quantity input and disabled input for poProduct/po name, po Type
+        this.props.onAddQuantity({ target: { id: error.poProduct._id}})
+        break
+      case "Allow Excess":
+        //show are you sure modal with error.po.name and error.po.type
+        break
+      case "Remove PO":
+        //show are you sure modal with error.po.name and error.po.type
+        break
       default:
       console.log('unkown option', option) 
     }
@@ -171,19 +219,21 @@ class ScanForm extends Component {
         let result = await this.showErrorModal({
           list: error.message,
           buttons: error.options.map(text=>({text, size: "small",})) || [],
+          error,
         })
         this.setState({ errorModalConfig: null })
         console.log(result)
-        this.handleErrorOption(result)
+        this.handleErrorOption(result,error)
         break
       case 'Product not found on provided POs':
         result = await this.showErrorModal({
           list: error.message,
           buttons: error.options.map(text => ({ text, size: "small", })) || [],
+          error,
         })
         this.setState({ errorModalConfig: null })
         console.log(result)
-        this.handleErrorOption(result);
+        this.handleErrorOption(result,error);
         break
       default:
         console.log({error: 'unknown error', data: {...error}})      
@@ -324,7 +374,7 @@ class ScanForm extends Component {
                       onUpdate={clicked =>
                         this.handleAutoUpdate(clicked, "currentPOs")
                       }
-                      ref={(node)=>this.poInputRef = node}
+                      setFocus={this.state.poFocus || false}
                     >
                       <Input style={{ display: "none" }} />
                     </AutoCompleteInput>
