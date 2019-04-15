@@ -143,27 +143,22 @@ exports.getProducts = async (req, res, next) => {
 
 exports.updateProducts = async (req,res,next) => {
 	try {
-		let updates = req.body.updates.map(u=>{
-			if (u.sku === undefined) {
-				return {
-					updateOne: {
-						filter: { _id: u.id },
-						update: { ...u },
-					}
-				}
-			} else {
-				return {
-					updateOne: {
-						filter: {_id: u.id},
-						update: {
-							...u,
-							...u.sku && {skuCompany: `${u.sku}-${req.body.company}`},
-							...u.barcode && {barcodeCompany: `${u.barcode}-${req.body.company}`},
-						},
-					}
-				}
+		if (!Array.isArray(req.body.updates) || req.body.updates.filter(u=>!u.id).length > 0) {
+			return next({
+				status: 404,
+				message: ['Please provide update array with id']
+			})
+		}
+		let updates = req.body.updates.map(u=>({
+			updateOne: {
+				filter: { _id: u.id },
+				update: {
+					...u,
+					...u.sku && { skuCompany: `${u.sku}-${req.body.company}` },
+					...u.barcode && { barcodeCompany: `${u.barcode}-${req.body.company}` },
+				},
 			}
-		})
+		}))
 		let updatedProducts = await db.Product.bulkWrite(updates)
 		return res.status(200).json({updatedProducts})
 	} catch(err) {
