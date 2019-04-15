@@ -67,17 +67,38 @@ class DrawerForm extends Component {
         }
       }
       // fitler out any empty entries or values that are the same
-      const values = Object.entries(inputs).filter(val=>val[1] !== undefined && inputs[val[0]] !== this.props.item[val[0]])
+      const values = Object.entries(inputs).filter(val=>val[1] !== undefined && inputs[val[0]] !== this.props.item[val[0]]).filter(val=>{
+        if (moment(val[1]).isValid()){
+          //compare if the dates are the same day
+          if (!moment(val[1]).isSame(this.props.item[val[0]], 'day')) {
+            return val
+          }
+        } else {
+          return val
+        }
+      })
+      console.log(values)
       if (values.length === 0) {
         this.handleAlert('No Updates Found','warning');
         return
       }
+      console.log(this.props.item)
       let update = {
         id: this.props.item._id,
-        poRef: this.props.item.poRef,
-        oldQty: this.props.item.quantity,
+        ...this.props.item.poRef && {poRef: this.props.item.poRef},
+        ...values.find(val=>val[0] === 'quantity') && {oldQty: this.props.item.quantity},
         ...this.state.selects,
       }
+      //add any required keys for update
+      if (Array.isArray(this.props.reqUpdateKeys)) {
+        for (let key of this.props.reqUpdateKeys) {
+          update = {
+            ...update,
+            [key]: this.props.item[key]
+          }
+        }
+      }
+      //add/overwrite any updated values into the update
       for (let val of values) {
         update = {
           ...update,

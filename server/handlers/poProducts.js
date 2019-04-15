@@ -7,6 +7,12 @@ const db = require('../models');
 */
 exports.updatePoProducts = async (req, res, next) => {
   try {
+    if (!Array.isArray(req.body.updates) || req.body.updates.filter(p=> !p.id || !p.sku || !p.quantity || !p.oldQty).length > 0) {
+      return next({
+        status: 404,
+        message: ['Please provide update array with id, sku, quantity, and oldQty']
+      })
+    }
     let poProductUpdates = req.body.updates.map(p=>{
       return ({
         updateOne: {
