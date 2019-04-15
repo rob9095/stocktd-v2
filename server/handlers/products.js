@@ -23,12 +23,12 @@ exports.processProductImport = async (req, res, next) => {
 						filter: { skuCompany: `${p.sku}-${req.body.company}`},
 						update: {
 							...p,
-							barcodeCompany: p.barcode ? p.barcode : p.sku  + "-" + req.body.company,
-							skuCompany: `${p.sku}-${req.body.company}`,
+							...p.barcode && { barcodeCompany: p.barcode + "-" + req.body.company },
+							...p.sku && { skuCompany: p.sku + "-" + req.body.company },
 							company: req.body.company
 						},
 						upsert: true,
-						$setOnInsert: { createdOn: new Date(), quantityToShip: 0, },
+						$setOnInsert: { createdOn: new Date(), quantityToShip: 0, skuCompany: p.sku +"-"+req.body.company, barcodeCompany: p.barcode || p.sku + "-" + company  },
 					}
 				}
 			}
@@ -143,7 +143,7 @@ exports.getProducts = async (req, res, next) => {
 
 exports.updateProducts = async (req,res,next) => {
 	try {
-		if (!Array.isArray(req.body.updates) || req.body.updates.filter(u=>!u.id).length > 0) {
+		if (!Array.isArray(req.body.updates) || req.body.updates.filter(u=>u.id).length === 0) {
 			return next({
 				status: 404,
 				message: ['Please provide update array with id']

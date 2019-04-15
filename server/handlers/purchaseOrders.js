@@ -88,9 +88,9 @@ exports.handlePOImport = async (req, res, next) => {
               update: {
                 company,
                 sku: product.sku,
-                barcodeCompany: product.barcode ? product.barcode : product.sku + "-" + company,
+                ...product.barcode && {barcodeCompany: product.barcode + "-" + company},
                 skuCompany: currentSku,
-                $setOnInsert: { createdOn: new Date(), quantityToShip: 0 },
+                $setOnInsert: { createdOn: new Date(), quantityToShip: 0, skuCompany: currentSku, barcodeCompany: product.barcode || product.sku + "-" + company },
                 $inc: product.type === 'outbound' ?
                   { quantity: parseInt(-skuSum) }
                   :
@@ -170,7 +170,7 @@ exports.updatePurchaseOrder = async (req, res, next) => {
       //     update: {...po},
       //   }
       // }))
-      poProductUpdates.push(...ppUpdates);
+      // poProductUpdates.push(...ppUpdates);
       //update quantity on main product if new po.type is different than current poProduct type
       let pUpdates = products.filter(p=>p.po.type !== po.type).map(poLine => ({
         updateOne: {
