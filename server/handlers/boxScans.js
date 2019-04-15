@@ -237,6 +237,7 @@ exports.upsertBoxScan = async (req,res,next) => {
       sku: product.sku,
       company: req.body.company,
       lastScan: new Date(),
+      product: product._id,
     }
     const scanQty = parseInt(req.body.scan.quantity);
     // add the scanned product to PO instead of scan from PO
