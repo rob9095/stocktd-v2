@@ -92,8 +92,10 @@ exports.processProductImport = async (req, res, next) => {
 		// return res.status(200).json({updatedProducts})
 	} catch(err) {
 		if(err.code === 11000) {
-			console.log(err)
-			err.message = 'Duplicate SKUs or Barcodes found. Please update instead.'
+			return next({
+				status: 404,
+				message: ['Duplicate SKUs or barcodes found.']
+			})
 		}
 		return next(err);
 	}
@@ -162,6 +164,12 @@ exports.updateProducts = async (req,res,next) => {
 		let updatedProducts = await db.Product.bulkWrite(updates)
 		return res.status(200).json({updatedProducts})
 	} catch(err) {
+		if (err.code === 11000) {
+			return next({
+				status: 404,
+				message: ['Duplicate SKUs or barcodes found.']
+			})
+		}
 		return next(err)
 	}
 }
@@ -176,6 +184,6 @@ exports.removeProducts = async (req,res,next) => {
 		let deletedProducts = await db.Product.bulkWrite(products)
 		return res.status(200).json({deletedProducts})
 	} catch(err) {
-		return next(err)
+		return next(err);
 	}
 }

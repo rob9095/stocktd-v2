@@ -59,13 +59,15 @@ class DrawerForm extends Component {
     this.props.form.validateFields((err, inputs) => {
       console.log('Received values of form: ', inputs);
       for (let input of this.props.inputs) {
-        if (input.required === true && inputs[input.id] === undefined || inputs[input.id] === '' || inputs[input.id] === null) {
-          this.handleAlert(`${input.text} cannot be blank`, 'error')
-          return
+        if (input.required === true) {
+          if (inputs[input.id] === undefined || inputs[input.id] === '' || inputs[input.id] === null) {
+            this.handleAlert(`${input.text} cannot be blank`, 'error')
+            return
+          }
         }
       }
       // fitler out any empty entries or values that are the same
-      const values = Object.entries(inputs).filter(val=>val[1] !== undefined)
+      const values = Object.entries(inputs).filter(val=>val[1] !== undefined && inputs[val[0]] !== this.props.item[val[0]])
       if (values.length === 0) {
         this.handleAlert('No Updates Found','warning');
         return

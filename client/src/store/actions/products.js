@@ -40,7 +40,7 @@ export function updateProducts(updates, currentUser){
 			})
 			.catch(err => {
 				dispatch(addError(err.message));
-				reject();
+				reject(err);
 			})
 		});
 	}
