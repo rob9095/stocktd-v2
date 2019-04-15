@@ -1,5 +1,6 @@
 const db = require('../models');
 const { createImportStatus } = require('../handlers/importStatus');
+const upsertBarcode = require('./barcode')
 
 exports.processProductImport = async (req, res, next) => {
 	try {
@@ -154,7 +155,11 @@ exports.updateProducts = async (req,res,next) => {
 				return {
 					updateOne: {
 						filter: {_id: u.id},
-						update: { ...u, skuCompany: `${u.sku}-${req.body.company}` },
+						update: {
+							...u,
+							...u.sku && {skuCompany: `${u.sku}-${req.body.company}`},
+							...u.barcode && {barcodeCompany: `${u.barcode}-${req.body.company}`},
+						},
 					}
 				}
 			}

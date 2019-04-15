@@ -1,4 +1,4 @@
-po name,po type,status,sku,quantity,title
+name,type,status,sku,quantity,title
 first po,inbound,processing,NEW-SKU,100,test
 first po,inbound,processing,RH0135-A-2/3,100,
 first po,inbound,processing,RH0135-A-3/4,100,

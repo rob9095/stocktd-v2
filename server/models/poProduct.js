@@ -1,24 +1,13 @@
 const mongoose = require('mongoose');
 
-const PoProductSchema = new mongoose.Schema({
-  poId: {
+const poProductSchema = new mongoose.Schema({
+  po: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'PurchaseOrder',
   },
   poRef: {
     type: String,
     required: true,
-  },
-  name: {
-    type: String,
-  },
-  type: {
-    type: String,
-    required: true,
-  },
-  status: {
-    type: String,
-    default: 'complete',
   },
   sku: {
     type: String,
@@ -28,7 +17,7 @@ const PoProductSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
-  productId: {
+  product: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Product',
   },
@@ -61,6 +50,8 @@ const PoProductSchema = new mongoose.Schema({
   },
 })
 
-const PoProduct = mongoose.model("PoProduct", PoProductSchema);
+poProductSchema.index({ poRef: 1, company: 1, sku: 1, }, { unique: true });
+
+const PoProduct = mongoose.model("PoProduct", poProductSchema);
 
 module.exports = PoProduct;

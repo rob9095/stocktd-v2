@@ -13,6 +13,7 @@ module.exports.Integration = require('./integration');
 module.exports.BoxScan = require('./boxScan');
 module.exports.Product = require('./product');
 module.exports.Location = require('./location');
+module.exports.Barcode = require('./barcode');
 module.exports.PoProduct = require('./poProduct');
 module.exports.PurchaseOrder = require('./purchaseOrder');
 module.exports.Order = require('./order');
