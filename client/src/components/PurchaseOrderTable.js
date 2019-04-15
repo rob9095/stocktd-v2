@@ -272,7 +272,7 @@ class PurchaseOrderTable extends Component {
         .then((res)=>{
           this.setState({
             data,
-            itemDrawerProduct: id ? {...data.find(i=>i._id === id)} : this.state.itemDrawerProduct,
+            drawerItem: id ? { ...data.find(i => i._id === id) } : this.state.drawerItem,
           })
           resolve(res)
         })
@@ -468,7 +468,7 @@ class PurchaseOrderTable extends Component {
               item={this.state.drawerItem}
               title={`${this.state.drawerItem._id ? 'Edit' : 'Create'} Purchase Order`}
               onClose={()=>this.setState({drawerItem: null})}
-              onSave={(data)=>this.state.drawerItem._id ? this.handlePOUpdate(data) : this.handleImport(data)}
+              onSave={(data,id) => id ? this.handlePOUpdate(data, id) : this.handleImport(data)}
               create={this.state.drawerItem._id ? false : true}
             />
           )}

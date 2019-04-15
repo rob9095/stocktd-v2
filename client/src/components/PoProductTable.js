@@ -546,7 +546,7 @@ class PoProductTable extends Component {
               onClose={this.toggle('showEditItemDrawer')}
               onSave={this.handleProductUpdate}
               create={false}
-              reqUpdateKeys={['sku','quantity','_id','poRef']}
+              reqUpdateKeys={['sku','quantity','poRef']}
             />
           )}
           {this.state.showCreateItemDrawer && (

@@ -164,13 +164,13 @@ exports.updatePurchaseOrder = async (req, res, next) => {
       delete po.oldQty, po.selectType;
       let products = await db.PoProduct.find({company: req.body.company, poRef: po.poRef}).populate('po')
       //poProduct updates
-      // let ppUpdates = products.map(poLine => ({
-      //   updateOne: {
-      //     filter: { skuCompany: poLine.skuCompany, poRef: poLine.poRef},
-      //     update: {...po},
-      //   }
-      // }))
-      // poProductUpdates.push(...ppUpdates);
+      let ppUpdates = products.map(poLine => ({
+        updateOne: {
+          filter: { skuCompany: poLine.skuCompany, poRef: poLine.poRef},
+          update: {...po},
+        }
+      }))
+      poProductUpdates.push(...ppUpdates);
       //update quantity on main product if new po.type is different than current poProduct type
       let pUpdates = products.filter(p=>p.po.type !== po.type).map(poLine => ({
         updateOne: {
