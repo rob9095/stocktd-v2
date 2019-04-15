@@ -9,6 +9,11 @@ const boxScanSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  po: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'PurchaseOrder',
+    required: true,
+  },
   quantity: {
     type: Number,
     required: true
@@ -38,6 +43,9 @@ const boxScanSchema = new mongoose.Schema({
   createdOn: {
     type: Date,
     default: Date.now
+  },
+  lastScan: {
+    type: Date,
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,

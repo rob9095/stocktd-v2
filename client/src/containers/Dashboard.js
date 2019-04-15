@@ -10,6 +10,7 @@ import PurchaseOrderTable from '../components/PurchaseOrderTable';
 import PoProductTable from '../components/PoProductTable';
 import ProductTableLegacy from '../components/ProductTableLegacy';
 import ReceiveInventory from '../components/ReceiveInventory';
+import ScanTable from '../components/ScanTable';
 const { Sider } = Layout;
 const SubMenu = Menu.SubMenu;
 
@@ -126,6 +127,7 @@ class Dashboard extends Component {
                 <Menu.Item className="stkd-dark sub-menu-item" key="products">Manage Products</Menu.Item>
                 <Menu.Item className="stkd-dark sub-menu-item" key="purchase-orders">Update Quantity</Menu.Item>
                 <Menu.Item className="stkd-dark sub-menu-item" key="receive-inventory">Receive Inventory</Menu.Item>
+                <Menu.Item className="stkd-dark sub-menu-item" key="scan-table">Scan Table</Menu.Item>
               </SubMenu>
               <Menu.Item className="stkd-dark menu-item" key="purchase-orders">
                 <Icon type="file-done" theme="outlined" />
@@ -166,6 +168,9 @@ class Dashboard extends Component {
               <Route exact path="/app/receive-inventory" render={props => (
                 <ReceiveInventory {...props} />
               )} />
+              <Route exact path="/app/scan-table" render={props => (
+                <ScanTable {...props} />
+              )} />              
               <Route exact path="/app" render={props => (
                 <div>
                   <Breadcrumb style={{ margin: '16px 0' }}>

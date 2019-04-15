@@ -84,15 +84,18 @@ const scanToPO = (boxScan,scanQty) => {
         },
         $inc: { quantity: scanQty },
       }, { upsert: true });
-      let foundBoxScan = await db.BoxScan.findOne({ skuCompany: boxScan.skuCompany, name: boxScan.name })
+      let poId = updatedPo.upserted ? updatedPo.upserted[0]._id : foundPo._id
+      let foundBoxScan = await db.BoxScan.findOne({ skuCompany: boxScan.skuCompany, name: boxScan.name, po: poId })
       if (foundBoxScan) {
         foundBoxScan.quantity += scanQty
+        foundBoxScan.lastScan = new Date()
         foundBoxScan.save()
         updatedBoxScan = foundBoxScan
       } else {
         updatedBoxScan = await db.BoxScan.create({
           ...boxScan,
           poRef: foundPo.poRef,
+          po: poId,
           createdOn: new Date(),
         })
       }
@@ -171,12 +174,14 @@ const scanFromPO = (scan, scanQty, product) => {
           let boxScan = {
             ...scan,
             poRef: po.poRef,
+            po: po._id,
             createdOn: new Date(),
             scanToPo: false,
           }
-          let foundBoxScan = await db.BoxScan.findOne({ skuCompany: boxScan.skuCompany, name: boxScan.name })
+          let foundBoxScan = await db.BoxScan.findOne({ skuCompany: boxScan.skuCompany, name: boxScan.name, po: po._id })
           if (foundBoxScan) {
             foundBoxScan.quantity += scanQty
+            foundBoxScan.lastScan = new Date()
             foundBoxScan.save()
             updatedBoxScan = foundBoxScan
           } else {
@@ -231,6 +236,7 @@ exports.upsertBoxScan = async (req,res,next) => {
       skuCompany: product.skuCompany,
       sku: product.sku,
       company: req.body.company,
+      lastScan: new Date(),
     }
     const scanQty = parseInt(req.body.scan.quantity);
     // add the scanned product to PO instead of scan from PO

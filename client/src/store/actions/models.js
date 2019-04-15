@@ -1,10 +1,10 @@
 import { apiCall } from '../../services/api';
 import { addError } from './errors';
 
-export function queryModelData(model, query, sortBy, sortDirection, activePage, rowsPerPage, company){
+export function queryModelData(model, query, sortBy, sortDirection, activePage, rowsPerPage, company, populateRefs){
   return dispatch => {
 		return new Promise((resolve,reject) => {
-			return apiCall('post', `/api/models/query/`, {model, query, sortBy, sortDirection, activePage, rowsPerPage, company})
+			return apiCall('post', `/api/models/query/`, {model, query, sortBy, sortDirection, activePage, rowsPerPage, company, populateRefs})
 			.then((res) => {
 				resolve(res);
 			})
