@@ -57,7 +57,7 @@ class ProductTable extends Component {
     })
     requestedPage === undefined ? requestedPage = this.state.activePage : null;
     requestedRowsPerPage === undefined ? requestedRowsPerPage = this.state.rowsPerPage : null;
-    this.props.queryModelData(this.props.queryModel,[this.state.query],this.state.column, this.state.direction, requestedPage, requestedRowsPerPage, this.props.currentUser.user.company,this.props.populateRefs)
+    this.props.queryModelData(this.props.queryModel,this.state.query,this.state.column, this.state.direction, requestedPage, requestedRowsPerPage, this.props.currentUser.user.company,this.props.populateRefs)
     .then(({data, activePage, totalPages, rowsPerPage, skip})=>{
       this.setState({
         loading: false,

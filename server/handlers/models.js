@@ -57,7 +57,6 @@ exports.queryModelData = async (req, res, next) => {
 		const limit = req.body.rowsPerPage
 		const skip = (req.body.activePage * req.body.rowsPerPage) - req.body.rowsPerPage
     const totalPages = Math.floor(count / req.body.rowsPerPage)
-    let populateString = '.populate("po").populate("user")'
     let data = await db[req.body.model].find(query).skip(skip).limit(limit).sort({[req.body.sortBy]: req.body.sortDirection}).populate(req.body.populateRefs || "")
 		return res.status(200).json({
 			data,
