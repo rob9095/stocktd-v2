@@ -9,8 +9,9 @@ class AutoCompleteInputForm extends Component {
   _isMounted = false 
   constructor(props) {
     super(props)
+    this.timeout = 0;
     this.state = {
-      data: []
+      data: [],
     }
   }
 
@@ -42,9 +43,16 @@ class AutoCompleteInputForm extends Component {
     }
   }
 
+  handleType = (value) => {
+    this.setState({ loading: true })
+    if (this.timeout) clearTimeout(this.timeout);
+    this.timeout = setTimeout(() => {
+      this.handleDataFetch(value)
+    }, 300);
+  }
+
   handleDataFetch = async (value) => {
     const searchKey = this.props.searchKey;
-    this.setState({loading: true})
     await getAllModelDocuments({model: this.props.queryModel, documentRef: {[searchKey]: value},groupBy: searchKey, company: this.props.currentUser.user.company, regex:true, limit: 15})
     .then((res)=>{
       //remove duplicates based on searchKey if in tags mode
@@ -94,9 +102,9 @@ class AutoCompleteInputForm extends Component {
           showSearch
           showArrow
           placeholder={this.props.placeholder}
-          notFoundContent={this.state.loading ? <Skeleton active loading paragraph={false} /> : this.props.notFound || null}
+          notFoundContent={this.state.loading ? <Skeleton active loading paragraph={false} /> : this.props.notFound || 'No Results'}
           filterOption={false}
-          onSearch={this.handleDataFetch}
+          onSearch={this.handleType}
           onChange={this.handleChange}
           mode={this.props.mode || "default"}
           labelInValue
