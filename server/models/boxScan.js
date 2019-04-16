@@ -44,7 +44,8 @@ const boxScanSchema = new mongoose.Schema({
     required: true,
   },
   locations: [{
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Location",
   }],
   createdOn: {
     type: Date,

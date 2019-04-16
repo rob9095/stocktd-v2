@@ -3,9 +3,9 @@ const db = require('../models');
 
 const buildQuery = (queryArr) => {
 	return new Promise((resolve,reject) => {
-		if (!Array.isArray(queryArr) || queryArr.map(val=>!Array.isArray(val)).length > 0) {
+		if (!Array.isArray(queryArr) || queryArr.filter(val=>!Array.isArray(val)).length > 0) {
 			console.log(queryArr)
-			reject('Please provide query with array of arrays')
+			reject({message: 'Please provide query with array of arrays'})
 		}
 		let removeKeys = []
 		let query = {}
@@ -50,7 +50,7 @@ const buildQuery = (queryArr) => {
 		for (let key of removeKeys) {
 			delete query[key]
 		}
-		resolve(query)
+		resolve({...query})
 	})
 }
 
@@ -75,6 +75,7 @@ exports.queryModelData = async (req, res, next) => {
 					...match,
 					company: req.body.company,
 				}
+				console.log({match})
 				populateArray.push({
 					...popConfig,
 					match,
@@ -88,7 +89,7 @@ exports.queryModelData = async (req, res, next) => {
 			// 	})
 			// })
 		}
-		console.log(populateArray)
+		console.log({populateArray})
 		let count = await db[req.body.model].count(query)
 		const limit = req.body.rowsPerPage
 		const skip = (req.body.activePage * req.body.rowsPerPage) - req.body.rowsPerPage

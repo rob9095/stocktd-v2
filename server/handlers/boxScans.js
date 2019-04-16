@@ -23,8 +23,10 @@ const upsertScanLocation = (upsertData) => {
           upsert: true,
         }
       }))
-      let result = await db.Location.bulkWrite(updates)
-      resolve({ result })
+      await db.Location.bulkWrite(updates)
+      //find the locations just upserted
+      let foundLocations = await db.Location.find({$and: [{ $or: locations.map(name=>({name,company})) }]})
+      resolve(foundLocations)
     } catch(err) {
       reject(err)
     }
@@ -47,7 +49,8 @@ const scanToPO = (boxScan,scanQty) => {
       }
       //upsert the locations if neccessary
       if (boxScan.locations && boxScan.locations.length > 0) {
-        await upsertScanLocation({ ...boxScan, filterRef: 'name' })
+        let locations = await upsertScanLocation({ ...boxScan, filterRef: 'name' })
+        boxScan.locations = locations.length > 0 ? locations.map(l=>l._id) : []
       }
       //define the current po, first array item if array, otherwise find in boxScan, if undefined in boxScan set to generic inbound po
       const currentPO = Array.isArray(boxScan.currentPOs) ? boxScan.currentPOs[0] : boxScan.currentPOs || genericInboundPo
@@ -131,7 +134,8 @@ const scanFromPO = (scan, scanQty, product) => {
           updatedPo = po
           //update locations if neccesary
           if (scan.locations && scan.locations.length > 0) {
-            await upsertScanLocation({ ...scan, filterRef: 'name' })
+            let locations = await upsertScanLocation({ ...scan, filterRef: 'name' })
+            scan.locations = locations.length > 0 ? locations.map(l => l._id) : []
           }
           //find the poProduct and throw error if we overscanned and allowExcess is not enabled for po
           updatedPoProduct = await db.PoProduct.findOne({_id: poProduct._id})

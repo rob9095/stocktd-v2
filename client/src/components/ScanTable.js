@@ -13,7 +13,7 @@ class ScanTable extends Component {
     return(
       <StkdTable
         queryModel="BoxScan"
-        populateArray={[{path:'po'},{path:'product'}]}
+        populateArray={[{path:'po'},{path:'product'},{path:'locations'}]}
         title="Scans"
         bulkMenuOptions={[
           {name: 'Delete', key: 'Delete'}
@@ -29,7 +29,7 @@ class ScanTable extends Component {
         {id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 4, className: 'no-wrap'},
         {id: 'po', nestedKey: 'name', text: 'PO Name',  width: 175, span: 8, className: 'no-wrap'},
         {id: 'po', nestedKey: 'type', text: 'PO Type', width: 175, span: 8, className: 'no-wrap'},
-        //{id: 'locations', type: 'array', text: 'Location', width: 175, span: 8, className: 'no-wrap'},
+        {id: 'locations', type: 'array', text: 'Location', width: 175, span: 8, className: 'no-wrap'},
         //{id: 'actions', text: 'Actions', width: 100, noSort: true},
       ]}
       />

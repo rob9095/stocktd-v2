@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { fetchAllProducts, updateProducts, importProducts } from '../store/actions/products';
 import { queryModelData, deleteModelDocuments } from '../store/actions/models';
-import { Button, Pagination, Divider, Icon, Spin, Form, Dropdown, Menu, Modal, message, Row, Col, Skeleton } from 'antd';
+import { Button, Pagination, Divider, Icon, Spin, Form, Dropdown, Menu, Modal, message, Row, Col, Skeleton, Input } from 'antd';
 import WrappedFilterForm from './FilterForm';
 import EditItemDrawer from './EditItemDrawer';
 import ImportModal from './ImportModal';
+import AutoCompleteInput from './AutoCompleteInput';
 
 const confirm = Modal.confirm;
 const FormItem = Form.Item;
@@ -373,6 +374,45 @@ class ProductTable extends Component {
                   <a className="ant-dropdown-link"><Icon type="down" /></a>
                 </Dropdown>
               </span>
+            </td>
+          )
+        }
+        if (Array.isArray(r[col.id])) {
+          const menu = (
+            <Menu key={`${r._id}-${col.id}-menu`} onClick={()=>console.log({key: col.id, id: r._id})}>
+              {r[col.id].map(o => {
+                o = typeof o === 'string' ? o : o[col.nestedKey]
+                return (
+                  <Menu.Item key={`${r._id}-${col.id}-${o}`}>
+                    <a id={r._id} name={o}>{o}</a>
+                  </Menu.Item>
+                )
+              })}
+            </Menu>
+          )
+          return (
+            <td key={`${r._id}-${col.id}`} className="stkd-td actions center-a no-wrap">
+              {/* <span>                
+                <Dropdown overlay={menu}>
+                  <a className="ant-dropdown-link">
+                    {r[col.id][0] || 'Add New'}
+                    <Divider type="vertical" />
+                    <Icon type="down" />
+                  </a>
+                </Dropdown>
+              </span> */}
+              <AutoCompleteInput
+                queryModel={"Location"}
+                searchKey={"name"}
+                placeholder={"Location"}
+                mode={"tags"}
+                onUpdate={clicked =>
+                  console.log(clicked, "locations")
+                }
+                selected={r[col.id]}
+              >
+                <Input style={{ display: "none" }} />
+              </AutoCompleteInput>
             </td>
           )
         }
