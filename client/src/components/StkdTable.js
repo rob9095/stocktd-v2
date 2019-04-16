@@ -402,12 +402,12 @@ class ProductTable extends Component {
                 </Dropdown>
               </span> */}
               <AutoCompleteInput
-                queryModel={"Location"}
-                searchKey={"name"}
-                placeholder={"Location"}
+                queryModel={col.text}
+                searchKey={col.nestedKey}
+                placeholder={col.text}
                 mode={"tags"}
                 onUpdate={clicked =>
-                  console.log(clicked, "locations")
+                  console.log(clicked, col.id)
                 }
                 selected={r[col.id]}
               >

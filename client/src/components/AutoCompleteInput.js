@@ -17,9 +17,13 @@ class AutoCompleteInputForm extends Component {
 
   async componentDidMount() {
     this._isMounted = true;
-    this.handleDataFetch('')
     if (this.props.selected) {
-      const selected = this.props.selected.map(item=>({props: {data: {...item}}, key:item._id, label: item[this.props.searchKey]}))
+      const selected = this.props.selected.map(item=>(
+        {props: 
+          {data: {...item}},
+          ...this.props.mode === 'tags' ? { key: item[this.props.searchKey] } : { key: item._id },
+          label: item[this.props.searchKey]}
+        ))
       this.setState({selected})
       this.handleChange(selected,selected)
     }
