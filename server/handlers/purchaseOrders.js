@@ -90,7 +90,7 @@ exports.handlePOImport = async (req, res, next) => {
                 sku: product.sku,
                 ...product.barcode && {barcodeCompany: product.barcode + "-" + company},
                 skuCompany: currentSku,
-                $setOnInsert: { createdOn: new Date(), quantityToShip: 0 },
+                $setOnInsert: { createdOn: new Date(), quantityToShip: 0, ...!product.barcode && { barcodeCompany: product.sku + "-" + company } },
                 $inc: product.type === 'outbound' ?
                   { quantity: parseInt(-skuSum) }
                   :

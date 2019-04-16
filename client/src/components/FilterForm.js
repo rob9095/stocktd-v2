@@ -55,8 +55,8 @@ class FilterForm extends Component {
       const query = Object.entries(values).filter(val=>val[1] !== '' && val[1] !== undefined && val[1].length > 0).map(val=>{
         //check if we have a select for the query value, if we do add it to the element in the query array
         let select = selects.find(s=>s[0] === `${val[0]}Select`)
-        if(select) {
-          return [...val,select[1]]
+        if(this.props.form[val[0]+"Select"]) {
+          return [...val,this.props.form[val[0]+"Select"]]
         } else if(Array.isArray(val[1])) {
           return [[val[0]],this.state.dates]
         } else {

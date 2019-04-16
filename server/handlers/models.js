@@ -31,8 +31,8 @@ exports.queryModelData = async (req, res, next) => {
 					[val[0]]: { $gte: startDate, $lt: endDate }
 				}
 				// numbers, if we get a third array item use it as $lte,$gte,$gt,$lt, otherwise use non Regex check
-			} else if ((Number.isInteger(parseInt(val[1])))) {
-				query = val[2] === undefined ?
+			} else if (val[2] !== undefined) {
+				query = val[2] === "=" ?
 					{
 						...query,
 						[val[0]]: val[1],
@@ -101,7 +101,9 @@ exports.upsertModelDocuments = async (req,res,next) => {
 				filter: {[req.body.filterRef]: doc[req.body.filterRef]},
 				update: {
           ...doc,
-          company: req.body.company,
+					company: req.body.company,
+					...req.body.model === 'Product' && doc.sku && {skuCompany: doc.sku+"-"+req.body.company},
+					...req.body.model === 'Product' && doc.barcode && { barcodeCompany: doc.barcode + "-" + req.body.company }
         },
 				upsert: true,
 			}
