@@ -401,7 +401,7 @@ class ProductTable extends Component {
           </Form>
           )}
           <WrappedFilterForm
-            inputs={this.props.headers.filter(h=>h.noSort !== true)}
+            inputs={this.props.headers.filter(h=>h.noSort !== true && h.nestedKey === undefined)}
             onFilterSearch={this.handleFilterSearch}
           />
           {this.state.showEditItemDrawer && (
@@ -463,7 +463,7 @@ class ProductTable extends Component {
               validInputs={[
                 {value:'sku', required: true},
                 {value:'title'},
-                {value: 'barcode'},
+                {value:'barcode'},
                 {value:'quantity', type: 'number'},
                 {value:'price', type: 'number'},
                 {value:'supplier'},

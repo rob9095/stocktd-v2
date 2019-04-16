@@ -9,6 +9,16 @@ const poProductSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  name: {
+    type: String,
+  },
+  type: {
+    type: String,
+  },
+  status: {
+    type: String,
+    default: 'complete',
+  },
   sku: {
     type: String,
     required: true,

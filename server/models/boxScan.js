@@ -41,6 +41,7 @@ const boxScanSchema = new mongoose.Schema({
   },
   barcode: {
     type: String,
+    required: true,
   },
   locations: [{
     type: String,
