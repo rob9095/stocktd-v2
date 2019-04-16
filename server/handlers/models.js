@@ -1,5 +1,53 @@
 const db = require('../models');
 
+
+const buildQuery = (queryArr) => {
+	let removeKeys = []
+	let query = {}
+	for (let val of queryArr) {
+		// if the query already contains that key, lets create an $and query, only works for exact matches for now, no regex
+		if (query[val[0]]) {
+			let andQuery = queryArr.filter(v => v[0] === val[0]).map(v => ({ [v[0]]: v[1] }))
+			query = {
+				...query,
+				$and: [{ $or: andQuery }],
+			}
+			// remove this key at the end of the query building loop
+			removeKeys.push(val[0])
+		} else if (Array.isArray(val[1])) {
+			// array of dates
+			let startDate = val[1][0]
+			let endDate = val[1][1]
+			query = {
+				...query,
+				[val[0]]: { $gte: startDate, $lt: endDate }
+			}
+			// numbers, if we get a third array item use it as $lte,$gte,$gt,$lt, otherwise use non Regex check
+		} else if (val[2] !== undefined) {
+			query = val[2] === "=" ?
+				{
+					...query,
+					[val[0]]: val[1],
+				}
+				:
+				{
+					...query,
+					[val[0]]: { [`$${val[2]}`]: val[1] },
+				}
+			//regex text feilds
+		} else {
+			query = {
+				...query,
+				[val[0]]: { $regex: new RegExp(val[1], "i") },
+			}
+		}
+	}
+	for (let key of removeKeys) {
+		delete query[key]
+	}
+	return query
+}
+
 /*
 * QUERY pagnated model data
 * Accepted Values: array of arrays in req.body.query, the document model in req.body.model,  sortDirection, sortBy, activePage, rowsPerPage in req.body
@@ -7,57 +55,30 @@ const db = require('../models');
 */
 exports.queryModelData = async (req, res, next) => {
 	try {
-		// query is a object built from the incoming query array. incoming query array structure looks like [['searchKey','searchValue || searchArr'],[],etc]
-		let query = {
+		// query is a object built from the incoming query array. incoming query array is an array of arrays and structure looks like [['searchKey','searchValue' || searchArr', '=,lte,gte,etc'],[],etc]
+		let query = buildQuery(req.body.query)
+		query = {
+			...query,
 			company: req.body.company,
 		}
-		let removeKeys = []
-		for (let val of req.body.query){
-			// if the query already contains that key, lets create an $and query, only works for exact matches for now, no regex
-			if (query[val[0]]) {
-				let andQuery = req.body.query.filter(v => v[0] === val[0]).map(v=>({[v[0]]:v[1]}))
-				query = {
-					...query,
-					$and: [{$or: andQuery}],
-				}
-				// remove this key at the end of the query building loop
-				removeKeys.push(val[0])
-			} else if (Array.isArray(val[1])){
-				// array of dates
-				let startDate = val[1][0]
-				let endDate = val[1][1]
-				query = {
-					...query,
-					[val[0]]: { $gte: startDate, $lt: endDate }
-				}
-				// numbers, if we get a third array item use it as $lte,$gte,$gt,$lt, otherwise use non Regex check
-			} else if (val[2] !== undefined) {
-				query = val[2] === "=" ?
-					{
-						...query,
-						[val[0]]: val[1],
-					}
-				 :
-				 {
-					 ...query,
-					 [val[0]]: {[`$${val[2]}`]: val[1]},
-				 }
-				 //regex text feilds
-			} else {
-				query = {
-					...query,
-					[val[0]]: { $regex : new RegExp(val[1], "i") },
-				}
-			}
+		let populateArray = []
+		if (Array.isArray(req.body.populateArray) && req.body.populateArray.length > 0) {
+			populateArray = req.body.populateArray.map(pC=>{
+				return ({
+					...pC,
+					...pC.query && { match: {...buildQuery(pC.query), company: req.body.company} },
+				})
+			})
 		}
-		for (let key of removeKeys) {
-			delete query[key]
-		}
+		console.log(populateArray)
 		let count = await db[req.body.model].count(query)
 		const limit = req.body.rowsPerPage
 		const skip = (req.body.activePage * req.body.rowsPerPage) - req.body.rowsPerPage
     const totalPages = Math.floor(count / req.body.rowsPerPage)
-    let data = await db[req.body.model].find(query).skip(skip).limit(limit).sort({[req.body.sortBy]: req.body.sortDirection}).populate(req.body.populateRefs || "")
+		let data = await db[req.body.model].find(query).skip(skip).limit(limit).sort({[req.body.sortBy]: req.body.sortDirection}).populate(populateArray)
+		for (let popConfig of populateArray) {
+			data = data.filter(doc=>doc[popConfig.path] !== null)
+		}
 		return res.status(200).json({
 			data,
 			totalPages,

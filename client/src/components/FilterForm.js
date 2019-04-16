@@ -50,11 +50,9 @@ class FilterForm extends Component {
     console.log(this.state)
     this.props.form.validateFields((err, values) => {
       console.log('Received values of form: ', values);
-      // fitler out any empty entries or equal selects
-      const selects = Object.entries(this.state.selects).filter(val=>val[1] !== '' && val[1] !== '=')
-      const query = Object.entries(values).filter(val=>val[1] !== '' && val[1] !== undefined && val[1].length > 0).map(val=>{
+      // fitler out any empty entries
+      let query = Object.entries(values).filter(val=>val[1] !== '' && val[1] !== undefined && val[1].length > 0).map(val=>{
         //check if we have a select for the query value, if we do add it to the element in the query array
-        let select = selects.find(s=>s[0] === `${val[0]}Select`)
         if(this.props.form[val[0]+"Select"]) {
           return [...val,this.props.form[val[0]+"Select"]]
         } else if(Array.isArray(val[1])) {
@@ -63,7 +61,19 @@ class FilterForm extends Component {
           return [...val]
         }
       })
-      this.props.onFilterSearch(query)
+      //loop the provided iputs(form fields) and remove any inputs with nestedKeys(populated fields), and create a populateArray query
+      let populateArray = [];
+      if (this.props.inputs.filter(input=>input.nestedKey).length > 0) {
+        for (let input of this.props.inputs) {
+          let match = query.find(val => val[0] === input.id + input.nestedKey)
+          if (match) {
+            query = query.filter(val => val[0] !== match[0])
+            match[0] = input.nestedKey
+            populateArray.push({ path: input.id, query: [match] })
+          }
+        }
+      }
+      this.props.onFilterSearch(query,populateArray)
     });
   }
 
@@ -74,20 +84,21 @@ class FilterForm extends Component {
   render() {
     const { getFieldDecorator } = this.props.form;
     let inputs = this.props.inputs.map(i=>{
+      const id = i.nestedKey ? i.id + i.nestedKey : i.id
       const selectBefore = (
-        <Select key={`${i.id}Select`} defaultValue={'='} onChange={this.handleSelect} showArrow={false} className="number-input pre-select">
-          <Option id={`${i.id}Select`} value="=">=</Option>
-          <Option id={`${i.id}Select`} value="gt">{'>'}</Option>
-          <Option id={`${i.id}Select`} value="gte">{'>='}</Option>
-          <Option id={`${i.id}Select`} value="lt">{'<'}</Option>
-          <Option id={`${i.id}Select`} value="lte">{'<='}</Option>
+        <Select key={`${id}Select`} defaultValue={'='} onChange={this.handleSelect} showArrow={false} className="number-input pre-select">
+          <Option id={`${id}Select`} value="=">=</Option>
+          <Option id={`${id}Select`} value="gt">{'>'}</Option>
+          <Option id={`${id}Select`} value="gte">{'>='}</Option>
+          <Option id={`${id}Select`} value="lt">{'<'}</Option>
+          <Option id={`${id}Select`} value="lte">{'<='}</Option>
         </Select>
       )
       if (i.type === 'number') {
         return(
-          <Col xs={i.span*3} md={i.span} key={i.id}>
-            <FormItem key={i.id} label={`${i.text}`}>
-              {getFieldDecorator(i.id, {
+          <Col xs={i.span*3} md={i.span} key={id}>
+            <FormItem key={id} label={`${i.text}`}>
+              {getFieldDecorator(id, {
                  rules: [{
                    required: false,
                    message: '',
@@ -104,24 +115,24 @@ class FilterForm extends Component {
         )
       } if (i.type === 'date') {
         return (
-          <Col xs={i.span*3} md={i.span} key={i.id}>
-            <FormItem key={i.id} label={`${i.text}`}>
-              {getFieldDecorator(i.id, {
+          <Col xs={i.span*3} md={i.span} key={id}>
+            <FormItem key={id} label={`${i.text}`}>
+              {getFieldDecorator(id, {
                  rules: [{
                    required: false,
                    message: '',
                  }],
                })(
-                 <RangePicker key={i.id} onChange={this.handleDateSelect} />
+                 <RangePicker key={id} onChange={this.handleDateSelect} />
                )}
             </FormItem>
           </Col>
         )
       } else {
         return (
-          <Col xs={i.span*3} md={i.span} key={i.id}>
-            <FormItem key={i.id} label={`${i.text}`}>
-              {getFieldDecorator(i.id, {
+          <Col xs={i.span*3} md={i.span} key={id}>
+            <FormItem key={id} label={`${i.text}`}>
+              {getFieldDecorator(id, {
                  rules: [{
                    required: false,
                    message: '',

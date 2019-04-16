@@ -57,8 +57,10 @@ class ProductTable extends Component {
     })
     requestedPage === undefined ? requestedPage = this.state.activePage : null;
     requestedRowsPerPage === undefined ? requestedRowsPerPage = this.state.rowsPerPage : null;
-    this.props.queryModelData(this.props.queryModel,this.state.query,this.state.column, this.state.direction, requestedPage, requestedRowsPerPage, this.props.currentUser.user.company,this.props.populateRefs)
+    let populateArray = this.state.populateArray || this.props.populateArray
+    this.props.queryModelData(this.props.queryModel,this.state.query,this.state.column, this.state.direction, requestedPage, requestedRowsPerPage, this.props.currentUser.user.company,populateArray)
     .then(({data, activePage, totalPages, rowsPerPage, skip})=>{
+      console.log(data)
       this.setState({
         loading: false,
         skip,
@@ -268,10 +270,11 @@ class ProductTable extends Component {
       })
     }
 
-    handleFilterSearch = async (query) => {
+    handleFilterSearch = async (query,populateArray) => {
       await this.setState({
         query,
-      })
+        populateArray
+      });
       this.handleDataFetch()
     }
 
@@ -374,9 +377,10 @@ class ProductTable extends Component {
             </td>
           )
         }
+        console.log({ [col.id]: r[col.id] })
         return (
           <td key={`${r._id}-${col.id}-${col.nestedKey || i}`} className={col.className}>
-            {col.nestedKey ? r[col.id][col.nestedKey] : r[col.id]}
+            {col.nestedKey && r[col.id] ? r[col.id][col.nestedKey] : r[col.id]}
           </td>
         )
       })
@@ -401,7 +405,7 @@ class ProductTable extends Component {
           </Form>
           )}
           <WrappedFilterForm
-            inputs={this.props.headers.filter(h=>h.noSort !== true && h.nestedKey === undefined)}
+            inputs={this.props.headers.filter(h=>h.noSort !== true)}
             onFilterSearch={this.handleFilterSearch}
           />
           {this.state.showEditItemDrawer && (

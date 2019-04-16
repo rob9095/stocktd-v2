@@ -13,7 +13,7 @@ class ScanTable extends Component {
     return(
       <StkdTable
         queryModel="BoxScan"
-        populateRefs={'po product'}
+        populateArray={[{path:'po'},{path:'product'}]}
         title="Scans"
         bulkMenuOptions={[
           {name: 'Display Options', key: 'Display Options'}
