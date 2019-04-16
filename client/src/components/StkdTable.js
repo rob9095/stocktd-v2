@@ -30,6 +30,7 @@ class ProductTable extends Component {
       showCreateItemDrawer: false,
       itemDrawerProduct: {},
       showImportModal: false,
+      populateArray: [],
       hiddenCols: ['supplier'],
       pagination: {
         position: 'bottom',
@@ -56,10 +57,19 @@ class ProductTable extends Component {
     this.setState({
       loading: true,
     })
-    requestedPage === undefined ? requestedPage = this.state.activePage : null;
-    requestedRowsPerPage === undefined ? requestedRowsPerPage = this.state.rowsPerPage : null;
-    let populateArray = this.state.populateArray || this.props.populateArray
-    this.props.queryModelData(this.props.queryModel,this.state.query,this.state.column, this.state.direction, requestedPage, requestedRowsPerPage, this.props.currentUser.user.company,populateArray)
+    requestedPage = requestedPage || this.state.activePage;
+    requestedRowsPerPage = requestedRowsPerPage || this.state.rowsPerPage;
+    let populateArray = this.props.populateArray.map(pC => {
+      const foundPc = this.state.populateArray.find(p => p.path === pC.path)
+      if (foundPc) {
+        return ({
+          ...foundPc
+        })
+      } else {
+        return({...pC})
+      }
+    })
+    this.props.queryModelData(this.props.queryModel,this.state.query,this.state.column, this.state.direction, requestedPage, requestedRowsPerPage,this.props.currentUser.user.company,populateArray)
     .then(({data, activePage, totalPages, rowsPerPage, skip})=>{
       this.setState({
         loading: false,
