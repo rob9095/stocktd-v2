@@ -388,36 +388,15 @@ class ProductTable extends Component {
           )
         }
         if (Array.isArray(r[col.id])) {
-          const menu = (
-            <Menu key={`${r._id}-${col.id}-menu`} onClick={()=>console.log({key: col.id, id: r._id})}>
-              {r[col.id].map(o => {
-                o = typeof o === 'string' ? o : o[col.nestedKey]
-                return (
-                  <Menu.Item key={`${r._id}-${col.id}-${o}`}>
-                    <a id={r._id} name={o}>{o}</a>
-                  </Menu.Item>
-                )
-              })}
-            </Menu>
-          )
           return (
             <td key={`${r._id}-${col.id}`} className="stkd-td actions center-a no-wrap">
-              {/* <span>                
-                <Dropdown overlay={menu}>
-                  <a className="ant-dropdown-link">
-                    {r[col.id][0] || 'Add New'}
-                    <Divider type="vertical" />
-                    <Icon type="down" />
-                  </a>
-                </Dropdown>
-              </span> */}
               <AutoCompleteInput
-                queryModel={col.text}
+                queryModel={col.queryModel}
                 searchKey={col.nestedKey}
                 placeholder={col.text}
                 mode={"tags"}
                 onUpdate={clicked =>
-                  console.log(clicked, col.id)
+                  col.handler({rowId: r._id, clicked, ...col, colId: col.id})
                 }
                 selected={r[col.id]}
               >

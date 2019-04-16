@@ -96,7 +96,10 @@ exports.queryModelData = async (req, res, next) => {
     const totalPages = Math.floor(count / req.body.rowsPerPage)
 		let data = await db[req.body.model].find(query).skip(skip).limit(limit).sort({[req.body.sortBy]: req.body.sortDirection}).populate(populateArray)
 		for (let popConfig of populateArray) {
-			data = data.filter(doc=>doc[popConfig.path] !== null && doc[popConfig.path].length !== 0)
+			//if we had to match in the populate config, remove any empty arrays or null values from data
+			if (Object.keys(popConfig.match).length === 0) {
+				data = data.filter(doc => doc[popConfig.path] !== null && doc[popConfig.path].length !== 0)
+			}
 		}
 		return res.status(200).json({
 			data,
@@ -129,6 +132,39 @@ exports.removeModelDocuments = async (req,res,next) => {
 	}
 }
 
+
+/*
+* UPDATE Document Refs for a model
+* used after upsert if neccesary
+*/
+updateModelDocumentsRefs = (config) => {
+	let { updates, refUpdates, model, refModel, company } = config
+	return new Promise(async (resolve,reject) => {
+		try {
+			//find all the recently updated docs
+			let foundDocs = updates.length > 0 ? await db[model].find({ $and: [{ $or: updates.map(u => ({ ...u, company })) }] }) : []
+			docRefs = foundDocs.length > 0 ? foundDocs.map(d => d._id) : []
+			//loop over the refUpdates and bulk update the refs
+			let docRefUpdates = refUpdates.map(doc=>({
+				updateOne: {
+					filter: { [doc.filterRef]: doc[doc.filterRef], company },
+					update: {
+						...doc.refArray ? { [doc.ref]: docRefs } : foundDocs[0]._id || null,
+					},
+				}
+			}))
+			console.log({
+				filter: docRefUpdates[0].updateOne.filter,
+				update: docRefUpdates[0].updateOne.update,
+			})
+			let updatedRefs = await db[refModel].bulkWrite(docRefUpdates)
+			resolve(updatedRefs)
+		} catch(err) {
+			reject({message: err.toString()})
+		}
+	})
+}
+
 /*
 *	UPSERT model documents
 *	Accepted Values: array of model objects in req.body.data, document model name in req.body.model
@@ -138,18 +174,28 @@ exports.upsertModelDocuments = async (req,res,next) => {
 	try {
 		let updates = req.body.data.map(doc=>({
 			updateOne: {
-				filter: {[req.body.filterRef]: doc[req.body.filterRef]},
+				filter: {[req.body.filterRef]: doc[req.body.filterRef], company: req.body.company},
 				update: {
-          ...doc,
 					company: req.body.company,
+          ...doc,
 					...req.body.model === 'Product' && doc.sku && {skuCompany: doc.sku+"-"+req.body.company},
 					...req.body.model === 'Product' && doc.barcode && { barcodeCompany: doc.barcode + "-" + req.body.company }
         },
 				upsert: true,
 			}
 		}))
-		let upsertedDocs = await db[req.body.model].bulkWrite(updates)
-		return res.status(200).json({upsertedDocs})
+		let upsertedDocs = updates.length > 0 && await db[req.body.model].bulkWrite(updates)
+		let updatedRefs = {}
+		if (Array.isArray(req.body.refUpdates) && req.body.refUpdates.length > 0) {
+			updatedRefs = await updateModelDocumentsRefs({
+				updates: req.body.data,
+				refUpdates: req.body.refUpdates,
+				refModel: req.body.refModel,
+				model: req.body.model,
+				company: req.body.company,
+			})
+		}
+		return res.status(200).json({upsertedDocs, updatedRefs})
 	} catch(err) {
 		return next(err)
 	}
