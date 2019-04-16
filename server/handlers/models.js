@@ -2,50 +2,56 @@ const db = require('../models');
 
 
 const buildQuery = (queryArr) => {
-	let removeKeys = []
-	let query = {}
-	for (let val of queryArr) {
-		// if the query already contains that key, lets create an $and query, only works for exact matches for now, no regex
-		if (query[val[0]]) {
-			let andQuery = queryArr.filter(v => v[0] === val[0]).map(v => ({ [v[0]]: v[1] }))
-			query = {
-				...query,
-				$and: [{ $or: andQuery }],
-			}
-			// remove this key at the end of the query building loop
-			removeKeys.push(val[0])
-		} else if (Array.isArray(val[1])) {
-			// array of dates
-			let startDate = val[1][0]
-			let endDate = val[1][1]
-			query = {
-				...query,
-				[val[0]]: { $gte: startDate, $lt: endDate }
-			}
-			// numbers, if we get a third array item use it as $lte,$gte,$gt,$lt, otherwise use non Regex check
-		} else if (val[2] !== undefined) {
-			query = val[2] === "=" ?
-				{
+	return new Promise((resolve,reject) => {
+		if (!Array.isArray(queryArr) || queryArr.map(val=>!Array.isArray(val)).length > 0) {
+			console.log(queryArr)
+			reject('Please provide query with array of arrays')
+		}
+		let removeKeys = []
+		let query = {}
+		for (let val of queryArr) {
+			// if the query already contains that key, lets create an $and query, only works for exact matches for now, no regex
+			if (query[val[0]]) {
+				let andQuery = queryArr.filter(v => v[0] === val[0]).map(v => ({ [v[0]]: v[1] }))
+				query = {
 					...query,
-					[val[0]]: val[1],
+					$and: [{ $or: andQuery }],
 				}
-				:
-				{
+				// remove this key at the end of the query building loop
+				removeKeys.push(val[0])
+			} else if (Array.isArray(val[1])) {
+				// array of dates
+				let startDate = val[1][0]
+				let endDate = val[1][1]
+				query = {
 					...query,
-					[val[0]]: { [`$${val[2]}`]: val[1] },
+					[val[0]]: { $gte: startDate, $lt: endDate }
 				}
-			//regex text feilds
-		} else {
-			query = {
-				...query,
-				[val[0]]: { $regex: new RegExp(val[1], "i") },
+				// numbers, if we get a third array item use it as $lte,$gte,$gt,$lt, otherwise use non Regex check
+			} else if (val[2] !== undefined) {
+				query = val[2] === "=" ?
+					{
+						...query,
+						[val[0]]: val[1],
+					}
+					:
+					{
+						...query,
+						[val[0]]: { [`$${val[2]}`]: val[1] },
+					}
+				//regex text feilds
+			} else {
+				query = {
+					...query,
+					[val[0]]: { $regex: new RegExp(val[1], "i") },
+				}
 			}
 		}
-	}
-	for (let key of removeKeys) {
-		delete query[key]
-	}
-	return query
+		for (let key of removeKeys) {
+			delete query[key]
+		}
+		resolve(query)
+	})
 }
 
 /*
@@ -56,19 +62,31 @@ const buildQuery = (queryArr) => {
 exports.queryModelData = async (req, res, next) => {
 	try {
 		// query is a object built from the incoming query array. incoming query array is an array of arrays and structure looks like [['searchKey','searchValue' || searchArr', '=,lte,gte,etc'],[],etc]
-		let query = buildQuery(req.body.query)
+		let query = await buildQuery(req.body.query)
 		query = {
 			...query,
 			company: req.body.company,
 		}
 		let populateArray = []
 		if (Array.isArray(req.body.populateArray) && req.body.populateArray.length > 0) {
-			populateArray = req.body.populateArray.map(pC=>{
-				return ({
-					...pC,
-					...pC.query && { match: {...buildQuery(pC.query), company: req.body.company} },
+			for (let popConfig of req.body.populateArray) {
+				let match = popConfig.query && await buildQuery(popConfig.query) || {}
+				match = {
+					...match,
+					company: req.body.company,
+				}
+				populateArray.push({
+					...popConfig,
+					match,
 				})
-			})
+			}
+			// populateArray = req.body.populateArray.map(async pC=>{
+			// 	let query = pC.query && await buildQuery(pC.query) || {}
+			// 	return ({
+			// 		...pC,
+			// 		...pC.query && { match: {...query, company: req.body.company} },
+			// 	})
+			// })
 		}
 		console.log(populateArray)
 		let count = await db[req.body.model].count(query)

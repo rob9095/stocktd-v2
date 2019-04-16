@@ -16,7 +16,7 @@ class ScanTable extends Component {
         populateArray={[{path:'po'},{path:'product'}]}
         title="Scans"
         bulkMenuOptions={[
-          {name: 'Display Options', key: 'Display Options'}
+          {name: 'Delete', key: 'Delete'}
         ]}
         tableMenuOptions={[
           {name: 'Display Options', key: 'Display Options'}
@@ -29,6 +29,7 @@ class ScanTable extends Component {
         {id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 4, className: 'no-wrap'},
         {id: 'po', nestedKey: 'name', text: 'PO Name',  width: 175, span: 8, className: 'no-wrap'},
         {id: 'po', nestedKey: 'type', text: 'PO Type', width: 175, span: 8, className: 'no-wrap'},
+        //{id: 'locations', type: 'array', text: 'Location', width: 175, span: 8, className: 'no-wrap'},
         //{id: 'actions', text: 'Actions', width: 100, noSort: true},
       ]}
       />

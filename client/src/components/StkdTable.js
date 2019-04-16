@@ -60,7 +60,6 @@ class ProductTable extends Component {
     let populateArray = this.state.populateArray || this.props.populateArray
     this.props.queryModelData(this.props.queryModel,this.state.query,this.state.column, this.state.direction, requestedPage, requestedRowsPerPage, this.props.currentUser.user.company,populateArray)
     .then(({data, activePage, totalPages, rowsPerPage, skip})=>{
-      console.log(data)
       this.setState({
         loading: false,
         skip,
@@ -377,7 +376,6 @@ class ProductTable extends Component {
             </td>
           )
         }
-        console.log({ [col.id]: r[col.id] })
         return (
           <td key={`${r._id}-${col.id}-${col.nestedKey || i}`} className={col.className}>
             {col.nestedKey && r[col.id] ? r[col.id][col.nestedKey] : r[col.id]}
