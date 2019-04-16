@@ -96,7 +96,7 @@ exports.queryModelData = async (req, res, next) => {
     const totalPages = Math.floor(count / req.body.rowsPerPage)
 		let data = await db[req.body.model].find(query).skip(skip).limit(limit).sort({[req.body.sortBy]: req.body.sortDirection}).populate(populateArray)
 		for (let popConfig of populateArray) {
-			data = data.filter(doc=>doc[popConfig.path] !== null)
+			data = data.filter(doc=>doc[popConfig.path] !== null && doc[popConfig.path].length !== 0)
 		}
 		return res.status(200).json({
 			data,
