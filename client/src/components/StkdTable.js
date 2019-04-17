@@ -17,6 +17,7 @@ class ProductTable extends Component {
     super(props);
     this.state = {
       loading: true,
+      loadingRows: [],
       rowsPerPage: 100,
       activePage: 1,
       totalPages: 0,
@@ -44,20 +45,23 @@ class ProductTable extends Component {
         showQuickJumper: true,
         pageSizeOptions: ['10','50','100','250','500'],
         size: 'small',
-        onChange: (page, pageSize) => {
-          this.handleDataFetch(page, pageSize)
+        onChange: (requestedPage, requestedRowsPerPage) => {
+          this.handleDataFetch({requestedPage, requestedRowsPerPage})
         },
-        onShowSizeChange: (page, pageSize) => {
-          this.handleDataFetch(page, pageSize)
+        onShowSizeChange: (requestedPage, requestedRowsPerPage) => {
+          this.handleDataFetch({requestedPage, requestedRowsPerPage})
         },
       },
     }
   }
 
-  handleDataFetch = (requestedPage, requestedRowsPerPage) => {
-    this.setState({
-      loading: true,
+  handleDataFetch = async (config) => {
+    let { requestedPage, requestedRowsPerPage, rowIds } = config || {}
+    let rowId = Array.isArray(rowIds) ? rowIds[0] : null
+    await this.setState({
+      ...rowId ? { loadingRows: [...rowIds] } : {loading: true}
     })
+    console.log({loadingRows: this.state.loadingRows, loading: this.state.loading})
     requestedPage = requestedPage || this.state.activePage;
     requestedRowsPerPage = requestedRowsPerPage || this.state.rowsPerPage;
     let populateArray = this.props.populateArray.map(pC => {
@@ -70,10 +74,9 @@ class ProductTable extends Component {
         return({...pC})
       }
     })
-    this.props.queryModelData(this.props.queryModel,this.state.query,this.state.column, this.state.direction, requestedPage, requestedRowsPerPage,this.props.currentUser.user.company,populateArray)
+    await this.props.queryModelData(this.props.queryModel,this.state.query,this.state.column, this.state.direction, requestedPage, requestedRowsPerPage,this.props.currentUser.user.company,populateArray)
     .then(({data, activePage, totalPages, rowsPerPage, skip})=>{
       this.setState({
-        loading: false,
         skip,
         data,
         activePage,
@@ -88,12 +91,16 @@ class ProductTable extends Component {
       })
     })
     .catch(err=>{
-      this.setState({
-        loading: false,
-      })
       console.log(err)
     })
-  }
+      await this.setState({
+        ...rowId ? { loadingRows: [] } : { loading: false }
+      })
+      console.log({
+        loadingRows: this.state.loadingRows,
+        loading: this.state.loading
+      });
+    }
     componentDidMount() {
       this.handleDataFetch();
     }
@@ -291,7 +298,7 @@ class ProductTable extends Component {
 
     handleAutoCompleteUpdate = async (data) => {
       this.setState({
-        loading: true
+        loadingRows: [...this.state.loadingRows, data.rowId]
       })
       let refUpdates = data.refModel && [{
         _id: data.rowId,
@@ -308,7 +315,7 @@ class ProductTable extends Component {
       .catch(err => {
         console.log(err)
       })
-      this.handleDataFetch()
+      this.handleDataFetch({ rowIds: [data.rowId] });
     }
 
     render() {
@@ -368,7 +375,7 @@ class ProductTable extends Component {
         if (col.id === 'select-all') {
           return (
             <td key={`${r._id}-select-all`} className="ant-table-selection-column">
-              <Skeleton paragraph={false} loading={this.state.loading} active>
+              <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
                 <label className="container">
                   <input
                     type="checkbox"
@@ -393,7 +400,7 @@ class ProductTable extends Component {
           )
           return (
             <td key={`${r._id}-${col.id}`} className="stkd-td actions center-a no-wrap">
-              <Skeleton paragraph={false} loading={this.state.loading} active>
+              <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
                 <span>
                   <a id={r._id} onClick={this.handleRowEdit}>Edit</a>
                   <Divider type="vertical" />
@@ -408,7 +415,7 @@ class ProductTable extends Component {
         if (Array.isArray(r[col.id])) {
           return (
             <td key={`${r._id}-${col.id}`} className="stkd-td actions center-a no-wrap">
-              <Skeleton paragraph={false} loading={this.state.loading} active>
+              <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
                 <AutoCompleteInput
                   key={`${r._id}-${col.id}-auto-complete`}
                   queryModel={col.queryModel}
@@ -427,7 +434,7 @@ class ProductTable extends Component {
         }
         return (
           <td key={`${r._id}-${col.id}-${col.nestedKey || i}`} className={col.className}>
-            <Skeleton paragraph={false} loading={this.state.loading} active>
+            <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
               {col.nestedKey && r[col.id] ? r[col.id][col.nestedKey] : r[col.id]}
             </Skeleton>
           </td>
