@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { fetchAllProducts, updateProducts, importProducts } from '../store/actions/products';
 import { queryModelData, deleteModelDocuments } from '../store/actions/models';
+import { upsertModelDocuments } from '../store/actions/models';
 import { Button, Pagination, Divider, Icon, Spin, Form, Dropdown, Menu, Modal, message, Row, Col, Skeleton, Input } from 'antd';
 import WrappedFilterForm from './FilterForm';
 import EditItemDrawer from './EditItemDrawer';
@@ -288,6 +289,28 @@ class ProductTable extends Component {
       this.handleDataFetch()
     }
 
+    handleAutoCompleteUpdate = async (data) => {
+      this.setState({
+        loading: true
+      })
+      let refUpdates = data.refModel && [{
+        _id: data.rowId,
+        filterRef: '_id',
+        ref: data.colId,
+        refArray: true,
+      }]
+      // clicked.id and clicked.data are not an array when select is empty
+      let update = Array.isArray(data.clicked.id) ? data.clicked.id.map(val => ({ [data.nestedKey]: val.id })) : []
+      await upsertModelDocuments(data.queryModel, update, this.props.currentUser.user.company, data.nestedKey, refUpdates, data.refModel)
+      .then(res => {
+        console.log(res)
+      })
+      .catch(err => {
+        console.log(err)
+      })
+      this.handleDataFetch()
+    }
+
     render() {
       const bulkMenu = this.props.bulkMenuOptions && (
         <Menu onClick={this.handleBulkMenuClick}>
@@ -342,26 +365,19 @@ class ProductTable extends Component {
       let rows = this.state.data.map((r,i) => {
       const isSelected = this.isSelected(r._id);
       let activeColumns = this.props.headers.filter(h=>this.state.hiddenCols.indexOf(h.id) === -1).map(col=>{
-        if (this.state.loading) {
-          return(
-            <td key={`${r._id}-${col.id}-${col.nestedKey || i}`}>
-            <Skeleton paragraph={false} loading={true} active>
-              loading
-            </Skeleton>
-            </td>
-          )
-        }
         if (col.id === 'select-all') {
           return (
             <td key={`${r._id}-select-all`} className="ant-table-selection-column">
-              <label className="container">
-                <input
-                  type="checkbox"
-                  onChange={event => this.handleRowCheck(event, r._id)}
-                  checked={isSelected}
-                />
-                <span className="checkmark"></span>
-              </label>
+              <Skeleton paragraph={false} loading={this.state.loading} active>
+                <label className="container">
+                  <input
+                    type="checkbox"
+                    onChange={event => this.handleRowCheck(event, r._id)}
+                    checked={isSelected}
+                  />
+                  <span className="checkmark"></span>
+                </label>
+              </Skeleton>
             </td>
           )
         }
@@ -377,37 +393,44 @@ class ProductTable extends Component {
           )
           return (
             <td key={`${r._id}-${col.id}`} className="stkd-td actions center-a no-wrap">
-              <span>
-                <a id={r._id} onClick={this.handleRowEdit}>Edit</a>
-                <Divider type="vertical" />
-                <Dropdown overlay={menu}>
-                  <a className="ant-dropdown-link"><Icon type="down" /></a>
-                </Dropdown>
-              </span>
+              <Skeleton paragraph={false} loading={this.state.loading} active>
+                <span>
+                  <a id={r._id} onClick={this.handleRowEdit}>Edit</a>
+                  <Divider type="vertical" />
+                  <Dropdown overlay={menu}>
+                    <a className="ant-dropdown-link"><Icon type="down" /></a>
+                  </Dropdown>
+                </span>
+              </Skeleton>
             </td>
           )
         }
         if (Array.isArray(r[col.id])) {
           return (
             <td key={`${r._id}-${col.id}`} className="stkd-td actions center-a no-wrap">
-              <AutoCompleteInput
-                queryModel={col.queryModel}
-                searchKey={col.nestedKey}
-                placeholder={col.text}
-                mode={"tags"}
-                onUpdate={clicked =>
-                  col.handler({rowId: r._id, clicked, ...col, colId: col.id})
-                }
-                selected={r[col.id]}
-              >
-                <Input style={{ display: "none" }} />
-              </AutoCompleteInput>
+              <Skeleton paragraph={false} loading={this.state.loading} active>
+                <AutoCompleteInput
+                  queryModel={col.queryModel}
+                  searchKey={col.nestedKey}
+                  placeholder={col.text}
+                  mode={"tags"}
+                  onUpdate={clicked =>
+                    this.handleAutoCompleteUpdate({ rowId: r._id, clicked, ...col, colId: col.id })
+                  }
+                  skipSelectedCallback
+                  selected={r[col.id]}
+                >
+                  <Input style={{ display: "none" }} />
+                </AutoCompleteInput>
+              </Skeleton>
             </td>
           )
         }
         return (
           <td key={`${r._id}-${col.id}-${col.nestedKey || i}`} className={col.className}>
-            {col.nestedKey && r[col.id] ? r[col.id][col.nestedKey] : r[col.id]}
+            <Skeleton paragraph={false} loading={this.state.loading} active>
+              {col.nestedKey && r[col.id] ? r[col.id][col.nestedKey] : r[col.id]}
+            </Skeleton>
           </td>
         )
       })
@@ -507,7 +530,7 @@ class ProductTable extends Component {
             />
           )}
           <div className="ant-table stkd-content no-pad contain">
-            <Spin spinning={this.state.loading}>
+            <Spin spinning={false}>
               <div className="table-options">
                 <div>
                   {bulkMenu && (

@@ -143,7 +143,7 @@ updateModelDocumentsRefs = (config) => {
 		try {
 			//find all the recently updated docs
 			let foundDocs = updates.length > 0 ? await db[model].find({ $and: [{ $or: updates.map(u => ({ ...u, company })) }] }) : []
-			docRefs = foundDocs.length > 0 ? foundDocs.map(d => d._id) : []
+			let docRefs = foundDocs.length > 0 ? foundDocs.map(d => d._id) : []
 			//loop over the refUpdates and bulk update the refs
 			let docRefUpdates = refUpdates.map(doc=>({
 				updateOne: {
@@ -153,10 +153,6 @@ updateModelDocumentsRefs = (config) => {
 					},
 				}
 			}))
-			console.log({
-				filter: docRefUpdates[0].updateOne.filter,
-				update: docRefUpdates[0].updateOne.update,
-			})
 			let updatedRefs = await db[refModel].bulkWrite(docRefUpdates)
 			resolve(updatedRefs)
 		} catch(err) {
