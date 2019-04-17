@@ -27,7 +27,7 @@ const buildQuery = (queryArr) => {
 					...query,
 					[val[0]]: { $gte: startDate, $lt: endDate }
 				}
-				// numbers, if we get a third array item use it as $lte,$gte,$gt,$lt, otherwise use non Regex check
+				// numbers, if we get a third array item that isn't 'array' use it as $lte,$gte,$gt,$lt, otherwise use non Regex check
 			} else if (val[2] !== undefined) {
 				query = val[2] === "=" ?
 					{
@@ -97,7 +97,9 @@ exports.queryModelData = async (req, res, next) => {
 		let data = await db[req.body.model].find(query).skip(skip).limit(limit).sort({[req.body.sortBy]: req.body.sortDirection}).populate(populateArray)
 		for (let popConfig of populateArray) {
 			//if we had to match in the populate config, remove any empty arrays or null values from data
-			if (Object.keys(popConfig.match).length === 0) {
+			delete popConfig.match.company
+			if (Object.keys(popConfig.match).length > 0) {
+				console.log('removing null data for key '+ popConfig.path)
 				data = data.filter(doc => doc[popConfig.path] !== null && doc[popConfig.path].length !== 0)
 			}
 		}

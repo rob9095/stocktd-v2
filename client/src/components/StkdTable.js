@@ -410,14 +410,13 @@ class ProductTable extends Component {
             <td key={`${r._id}-${col.id}`} className="stkd-td actions center-a no-wrap">
               <Skeleton paragraph={false} loading={this.state.loading} active>
                 <AutoCompleteInput
+                  key={`${r._id}-${col.id}-auto-complete`}
                   queryModel={col.queryModel}
                   searchKey={col.nestedKey}
                   placeholder={col.text}
                   mode={"tags"}
-                  onUpdate={clicked =>
-                    this.handleAutoCompleteUpdate({ rowId: r._id, clicked, ...col, colId: col.id })
-                  }
-                  skipSelectedCallback
+                  onUpdate={(clicked) => this.handleAutoCompleteUpdate({ rowId: r._id, clicked, ...col, colId: col.id })}
+                  skipSelectedCallback={true}
                   selected={r[col.id]}
                 >
                   <Input style={{ display: "none" }} />

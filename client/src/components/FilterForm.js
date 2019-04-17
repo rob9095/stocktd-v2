@@ -26,7 +26,7 @@ class FilterForm extends Component {
 
   handleReset = () => {
     this.props.form.resetFields();
-    this.props.onFilterSearch([]);
+    this.props.onFilterSearch([],[]);
   }
 
   handleSelect = (value, select) => {

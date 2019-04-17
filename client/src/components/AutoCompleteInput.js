@@ -25,7 +25,9 @@ class AutoCompleteInputForm extends Component {
           label: item[this.props.searchKey]}
         ))
       this.setState({selected})
-      this.handleChange(selected, selected, this.props.skipSelectedCallback)
+      if (this.props.skipSelectedCallback !== true) {
+        this.handleChange(selected, selected);
+      }
     }
   }
 
@@ -74,7 +76,7 @@ class AutoCompleteInputForm extends Component {
     this._isMounted && this.setState({ loading: false });
   }
 
-  handleChange = (id,e,skip) => {
+  handleChange = (id,e) => {
     console.log({id,e})
     if (!id) {
       this.props.onUpdate({ id: '', data: {} })
@@ -86,7 +88,7 @@ class AutoCompleteInputForm extends Component {
     }
     let data = Array.isArray(e) ? e.map(d=>({...d.props.data})) : e.props.data
     id = Array.isArray(id) ? id.map(i=>({id:i.key})) : id
-    skip || this.props.onUpdate({id,data})
+    this.props.onUpdate({ id, data })
   }
 
   render() {
