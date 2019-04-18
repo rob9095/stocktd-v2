@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Alert, Drawer, Form, Button, Col, Row, Input, Select, DatePicker } from 'antd';
+import AutoCompleteInput from './AutoCompleteInput';
 const moment = require('moment');
 
 const Option = Select.Option;
@@ -137,6 +138,31 @@ class DrawerForm extends Component {
                    disabled={i.disabled}
                   />
                )}
+            </FormItem>
+          </Col>
+        )
+      } else if (i.type === 'array') {
+        return (
+          <Col xs={i.span * 3} sm={i.span} key={i.id}>
+            <FormItem label={`${i.text}`}>
+              {getFieldDecorator(i.id, { initialValue: item[i.id] }, {
+                rules: [{
+                  required: i.required,
+                  message: i.message,
+                }],
+              })(
+                <AutoCompleteInput
+                  queryModel={i.queryModel}
+                  searchKey={i.nestedKey}
+                  placeholder={i.text}
+                  mode={i.autoCompleteMode}
+                  onUpdate={(clicked) => i.onChange({ rowId: item._id, clicked, ...i, colId: i.id })}
+                  skipSelectedCallback={true}
+                  selected={item[i.id]}
+                >
+                  <Input style={{ display: "none" }} />
+                </AutoCompleteInput>
+              )}
             </FormItem>
           </Col>
         )

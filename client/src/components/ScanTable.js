@@ -46,8 +46,8 @@ class ScanTable extends Component {
         {id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 4, className: 'no-wrap'},
         {id: 'po', nestedKey: 'name', text: 'PO Name',  width: 175, span: 8, className: 'no-wrap'},
         {id: 'po', nestedKey: 'type', text: 'PO Type', width: 175, span: 8, className: 'no-wrap'},
-        {id: 'locations', type: 'array', nestedKey: 'name', refModel: 'BoxScan', queryModel: 'Location', text: 'Location', width: 175, span: 8, className: 'no-wrap',},
-        //{id: 'actions', text: 'Actions', width: 100, noSort: true},
+        {id: 'locations', type: 'array', autoCompleteMode: 'tags', nestedKey: 'name', refModel: 'BoxScan', queryModel: 'Location', text: 'Location', width: 175, span: 8, className: 'no-wrap',},
+        {id: 'actions', text: 'Actions', width: 100, noSort: true, actionOptions: [{name: 'Delete', key: 'delete',}]},
       ]}
       />
     )

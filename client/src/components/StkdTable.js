@@ -126,10 +126,9 @@ class ProductTable extends Component {
     };
 
     handleRowEdit = async (e) => {
-      let itemDrawerProduct = this.state.data.find(p=>p._id === e.target.id)
+      let drawerItem = this.state.data.find(p=>p._id === e.target.id)
       this.setState({
-        showEditItemDrawer: true,
-        itemDrawerProduct,
+        drawerItem,
       })
       console.log(e.target.id)
     }
@@ -412,7 +411,7 @@ class ProductTable extends Component {
             <Menu key={`${r._id}-action-menu`} onClick={this.handleActionMenuClick}>
               {col.actionOptions.map(o=>(
                 <Menu.Item key={`${r._id}-action-menu-option-${o.name}`}>
-                  <a id={r._id} name={o.name}>{o.name}</a>
+                  <a id={r._id} key={o.key} name={o.name}>{o.name}</a>
                 </Menu.Item>
               ))}
             </Menu>
@@ -440,7 +439,7 @@ class ProductTable extends Component {
                   queryModel={col.queryModel}
                   searchKey={col.nestedKey}
                   placeholder={col.text}
-                  mode={"tags"}
+                  mode={col.autoCompleteMode}
                   onUpdate={(clicked) => this.handleAutoCompleteUpdate({ rowId: r._id, clicked, ...col, colId: col.id })}
                   skipSelectedCallback={true}
                   selected={r[col.id]}
@@ -483,6 +482,21 @@ class ProductTable extends Component {
             inputs={this.props.headers.filter(h=>h.noSort !== true)}
             onFilterSearch={this.handleFilterSearch}
           />
+          {this.state.drawerItem && (
+            <EditItemDrawer
+              inputs={[
+                { id: 'sku', text: 'SKU', span: 8, className: 'no-wrap', required: true, type: 'text', message: 'SKU cannot be blank', disabled: true },
+                { id: 'name', text: 'Box Name', span: 16, className: 'no-wrap', required: true, type: 'text', message: 'Name cannot be blank' },
+                { id: 'quantity', text: 'Quantity', type: 'number', span: 8, className: 'no-wrap', type: 'text', required: true, message: 'Quantity cannot be blank' },
+                { id: 'locations', type: 'array', nestedKey: 'name', refModel: 'BoxScan', queryModel: 'Location', text: 'Location', width: 175, span: 8, className: 'no-wrap', autoCompleteMode: 'tags', onChange: this.handleAutoCompleteUpdate }
+              ]}
+              item={this.state.drawerItem}
+              title={`${this.state.drawerItem._id ? 'Edit '+ this.state.drawerItem.name || 'Item' : 'Create Item'} `}
+              onClose={() => this.setState({ drawerItem: null })}
+              onSave={(data, id) => id ? this.handlePOUpdate(data, id) : this.handleImport(data)}
+              create={this.state.drawerItem._id ? false : true}
+            />
+          )}
           {this.state.showEditItemDrawer && (
             <EditItemDrawer
               inputs={[
