@@ -94,6 +94,7 @@ class ScanForm extends Component {
   showErrorModal = (config) => {
     let { title, action, list, buttons, okText, okType, maskClosable, error } = config
     return new Promise((resolve,reject) => {
+      error = error || {}
       list = Array.isArray(list) && list.map((str, i) => <li key={i}>{str}</li>)
       buttons = Array.isArray(buttons) && buttons.map((btn, i) => 
       <Button onClick={()=>resolve(btn.text)} {...btn} key={i}>{btn.text}</Button>)
@@ -236,7 +237,11 @@ class ScanForm extends Component {
         this.handleErrorOption(result,error);
         break
       default:
-        console.log({error: 'unknown error', data: {...error}})      
+        console.log({error: 'unknown error', error})
+        await this.showErrorModal({
+          list: ['Error scanning, please try again'],
+        })
+        this.setState({errorModalConfig: null})
     }
 
     setTimeout(() => {

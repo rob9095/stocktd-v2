@@ -124,10 +124,10 @@ exports.removeModelDocuments = async (req,res,next) => {
 	try {
 		let updates = req.body.data.map(id=>({
 			deleteOne: {
-				filter: {_id: id}
+				filter: {_id: id, company: req.body.company}
 			}
 		}))
-		let deletedDocs = await db[req.body.model].bulkWrite(updates)
+		let deletedDocs = updates.length > 0 && await db[req.body.model].bulkWrite(updates)
 		return res.status(200).json({deletedDocs})
 	} catch(err) {
 		return next(err)

@@ -13,3 +13,15 @@ export function addBoxScan(scan, company){
 		});
 	}
 }
+
+export function deleteBoxScans(data,company){
+	return new Promise((resolve,reject) => {
+		return apiCall('post', `/api/scans/delete`, {data,company})
+		.then((res) => {
+			resolve(res);
+		})
+		.catch(err => {
+			reject({...err});
+		})
+	});
+}

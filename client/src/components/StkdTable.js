@@ -155,30 +155,34 @@ class ProductTable extends Component {
 
     handleActionMenuClick = async ({ item, key, keyPath }) => {
       console.log(item.props.children.props.name)
-      // switch(item.props.children.props.name) {
-      //   case 'delete':
-      //     let items = await this.showConfirm(null,'Delete',[item.props.children.props.id])
-      //     if (items !== 'cancel') {
-      //       this.handleProductDelete(items)
-      //     }
-      //     break;
-      //   default:
-      //     console.log('unknown menu option');
-      // }
+      switch(item.props.children.props.name) {
+        case 'delete':
+          let items = await this.showConfirm(null,'Delete',[item.props.children.props.id])
+          if (items !== 'cancel') {
+            this.handleRowDelete(items)
+          }
+          break;
+        default:
+          console.log('unknown menu option');
+      }
     }
 
     handleBulkMenuClick = async ({ item, key, keyPath }) => {
       console.log(key)
-      // switch(key) {
-      //   case 'delete':
-      //     let items = await this.showConfirm(null,'Delete',this.state.selected)
-      //     if (items !== 'cancel') {
-      //       this.handleProductDelete(items)
-      //     }
-      //     break;
-      //   default:
-      //     console.log('unknown menu option');
-      // }
+      switch(key) {
+        case 'delete':
+          let items = await this.showConfirm(null,'Delete',this.state.selected)
+          if (items !== 'cancel') {
+            let foundOption = this.props.bulkMenuOptions.find(o=>o.handler && o.key === key)
+            let result = foundOption ? await foundOption.handler(items) : this.handleRowDelete(items);
+            if (foundOption) {
+              result.error ? console.log(result) : this.handleRowDelete(items,false)
+            }
+          }
+          break;
+        default:
+          console.log('unknown menu option');
+      }
     }
 
     handleOptionsMenuClick = async ({ item, key, keyPath }) => {
@@ -210,21 +214,36 @@ class ProductTable extends Component {
       message[type](text)
     }
 
-    handleProductDelete = (ids) => {
-       let data = this.state.data.filter(p=>ids.indexOf(p._id) === -1)
-       let selected = this.state.selected.filter(id=>ids.indexOf(id) === -1)
-       const end = ids.length > 1 ? 's' : ''
-       this.props.deleteModelDocuments('Product',ids,this.props.currentUser)
-       .then(res=>{
-         this.handleMessage('success',`Product${end} Deleted Successfully`)
-         this.setState({
-           data,
-           selected,
-         })
-       })
-       .catch(err=>{
-         this.handleMessage('error',err)
-       })
+    handleRowDelete = async (ids, ignore) => {
+      this.setState({
+        loadingRows: [...this.state.loadingRows, ...ids]
+      })
+      let data = this.state.data.filter(r => ids.indexOf(r._id) === -1)
+      let selected = this.state.selected.filter(id => ids.indexOf(id) === -1)
+      const end = ids.length > 1 ? 's' : ''
+      if (ignore !== true) {
+        await this.props.deleteModelDocuments(this.props.queryModel, ids, this.props.currentUser)
+          .then(res => {
+            this.handleMessage('success', `${ids.length} record${end} deleted`)
+            this.setState({
+              data,
+              selected,
+            })
+          })
+          .catch(err => {
+            console.log(err)
+            this.handleMessage('error', err)
+          })
+      } else {
+        this.handleMessage('success', `${ids.length} record${end} deleted`)
+        this.setState({
+          data,
+          selected,
+        })
+      }
+      this.setState({
+        loadingRows: this.state.loadingRows.filter(id=>!ids.includes(id)),
+      })
      }
 
     handleSort = async (e) => {

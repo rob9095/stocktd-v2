@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import StkdTable from './StkdTable';
 import { connect } from "react-redux";
+import { addBoxScan, deleteBoxScans } from "../store/actions/boxScans";
 
 
 class ScanTable extends Component {
@@ -11,6 +12,20 @@ class ScanTable extends Component {
     }
   }
 
+  handleDelete = (ids) => {
+    return new Promise(async(resolve,reject) => {
+      await deleteBoxScans(ids,this.props.currentUser.user.company)
+      .then(res=>{
+        console.log(res)
+        resolve(res)
+      })
+      .catch(err=>{
+        console.log(err)
+        reject(err)
+      })
+    })
+  }
+
   render() {
     return(
       <StkdTable
@@ -18,7 +33,7 @@ class ScanTable extends Component {
         populateArray={[{path:'po'},{path:'product'},{path:'locations'}]}
         title="Scans"
         bulkMenuOptions={[
-          {name: 'Delete', key: 'Delete'}
+          {name: 'Delete', key: 'delete', handler: this.handleDelete}
         ]}
         tableMenuOptions={[
           {name: 'Display Options', key: 'Display Options'}

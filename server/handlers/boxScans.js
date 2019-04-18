@@ -73,7 +73,7 @@ const scanToPO = (boxScan,scanQty) => {
       }, { upsert: true });
       updatedPoProduct = await db.PoProduct.findOne({ poRef: foundPo.poRef, skuCompany: boxScan.skuCompany })
 
-      updatedProduct = await db.Product.findOneAndUpdate({ skuCompany: boxScan.skuCompany }, {
+      updatedProduct = await db.Product.findOneAndUpdate({ skuCompany: boxScan.skuCompany, _id: boxScan.product }, {
         $inc: { quantity: scanQty }
       });
       updatedPo = await db.PurchaseOrder.update({ poRef: foundPo.poRef }, {
@@ -122,7 +122,7 @@ const scanFromPO = (scan, scanQty, product) => {
       let updatedBoxScan = {};
       let completedPoProducts = {};
       let updatedPo = {};
-      let andQuery = scan.currentPOs.map(p => ({ poRef: p.poRef }))
+      let andQuery = scan.currentPOs.map(p => ({ poRef: p.poRef, company: req.body.company }))
       let poProducts = await db.PoProduct.find({
         $and: [{ $or: andQuery }],
       })
@@ -270,5 +270,44 @@ exports.upsertBoxScan = async (req,res,next) => {
       status: 404,
       message: message.toString(),
     })
+  }
+}
+
+
+//Delete BoxScan
+exports.deleteBoxScans = async (req,res,next) => {
+  try {
+    if (!Array.isArray(req.body.data) || req.body.data.filter(id=>typeof id !== 'string').length>0) {
+      return next({
+        status: 404,
+        message: ['Please provide array of box ids in string format']
+      })
+    }
+    let foundBoxes = await db.BoxScan.find({company: req.body.company, $and: [{ $or: req.body.data.map(_id=>({_id})) }]})
+    console.log(foundBoxes)
+    // delete the boxes
+		let deletes = foundBoxes.map(box => ({
+      deleteOne: {
+        filter: { _id: box._id }
+      }
+    }));
+    let productUpdates = []
+    let foundBoxesScannedTo = foundBoxes.filter(box=>box.scanToPo===true)
+    if (foundBoxesScannedTo.length > 0) {
+      //remove the quantity from product
+      productUpdates = foundBoxesScannedTo.map(box => ({
+        updateOne: {
+          filter: { _id: box.product },
+          update: {
+            $inc: { quantity: parseInt(-box.quantity) }
+          }
+        }
+      }));
+    }
+    let deletedBoxes = deletes.length > 0 && await db.BoxScan.bulkWrite(deletes);
+    let updatedProducts = productUpdates.length > 0 && await db.Product.bulkWrite(productUpdates)
+    return res.status(200).json({ deletedBoxes, updatedProducts });
+  } catch(err) {
+    return next(err);
   }
 }
