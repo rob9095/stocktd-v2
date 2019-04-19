@@ -299,7 +299,7 @@ const updateBoxScans = (config) => {
       let poProductUpdates = []
       for (let box of foundBoxes) {
         let update = boxes.find(b=>b.id == box._id)
-        if (update === 'delete') {
+        if (update.deleteDoc) {
           //push delete box update (delete box)
           boxUpdates.push({
             deleteOne: {
@@ -480,7 +480,7 @@ exports.upsertBoxScan = async (req, res, next) => {
 exports.deleteBoxScans = async (req, res, next) => {
   try {
     let result = await updateBoxScans({
-      boxes: req.body.data.map(id => ({ id, update: 'delete' })),
+      boxes: req.body.data.map(id => ({ id, deleteDoc: true })),
       company: req.body.company,
       user: req.body.user,
     })
