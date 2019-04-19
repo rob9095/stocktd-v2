@@ -19,6 +19,11 @@ const boxScanSchema = new mongoose.Schema({
     ref: 'Product',
     required: true,
   },
+  poProduct: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'PoProduct',
+    required: true,
+  },
   quantity: {
     type: Number,
     required: true

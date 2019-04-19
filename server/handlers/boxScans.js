@@ -100,6 +100,7 @@ const scanToPO = (boxScan,scanQty) => {
           poRef: foundPo.poRef,
           po: poId,
           createdOn: new Date(),
+          poProduct: updatedPoProduct._id
         })
       }
       resolve({
@@ -122,7 +123,7 @@ const scanFromPO = (scan, scanQty, product) => {
       let updatedBoxScan = {};
       let completedPoProducts = {};
       let updatedPo = {};
-      let andQuery = scan.currentPOs.map(p => ({ poRef: p.poRef, company: req.body.company }))
+      let andQuery = scan.currentPOs.map(p => ({ poRef: p.poRef, company: scan.company }))
       let poProducts = await db.PoProduct.find({
         $and: [{ $or: andQuery }],
       })
@@ -181,6 +182,7 @@ const scanFromPO = (scan, scanQty, product) => {
             po: po._id,
             createdOn: new Date(),
             scanToPo: false,
+            poProduct: updatedPoProduct._id,
           }
           let foundBoxScan = await db.BoxScan.findOne({ skuCompany: boxScan.skuCompany, name: boxScan.name, po: po._id })
           if (foundBoxScan) {
