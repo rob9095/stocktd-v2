@@ -25,3 +25,15 @@ export function deleteBoxScans(data,company){
 		})
 	});
 }
+
+export function updateBoxScans(data, user) {
+	return new Promise((resolve, reject) => {
+		return apiCall('post', `/api/scans/update`, { data, company: user.company, user: user.id })
+			.then((res) => {
+				resolve(res);
+			})
+			.catch(err => {
+				reject({ ...err });
+			})
+	});
+}

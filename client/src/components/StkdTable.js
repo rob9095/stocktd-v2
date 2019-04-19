@@ -294,6 +294,46 @@ class ProductTable extends Component {
       })
     }
 
+    handleRowEditSave = (updates,id) => {
+      return new Promise(async (resolve, reject) => {
+        if (this.props.onRowEditSave) {
+          this.setState({
+            loadingRows: [...this.state.loadingRows, ...updates.map(u=>u.id)]
+          })
+          let result = await this.props.onRowEditSave(updates,id)
+          resolve(result)
+          this.setState({
+            drawerItem: id ? { ...updates.find(i => i._id === id) } : {},
+          })
+          this.handleDataFetch({ rowIds: updates.map(u => u.id)})
+        }
+        let data = this.state.data.map(r => {
+          let update = updates.find(u => u.id === r._id)
+          if (update) {
+            return {
+              ...r,
+              ...update,
+            }
+          } else {
+            return {
+              ...r,
+            }
+          }
+        })
+        await upsertModelDocuments(this.props.queryModel, updates, this.props.currentUser.user.company)
+        .then((res) => {
+          this.setState({
+            data,
+            drawerItem: id ? { ...data.find(i => i._id === id) } : {},
+          })
+          resolve(res)
+        })
+        .catch(error => {
+          reject(error)
+        })
+      })
+    }
+
     handleProductImport = (json) => {
       return new Promise((resolve,reject) => {
         this.props.importProducts(json, this.props.currentUser)
@@ -493,7 +533,7 @@ class ProductTable extends Component {
               item={this.state.drawerItem}
               title={`${this.state.drawerItem._id ? 'Edit '+ this.state.drawerItem.name || 'Item' : 'Create Item'} `}
               onClose={() => this.setState({ drawerItem: null })}
-              onSave={(data, id) => id ? this.handlePOUpdate(data, id) : this.handleImport(data)}
+              onSave={(data, id) => id ? this.handleRowEditSave(data, id) : this.handleImport(data)}
               create={this.state.drawerItem._id ? false : true}
             />
           )}

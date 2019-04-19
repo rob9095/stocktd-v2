@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import StkdTable from './StkdTable';
 import { connect } from "react-redux";
-import { addBoxScan, deleteBoxScans } from "../store/actions/boxScans";
+import * as scanHandlers from "../store/actions/boxScans";
 
 
 class ScanTable extends Component {
@@ -14,7 +14,21 @@ class ScanTable extends Component {
 
   handleDelete = (ids) => {
     return new Promise(async(resolve,reject) => {
-      await deleteBoxScans(ids,this.props.currentUser.user.company)
+      await scanHandlers.deleteBoxScans(ids,this.props.currentUser.user.company)
+      .then(res=>{
+        console.log(res)
+        resolve(res)
+      })
+      .catch(err=>{
+        console.log(err)
+        reject(err)
+      })
+    })
+  }
+
+  handleRowEditSave = (updates, id) => {
+    return new Promise(async (resolve,reject) => {
+      await scanHandlers.updateBoxScans(updates,this.props.currentUser.user)
       .then(res=>{
         console.log(res)
         resolve(res)
@@ -32,6 +46,7 @@ class ScanTable extends Component {
         queryModel="BoxScan"
         populateArray={[{path:'po'},{path:'product'},{path:'locations'}]}
         title="Scans"
+        onRowEditSave={this.handleRowEditSave}
         bulkMenuOptions={[
           {name: 'Delete', key: 'delete', handler: this.handleDelete}
         ]}

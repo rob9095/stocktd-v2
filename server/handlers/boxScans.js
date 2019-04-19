@@ -221,15 +221,217 @@ const scanFromPO = (scan, scanQty, product) => {
   })
 }
 
+//Delete BoxScan - legacay
+// exports.deleteBoxScans = async (req,res,next) => {
+//   try {
+//     if (!Array.isArray(req.body.data) || req.body.data.filter(id=>typeof id !== 'string').length>0) {
+//       return next({
+//         status: 404,
+//         message: ['Please provide array of box ids in string format']
+//       })
+//     }
+//     let foundBoxes = await db.BoxScan.find({company: req.body.company, $and: [{ $or: req.body.data.map(_id=>({_id})) }]})
+//     console.log(foundBoxes)
+//     // delete the boxes
+// 		let deletes = foundBoxes.map(box => ({
+//       deleteOne: {
+//         filter: { _id: box._id }
+//       }
+//     }));
+//     let productUpdates = []
+//     let poProductUpdates = []
+//     let foundBoxesScannedTo = foundBoxes.filter(box=>box.scanToPo===true)
+//     if (foundBoxesScannedTo.length > 0) {
+//       //remove box quantity from product
+//       productUpdates = foundBoxesScannedTo.map(box => ({
+//         updateOne: {
+//           filter: { _id: box.product },
+//           update: {
+//             $inc: { quantity: parseInt(-box.quantity) },
+//           }
+//         }
+//       }));
+//       //remove box quantity from poProduct
+//       poProductUpdates = foundBoxesScannedTo.map(box => ({
+//         updateOne: {
+//           filter: { _id: box.poProduct },
+//           update: {
+//             $inc: { quantity: parseInt(-box.quantity) },
+//           }
+//         }
+//       }))
+//     } else {
+//       //remove box.quantity from scannedQuantity on the poProducts for boxes that were scanned to the po
+//       poProductUpdates = foundBoxes.filter(box => box.scanToPo === false).map(box => ({
+//         updateOne: {
+//           filter: { _id: box.poProduct },
+//           update: {
+//             $inc: { scannedQuantity: parseInt(-box.quantity) },
+//           }
+//         }
+//       }))
+//     }
+//     let deletedBoxes = deletes.length > 0 && await db.BoxScan.bulkWrite(deletes);
+//     let updatedProducts = productUpdates.length > 0 && await db.Product.bulkWrite(productUpdates)
+//     let updatedPoProducts = poProductUpdates.length > 0 && await db.PoProduct.bulkWrite(productUpdates)
+//     return res.status(200).json({ deletedBoxes, updatedProducts, updatedPoProducts });
+//   } catch(err) {
+//     return next(err);
+//   }
+// }
+
+// only support updates for box quantity, locations, name, prefix, and delete box
+const updateBoxScans = (config) => {
+  let { boxes, company, user } = config
+  return new Promise( async (resolve, reject) => {
+    try {
+      if (!Array.isArray(boxes) || boxes.filter(box => typeof box.id !== 'string').length > 0) {
+        reject({
+          message: ['Please provide array of box ids in string format']
+        })
+      }
+      //find the boxes to update
+      let foundBoxes = await db.BoxScan.find({ company, $and: [{ $or: boxes.map(box => ({ _id: box.id })) }] })
+      //update/remove the boxes
+      let boxUpdates = []
+      let productUpdates = []
+      let poUpdates = []
+      let poProductUpdates = []
+      for (let box of foundBoxes) {
+        let update = boxes.find(b=>b.id == box._id)
+        if (update === 'delete') {
+          //push delete box update (delete box)
+          boxUpdates.push({
+            deleteOne: {
+              filter: { _id: box._id }
+            }
+          })
+          //push product update if scanToPo was true (remove box qty)
+          box.scanToPo && productUpdates.push({
+            updateOne: {
+              filter: { _id: box.product },
+              update: {
+                $inc: { quantity: parseInt(-box.quantity) },
+              }
+            }
+          })
+          //push poProduct update (remove box qty from qty or scannedQty depending on scanToPo)
+          poProductUpdates.push({
+            updateOne: {
+              filter: { _id: box.poProduct },
+              update: {
+                $inc: { ...box.scanToPo ? {quantity: parseInt(-box.quantity)} : {scannedQuantity: parseInt(-box.quantity)} },
+              }
+            }
+          })
+          //push po update (remove box qty from quantity if scanToPo was true on box)
+          box.scanToPo && poUpdates.push({
+            updateOne: {
+              filter: { _id: box.po },
+              update: {
+                $inc: { quantity: parseInt(-box.quantity) },
+              }
+            }
+          })
+          // move to next iteration(box)
+          continue
+        }
+        if (update.quantity !== box.quantity) {
+          let difference = parseInt(box.quantity - update.quantity)
+          //push box updates with new qty
+          boxUpdates.push({
+            updateOne: {
+              filter: {_id: box._id},
+              update: {
+                quantity: update.quantity,
+              }
+            }
+          })
+          //push product updates with old/new qty difference if scanToPo is true
+          box.scanToPo && productUpdates.push({
+            updateOne: {
+              filter: { _id: box.product },
+              update: {
+                $inc: { quantity: difference },
+              }
+            }
+          })
+          //push product updates with old/new qty difference, update quantity if scanToPo is true and scannedQuantity if false
+          poProductUpdates.push({
+            updateOne: {
+              filter: { _id: box.poProduct },
+              update: {
+                $inc: { ...box.scanToPo ? { quantity: difference } : { scannedQuantity: difference } },
+              }
+            }
+          })
+          //push po quantity update if scanToPo is true
+          box.scanToPo && poUpdates.push({
+            updateOne: {
+              filter: { _id: box.po },
+              update: {
+                $inc: { quantity: difference },
+              }
+            }
+          })
+        }
+        if (update.locations) {
+          //upate locations
+          let locations = await upsertScanLocation({ company, locations: update.locations, filterRef: 'name' })
+          locations = locations.length > 0 ? locations.map(l=>(l._id)) : []
+          //push the updated refs array to the box
+          boxUpdates.push({
+            updateOne: {
+              filter: {_id: box._id},
+              update: {
+                locations,
+              }
+            }
+          })
+        }
+        //check for any other generic updates, only name or prefix allowed currently
+        if (Object.keys(update).includes(key=> key === 'name' || key === 'prefix')) {
+          const { name, prefix } = update
+          if (prefix) {
+            //create the prefix
+            await db.BoxPrefix.update({name: prefix, company, user},{upsert: true})
+          }
+          //update box
+          boxUpdates.push({
+            ...name && {name},
+            ...prefix && {prefix},
+          })
+        }
+      }
+      let updatedProducts = productUpdates.length > 0 && await db.Product.bulkWrite(productUpdates)
+      let updatedPoProducts = poProductUpdates.length > 0 && await db.PoProduct.bulkWrite(poProductUpdates)
+      let updatedPos = poUpdates.length > 0 && await db.PurchaseOrder.bulkWrite(poUpdates)
+      let updatedBoxes = boxUpdates.length > 0 && await db.BoxScan.bulkWrite(boxUpdates)
+      resolve({
+        updatedProducts,
+        updatedPoProducts,
+        updatedPos,
+        updatedBoxes,
+      })
+    } catch(err) {
+      console.log({error: err})
+      reject({
+        ...err,
+        message: err.toString()
+      })
+    }
+  })
+}
+
 /*
-* UPDATE/UPSERT Box Scan
+* UPSERT Box Scan
 rew.body.scan has user, quantity, barcode, name
 */
-exports.upsertBoxScan = async (req,res,next) => {
+exports.upsertBoxScan = async (req, res, next) => {
   try {
-    let [product,...products] = await db.Product.find({
+    let [product, ...products] = await db.Product.find({
       company: req.body.company,
-      barcode: { $regex : new RegExp(["^", req.body.scan.barcode, "$"].join(""), "i") }
+      barcode: { $regex: new RegExp(["^", req.body.scan.barcode, "$"].join(""), "i") }
     })
     if (!product) {
       return next({
@@ -260,13 +462,13 @@ exports.upsertBoxScan = async (req,res,next) => {
       return next({
         status: 400,
         ...result.error
-      }) 
+      })
     }
     return res.status(200).json({
       ...result
     })
-    
-  } catch(message) {
+
+  } catch (message) {
     console.log(message)
     return next({
       status: 404,
@@ -275,41 +477,29 @@ exports.upsertBoxScan = async (req,res,next) => {
   }
 }
 
-
-//Delete BoxScan
-exports.deleteBoxScans = async (req,res,next) => {
+exports.deleteBoxScans = async (req, res, next) => {
   try {
-    if (!Array.isArray(req.body.data) || req.body.data.filter(id=>typeof id !== 'string').length>0) {
-      return next({
-        status: 404,
-        message: ['Please provide array of box ids in string format']
-      })
-    }
-    let foundBoxes = await db.BoxScan.find({company: req.body.company, $and: [{ $or: req.body.data.map(_id=>({_id})) }]})
-    console.log(foundBoxes)
-    // delete the boxes
-		let deletes = foundBoxes.map(box => ({
-      deleteOne: {
-        filter: { _id: box._id }
-      }
-    }));
-    let productUpdates = []
-    let foundBoxesScannedTo = foundBoxes.filter(box=>box.scanToPo===true)
-    if (foundBoxesScannedTo.length > 0) {
-      //remove the quantity from product
-      productUpdates = foundBoxesScannedTo.map(box => ({
-        updateOne: {
-          filter: { _id: box.product },
-          update: {
-            $inc: { quantity: parseInt(-box.quantity) }
-          }
-        }
-      }));
-    }
-    let deletedBoxes = deletes.length > 0 && await db.BoxScan.bulkWrite(deletes);
-    let updatedProducts = productUpdates.length > 0 && await db.Product.bulkWrite(productUpdates)
-    return res.status(200).json({ deletedBoxes, updatedProducts });
-  } catch(err) {
+    let result = await updateBoxScans({
+      boxes: req.body.data.map(id => ({ id, update: 'delete' })),
+      company: req.body.company,
+      user: req.body.user,
+    })
+    return res.status(200).json({ ...result });
+  } catch (err) {
+    return next(err);
+  }
+}
+
+exports.handleBoxUpdates = async (req, res, next) => {
+  try {
+    let result = await updateBoxScans({
+      boxes: req.body.data,
+      company: req.body.company,
+      user: req.body.user,
+    })
+    return res.status(200).json({ ...result });
+  } catch (err) {
+    console.log(err)
     return next(err);
   }
 }
