@@ -23,9 +23,9 @@ const upsertScanLocation = (upsertData) => {
           upsert: true,
         }
       }))
-      await db.Location.bulkWrite(updates)
+      updates.length > 0 && await db.Location.bulkWrite(updates)
       //find the locations just upserted
-      let foundLocations = await db.Location.find({$and: [{ $or: locations.map(name=>({name,company})) }]})
+      let foundLocations = updates.length > 0 ? await db.Location.find({$and: [{ $or: locations.map(name=>({name,company})) }]}) : []
       resolve(foundLocations)
     } catch(err) {
       reject(err)
@@ -299,6 +299,8 @@ const updateBoxScans = (config) => {
       let poProductUpdates = []
       for (let box of foundBoxes) {
         let update = boxes.find(b=>b.id == box._id)
+        let quantity = parseInt(update.quantity)
+        let boxQty = parseInt(box.quantity)
         if (update.deleteDoc) {
           //push delete box update (delete box)
           boxUpdates.push({
@@ -311,7 +313,7 @@ const updateBoxScans = (config) => {
             updateOne: {
               filter: { _id: box.product },
               update: {
-                $inc: { quantity: parseInt(-box.quantity) },
+                $inc: { quantity: -boxQty },
               }
             }
           })
@@ -320,7 +322,7 @@ const updateBoxScans = (config) => {
             updateOne: {
               filter: { _id: box.poProduct },
               update: {
-                $inc: { ...box.scanToPo ? {quantity: parseInt(-box.quantity)} : {scannedQuantity: parseInt(-box.quantity)} },
+                $inc: { ...box.scanToPo ? { quantity: -boxQty } : { scannedQuantity: -boxQty} },
               }
             }
           })
@@ -329,21 +331,21 @@ const updateBoxScans = (config) => {
             updateOne: {
               filter: { _id: box.po },
               update: {
-                $inc: { quantity: parseInt(-box.quantity) },
+                $inc: { quantity: -boxQty },
               }
             }
           })
           // move to next iteration(box)
           continue
         }
-        if (update.quantity !== box.quantity) {
-          let difference = parseInt(box.quantity - update.quantity)
+        if (update.quantity) {
+          let difference = quantity - boxQty
           //push box updates with new qty
           boxUpdates.push({
             updateOne: {
               filter: {_id: box._id},
               update: {
-                quantity: update.quantity,
+                quantity,
               }
             }
           })
@@ -377,8 +379,8 @@ const updateBoxScans = (config) => {
         }
         if (update.locations) {
           //upate locations
-          let locations = await upsertScanLocation({ company, locations: update.locations, filterRef: 'name' })
-          locations = locations.length > 0 ? locations.map(l=>(l._id)) : []
+          let locations = update.locations.length > 0 ? await upsertScanLocation({ company, locations: update.locations, filterRef: 'name' }) : []
+          locations = locations.length > 0 ? locations.map(l=>l._id) : []
           //push the updated refs array to the box
           boxUpdates.push({
             updateOne: {
@@ -388,18 +390,28 @@ const updateBoxScans = (config) => {
               }
             }
           })
+          delete update.locations
         }
         //check for any other generic updates, only name or prefix allowed currently
-        if (Object.keys(update).includes(key=> key === 'name' || key === 'prefix')) {
+        if (update.name || update.prefix) {
           const { name, prefix } = update
+          console.log({
+            name,
+            prefix
+          })
           if (prefix) {
             //create the prefix
-            await db.BoxPrefix.update({name: prefix, company, user},{upsert: true})
+            await db.BoxPrefix.update({ name: prefix, company, user }, { name: prefix, company, user},{upsert: true})
           }
           //update box
           boxUpdates.push({
-            ...name && {name},
-            ...prefix && {prefix},
+            updateOne: {
+              filter: { _id: box._id },
+              update: {
+                ...name && { name },
+                ...prefix && { prefix },
+              }
+            }
           })
         }
       }
@@ -414,7 +426,6 @@ const updateBoxScans = (config) => {
         updatedBoxes,
       })
     } catch(err) {
-      console.log({error: err})
       reject({
         ...err,
         message: err.toString()
@@ -499,7 +510,7 @@ exports.handleBoxUpdates = async (req, res, next) => {
     })
     return res.status(200).json({ ...result });
   } catch (err) {
-    console.log(err)
+    console.log({err})
     return next(err);
   }
 }

@@ -55,12 +55,12 @@ class ScanTable extends Component {
         ]}
         headers={[
         {id: 'select-all', text: '', width: 75, noSort: true},
-        {id: 'sku', text: 'SKU', width: 175, span: 8, className: 'no-wrap'},
-        {id: 'name', text: 'Box Name', width: 175, span: 8,className: 'no-wrap'},
-        {id: 'prefix', text: 'Box Prefix', width: 175, span: 8, className: 'no-wrap'},
-        {id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 4, className: 'no-wrap'},
-        {id: 'po', nestedKey: 'name', text: 'PO Name',  width: 175, span: 8, className: 'no-wrap'},
-        {id: 'po', nestedKey: 'type', text: 'PO Type', width: 175, span: 8, className: 'no-wrap'},
+        {id: 'sku', text: 'SKU', width: 175, span: 8, className: 'no-wrap', disabled: true },
+        {id: 'name', text: 'Box Name', width: 175, span: 8,className: 'no-wrap', required: true},
+        {id: 'prefix', text: 'Box Prefix', width: 175, span: 8, className: 'no-wrap', required: true,},
+        {id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 4, className: 'no-wrap', required: true},
+        {id: 'po', nestedKey: 'name', text: 'PO Name',  width: 175, span: 8, className: 'no-wrap', disabled: true},
+        {id: 'po', nestedKey: 'type', text: 'PO Type', width: 175, span: 8, className: 'no-wrap', disabled: true},
         {id: 'locations', type: 'array', autoCompleteMode: 'tags', nestedKey: 'name', refModel: 'BoxScan', queryModel: 'Location', text: 'Location', width: 175, span: 8, className: 'no-wrap',},
         {id: 'actions', text: 'Actions', width: 100, noSort: true, actionOptions: [{name: 'Delete', key: 'delete',}]},
       ]}

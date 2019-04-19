@@ -101,6 +101,7 @@ class ProductTable extends Component {
         loading: this.state.loading
       });
     }
+    
     componentDidMount() {
       this.handleDataFetch();
     }
@@ -126,7 +127,7 @@ class ProductTable extends Component {
     };
 
     handleRowEdit = async (e) => {
-      let drawerItem = this.state.data.find(p=>p._id === e.target.id)
+      let drawerItem = this.state.data.find(p=>p._id === e.target.id)._id
       this.setState({
         drawerItem,
       })
@@ -301,11 +302,9 @@ class ProductTable extends Component {
             loadingRows: [...this.state.loadingRows, ...updates.map(u=>u.id)]
           })
           let result = await this.props.onRowEditSave(updates,id)
+          this.handleDataFetch({ rowIds: updates.map(u => u.id) })
           resolve(result)
-          this.setState({
-            drawerItem: id ? { ...updates.find(i => i._id === id) } : {},
-          })
-          this.handleDataFetch({ rowIds: updates.map(u => u.id)})
+          return
         }
         let data = this.state.data.map(r => {
           let update = updates.find(u => u.id === r._id)
@@ -324,7 +323,6 @@ class ProductTable extends Component {
         .then((res) => {
           this.setState({
             data,
-            drawerItem: id ? { ...data.find(i => i._id === id) } : {},
           })
           resolve(res)
         })
@@ -377,6 +375,7 @@ class ProductTable extends Component {
     }
 
     render() {
+      let drawerItem = this.state.data.find(item=>item._id === this.state.drawerItem) || {}
       const bulkMenu = this.props.bulkMenuOptions && (
         <Menu onClick={this.handleBulkMenuClick}>
           {this.props.bulkMenuOptions.map(o=>(
@@ -493,7 +492,7 @@ class ProductTable extends Component {
         return (
           <td key={`${r._id}-${col.id}-${col.nestedKey || i}`} className={col.className}>
             <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
-              {col.nestedKey && r[col.id] ? r[col.id][col.nestedKey] : r[col.id]}
+              {col.nestedKey && r[col.id] ? r[col.id][col.nestedKey] : r[col.id] || 'error'}
             </Skeleton>
           </td>
         )
@@ -522,19 +521,14 @@ class ProductTable extends Component {
             inputs={this.props.headers.filter(h=>h.noSort !== true)}
             onFilterSearch={this.handleFilterSearch}
           />
-          {this.state.drawerItem && (
+          {drawerItem._id && (
             <EditItemDrawer
-              inputs={[
-                { id: 'sku', text: 'SKU', span: 8, className: 'no-wrap', required: true, type: 'text', message: 'SKU cannot be blank', disabled: true },
-                { id: 'name', text: 'Box Name', span: 16, className: 'no-wrap', required: true, type: 'text', message: 'Name cannot be blank' },
-                { id: 'quantity', text: 'Quantity', type: 'number', span: 8, className: 'no-wrap', type: 'text', required: true, message: 'Quantity cannot be blank' },
-                { id: 'locations', type: 'array', nestedKey: 'name', refModel: 'BoxScan', queryModel: 'Location', text: 'Location', width: 175, span: 8, className: 'no-wrap', autoCompleteMode: 'tags', onChange: this.handleAutoCompleteUpdate }
-              ]}
-              item={this.state.drawerItem}
-              title={`${this.state.drawerItem._id ? 'Edit '+ this.state.drawerItem.name || 'Item' : 'Create Item'} `}
+              inputs={this.props.headers.filter(h => !h.noSort)}
+              item={drawerItem}
+              title={`${drawerItem._id ? 'Edit '+ drawerItem.name || 'Item' : 'Create Item'} `}
               onClose={() => this.setState({ drawerItem: null })}
               onSave={(data, id) => id ? this.handleRowEditSave(data, id) : this.handleImport(data)}
-              create={this.state.drawerItem._id ? false : true}
+              create={drawerItem._id ? false : true}
             />
           )}
           {this.state.showEditItemDrawer && (

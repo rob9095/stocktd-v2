@@ -67,6 +67,14 @@ class DrawerForm extends Component {
           }
         }
       }
+      //need to loop this.props.inputs and update nestedKeys with correct key
+      for (let input of this.props.inputs) {
+        console.log(inputs[input.id + input.nestedKey])
+        if (inputs[input.id + input.nestedKey] !== undefined) {
+          inputs[input.id] = inputs[input.id+input.nestedKey]
+          delete inputs[input.id + input.nestedKey]
+        }
+      }
       // fitler out any empty entries or values that are the same
       const values = Object.entries(inputs).filter(val=>val[1] !== undefined && inputs[val[0]] !== this.props.item[val[0]]).filter(val=>{
         if (moment(val[1]).isValid()){
@@ -118,15 +126,22 @@ class DrawerForm extends Component {
     });
   }
 
+  handleAutoUpdate = (clicked, id, nestedKey) => {
+    console.log(clicked)
+    this.props.form.setFieldsValue({ [id]: Array.isArray(clicked.id) && clicked.id.map(c =>c.id) || [] })
+  }
+
   render() {
     const { getFieldDecorator } = this.props.form;
-    let item = this.props.item
-    let inputs = this.props.inputs.map(i=>{
+    let { item, inputs } = this.props
+    let formInputs = inputs.map(i=>{
+      let initialValue = i.nestedKey && item[i.id] ? item[i.id][i.nestedKey] : item[i.id]
+      let id = i.nestedKey ? i.id+i.nestedKey : i.id
       if (i.type === 'textarea') {
         return (
-          <Col xs={i.span*3} sm={i.span} key={i.id}>
+          <Col xs={i.span*3} sm={i.span} key={id}>
             <FormItem label={`${i.text}`}>
-              {getFieldDecorator(i.id, { initialValue: item[i.id] }, {
+              {getFieldDecorator(id, { initialValue }, {
                  rules: [{
                    required: i.required,
                    message: i.message,
@@ -143,9 +158,9 @@ class DrawerForm extends Component {
         )
       } else if (i.type === 'array') {
         return (
-          <Col xs={i.span * 3} sm={i.span} key={i.id}>
+          <Col xs={i.span * 3} sm={i.span} key={id}>
             <FormItem label={`${i.text}`}>
-              {getFieldDecorator(i.id, { initialValue: item[i.id] }, {
+              {getFieldDecorator(i.id, { initialValue }, {
                 rules: [{
                   required: i.required,
                   message: i.message,
@@ -156,9 +171,9 @@ class DrawerForm extends Component {
                   searchKey={i.nestedKey}
                   placeholder={i.text}
                   mode={i.autoCompleteMode}
-                  onUpdate={(clicked) => i.onChange({ rowId: item._id, clicked, ...i, colId: i.id })}
+                  onUpdate={(clicked) => this.handleAutoUpdate(clicked, i.id, i.nestedKey)}
                   skipSelectedCallback={true}
-                  selected={item[i.id]}
+                  selected={Array.isArray(item[i.id]) ? item[i.id] : []}
                 >
                   <Input style={{ display: "none" }} />
                 </AutoCompleteInput>
@@ -168,9 +183,9 @@ class DrawerForm extends Component {
         )
       } else if (i.type === 'date') {
         return (
-          <Col xs={i.span*3} sm={i.span} key={i.id}>
+          <Col xs={i.span*3} sm={i.span} key={id}>
             <FormItem label={`${i.text}`}>
-              {getFieldDecorator(i.id, { initialValue: !this.props.create ? moment(new Date(item[i.id])) : moment() }, {
+              {getFieldDecorator(id, { initialValue: !this.props.create ? moment(new Date(initialValue)) : moment() }, {
                  rules: [{
                    required: i.required,
                    message: i.message,
@@ -183,17 +198,17 @@ class DrawerForm extends Component {
         )
       } else if (i.type === 'dropdown') {
         return (
-          <Col xs={i.span*3} sm={i.span} key={i.id}>
+          <Col xs={i.span*3} sm={i.span} key={id}>
             <FormItem label={`${i.text}`}>
-              {getFieldDecorator(i.id, { initialValue: item[i.id] }, {
+              {getFieldDecorator(id, { initialValue }, {
                  rules: [{
                    required: i.required,
                    message: i.message,
                  }],
                })(
-                 <Select key={`${i.id}Select`} onChange={this.handleSelect} size="large" disabled={i.disabled}>
+                 <Select key={`${id}Select`} onChange={this.handleSelect} size="large" disabled={i.disabled}>
                    {i.values.map(val => (
-                     <Option id={`${i.id}Select`} key={val.id} value={val.id}>{val.text}</Option>
+                     <Option id={`${id}Select`} key={val.id} value={val.id}>{val.text}</Option>
                    ))}
                  </Select>
                )}
@@ -202,9 +217,9 @@ class DrawerForm extends Component {
         )
       } else {
         return (
-          <Col xs={i.span*3} sm={i.span} key={i.id}>
+          <Col xs={i.span*3} sm={i.span} key={id}>
             <FormItem label={`${i.text}`}>
-              {getFieldDecorator(i.id, { initialValue: item[i.id] }, {
+              {getFieldDecorator(id, { initialValue }, {
                  rules: [{
                    required: i.required,
                    message: i.message,
@@ -240,7 +255,7 @@ class DrawerForm extends Component {
           )}
 
           <Form layout="vertical" onSubmit={this.handleSubmit}>
-            <Row gutter={24}>{inputs}</Row>
+            <Row gutter={24}>{formInputs}</Row>
             <div
               style={{
                 position: 'absolute',
