@@ -7,6 +7,7 @@ import { Button, Pagination, Divider, Icon, Spin, Form, Dropdown, Menu, Modal, m
 import WrappedFilterForm from './FilterForm';
 import EditItemDrawer from './EditItemDrawer';
 import ImportModal from './ImportModal';
+import InsertDataModal from './InsertDataModal';
 import AutoCompleteInput from './AutoCompleteInput';
 
 const confirm = Modal.confirm;
@@ -30,6 +31,7 @@ class ProductTable extends Component {
       query: [],
       showEditItemDrawer: false,
       showCreateItemDrawer: false,
+      showInsertDataModal: false,
       itemDrawerProduct: {},
       showImportModal: false,
       populateArray: [],
@@ -54,6 +56,8 @@ class ProductTable extends Component {
       },
     }
   }
+
+  toggle = (key) => this.setState({[key]: !this.state[key]})
 
   handleDataFetch = async (config) => {
     let { requestedPage, requestedRowsPerPage, rowIds } = config || {}
@@ -180,6 +184,9 @@ class ProductTable extends Component {
             }
           }
           break;
+        case 'bulk-edit':
+          this.toggle('showInsertDataModal')
+          break;
         default:
           console.log('unknown menu option');
       }
@@ -199,14 +206,6 @@ class ProductTable extends Component {
           break;
         default:
           console.log('unknown menu option');
-      }
-    }
-
-    toggle = (prop) => {
-      return () => {
-        this.setState({
-          [prop]: !this.state[prop],
-        })
       }
     }
 
@@ -301,7 +300,7 @@ class ProductTable extends Component {
           this.setState({
             loadingRows: [...this.state.loadingRows, ...updates.map(u=>u.id)]
           })
-          let result = await this.props.onRowEditSave(updates,id)
+          let result = await this.props.onRowEditSave(updates)
           this.handleDataFetch({ rowIds: updates.map(u => u.id) })
           resolve(result)
           return
@@ -350,6 +349,21 @@ class ProductTable extends Component {
         populateArray
       });
       this.handleDataFetch()
+    }
+
+    handleInsertDataSave = (data) => {
+      return new Promise((resolve,reject)=>{
+        //get the selected items
+        let updates = this.state.data.filter(row => this.isSelected(row._id)).map(row => ({ id: row._id, ...data }))
+        this.handleRowEditSave(updates)
+        .then(res=>{
+          resolve({ text: 'Changes Saved', status: 'success' })
+        })
+        .catch(err=>{
+          console.log({err})
+          reject({text: 'Error', status: 'error'})
+        })
+      })
     }
 
     handleAutoCompleteUpdate = async (data) => {
@@ -529,6 +543,17 @@ class ProductTable extends Component {
               onClose={() => this.setState({ drawerItem: null })}
               onSave={(data, id) => id ? this.handleRowEditSave(data, id) : this.handleImport(data)}
               create={drawerItem._id ? false : true}
+            />
+          )}
+          {this.state.showInsertDataModal && (
+            <InsertDataModal
+              currentUser={this.props.currentUser.user}
+              title={"Add Box Prefix"}
+              inputs={this.props.headers.filter(h => !h.noSort && !h.disabled).map(h=>({...h, required: false}))}
+              okText={"Save"}
+              cancelText={"Cancel"}
+              onClose={() => this.toggle("showInsertDataModal")}
+              onSave={this.handleInsertDataSave}
             />
           )}
           {this.state.showEditItemDrawer && (

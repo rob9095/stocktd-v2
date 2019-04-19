@@ -325,7 +325,7 @@ class ScanForm extends Component {
                 text: "SKU",
                 required: true,
                 message: "SKU is required",
-                autoComplete: true,
+                type: 'autoComplete',
                 queryModel: "Product"
               },
               {

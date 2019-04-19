@@ -23,20 +23,30 @@ class ModalForm extends Component {
   handleSubmit = (e) => {
     e.preventDefault();
     this.props.form.validateFields((err, data) => {
-      console.log(this.state.values)
-      console.log('Received values of form: ', {...data,...this.state.values});
+      console.log('Received values of form: ', {...data,});
       if (err) {
         return
-      } else {
-        this.props.onSave({...data,...this.state.values})
-        .then(res =>{
-          this.handleAlert(res.text, res.status)
-        })
-        .catch(err =>{
-          console.log(err)
-          this.handleAlert(err.text, err.status)
-        })
       }
+      //need to loop this.props.inputs and update nestedKeys with correct key
+      for (let input of this.props.inputs) {
+        if (data[input.id + input.nestedKey] !== undefined) {
+          data[input.id] = data[input.id + input.nestedKey]
+          delete data[input.id + input.nestedKey]
+        }
+      }
+      const values = Object.entries(data).filter(val => val[1] !== undefined && val[1] !== '')
+      if (values.length === 0) {
+        this.handleAlert('No Updates found', 'warning')
+        return
+      }
+      this.props.onSave({ ...data, })
+      .then(res => {
+        this.handleAlert(res.text, res.status)
+      })
+      .catch(err => {
+        console.log(err)
+        this.handleAlert(err.text, err.status)
+      })
     })
   }
 
@@ -55,21 +65,17 @@ class ModalForm extends Component {
   }
 
   handleAutoUpdate = (clicked, id) => {
-    this.props.form.setFieldsValue({[id]: clicked.data[id] || ''})
-    this.setState({
-      values: {
-        ...this.state.values,
-        [id]: clicked.data[id] || '',
-      }
-    })
+    console.log(clicked)
+    this.props.form.setFieldsValue({ [id]: Array.isArray(clicked.id) && clicked.id.map(c => c.id) || [] })
   }
 
   render() {
     const { getFieldDecorator } = this.props.form;
     let inputs = this.props.inputs.map(i=>{
-      if (i.autoComplete) {
+      let id = i.nestedKey ? i.id + i.nestedKey : i.id
+      if (i.type === 'autoComplete') {
         return (
-          <Col xs={i.span*3} md={i.span} key={i.id}>
+          <Col xs={i.span*3} key={id}>
             <FormItem key={i.id} label={`${i.text}`}>
               {getFieldDecorator(i.id, {
                  rules: [{
@@ -78,10 +84,11 @@ class ModalForm extends Component {
                  }],
                })(
                 <AutoCompleteInput
-                  queryModel={i.queryModel}
-                  searchKey={i.id}
-                  placeholder={"SKU"}
-                  onUpdate={(clicked)=>this.handleAutoUpdate(clicked,i.id)}
+                   queryModel={i.queryModel}
+                   searchKey={i.nestedKey}
+                   placeholder={i.text}
+                   mode={i.autoCompleteMode}
+                   onUpdate={(clicked) => this.handleAutoUpdate(clicked, i.id, i.nestedKey)}
                 >
                   <Input style={{display: 'none'}} />
                 </AutoCompleteInput>
@@ -91,9 +98,9 @@ class ModalForm extends Component {
         )
       } else {
         return (
-          <Col xs={i.span*3} md={i.span} key={i.id}>
-            <FormItem key={i.id} label={`${i.text}`}>
-              {getFieldDecorator(i.id, {
+          <Col xs={i.span*3} key={id}>
+            <FormItem key={id} label={`${i.text}`}>
+              {getFieldDecorator(id, {
                  rules: [{
                   required: i.required,
                   message: i.message,

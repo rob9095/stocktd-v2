@@ -126,7 +126,7 @@ class DrawerForm extends Component {
     });
   }
 
-  handleAutoUpdate = (clicked, id, nestedKey) => {
+  handleAutoUpdate = (clicked, id) => {
     console.log(clicked)
     this.props.form.setFieldsValue({ [id]: Array.isArray(clicked.id) && clicked.id.map(c =>c.id) || [] })
   }
@@ -156,7 +156,7 @@ class DrawerForm extends Component {
             </FormItem>
           </Col>
         )
-      } else if (i.type === 'array') {
+      } else if (i.type === 'autoComplete') {
         return (
           <Col xs={i.span * 3} sm={i.span} key={id}>
             <FormItem label={`${i.text}`}>
@@ -171,7 +171,7 @@ class DrawerForm extends Component {
                   searchKey={i.nestedKey}
                   placeholder={i.text}
                   mode={i.autoCompleteMode}
-                  onUpdate={(clicked) => this.handleAutoUpdate(clicked, i.id, i.nestedKey)}
+                  onUpdate={(clicked) => this.handleAutoUpdate(clicked, i.id)}
                   skipSelectedCallback={true}
                   selected={Array.isArray(item[i.id]) ? item[i.id] : []}
                 >

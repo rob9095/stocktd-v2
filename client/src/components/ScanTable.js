@@ -48,7 +48,8 @@ class ScanTable extends Component {
         title="Scans"
         onRowEditSave={this.handleRowEditSave}
         bulkMenuOptions={[
-          {name: 'Delete', key: 'delete', handler: this.handleDelete}
+          {name: 'Delete', key: 'delete', handler: this.handleDelete},
+          {name: 'Bulk Edit', key: 'bulk-edit'}
         ]}
         tableMenuOptions={[
           {name: 'Display Options', key: 'Display Options'}
@@ -61,7 +62,7 @@ class ScanTable extends Component {
         {id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 4, className: 'no-wrap', required: true},
         {id: 'po', nestedKey: 'name', text: 'PO Name',  width: 175, span: 8, className: 'no-wrap', disabled: true},
         {id: 'po', nestedKey: 'type', text: 'PO Type', width: 175, span: 8, className: 'no-wrap', disabled: true},
-        {id: 'locations', type: 'array', autoCompleteMode: 'tags', nestedKey: 'name', refModel: 'BoxScan', queryModel: 'Location', text: 'Location', width: 175, span: 8, className: 'no-wrap',},
+        {id: 'locations', type: 'autoComplete', autoCompleteMode: 'tags', nestedKey: 'name', refModel: 'BoxScan', queryModel: 'Location', text: 'Location', width: 175, span: 8, className: 'no-wrap',},
         {id: 'actions', text: 'Actions', width: 100, noSort: true, actionOptions: [{name: 'Delete', key: 'delete',}]},
       ]}
       />
