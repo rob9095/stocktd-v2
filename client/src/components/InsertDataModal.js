@@ -66,7 +66,7 @@ class ModalForm extends Component {
 
   handleAutoUpdate = (clicked, id) => {
     console.log(clicked)
-    this.props.form.setFieldsValue({ [id]: Array.isArray(clicked.id) && clicked.id.map(c => c.id) || [] })
+    this.props.form.setFieldsValue({ [id]: Array.isArray(clicked.id) && clicked.id.map(c => c.id) || clicked.data[id] || ''})
   }
 
   render() {
@@ -85,7 +85,7 @@ class ModalForm extends Component {
                })(
                 <AutoCompleteInput
                    queryModel={i.queryModel}
-                   searchKey={i.nestedKey}
+                   searchKey={i.nestedKey || i.id}
                    placeholder={i.text}
                    mode={i.autoCompleteMode}
                    onUpdate={(clicked) => this.handleAutoUpdate(clicked, i.id, i.nestedKey)}
