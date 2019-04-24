@@ -115,6 +115,7 @@ class AutoCompleteInputForm extends Component {
           mode={this.props.mode || "default"}
           labelInValue
           ref={node => (this.selectRef = node)}
+          onMouseLeave={(e)=> e.stopPropagation()}
         >
           {children}
         </Select>
