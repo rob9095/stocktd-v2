@@ -11,6 +11,134 @@ function groupBy(objectArray, property) {
  }, {});
 }
 
+const upsertPurchaseOrders = (config) => {
+  let {data, company, user } = config
+  return new Promise( async (resolve,reject) => {
+    try {
+      if (data.length > 7000) {
+        reject({
+          status: 404,
+          message: ['Request to large']
+        })
+      }
+      let poData = data.map((po, i) => ({
+        name: po['name'],
+        type: po['type'],
+        status: po['status'] || 'complete',
+        sku: po['sku'],
+        quantity: po['quantity'] || 0,
+        company,
+        skuCompany: `${po['sku']}-${company}`,
+        poRef: `${company}-${po['name']}-${po['type']}`,
+      }))
+      let groupedPOs = groupBy(poData, 'poRef');
+      let poUpdates = [];
+      let poProductUpdates = [];
+      let productUpdates = [];
+      for (let po of Object.entries(groupedPOs)) {
+        let poRef = po[0]
+        let poArr = po[1]
+        let qtyArr = poArr.map(line => parseInt(line.quantity))
+        let sum = qtyArr.reduce((acc, cv) => (acc + cv), 0)
+        let poProductsObj = groupBy(poArr, 'skuCompany')
+        poUpdates.push({
+          updateOne: {
+            filter: { poRef },
+            update: {
+              name: poArr[0].name,
+              type: poArr[0].type,
+              status: poArr[0].status,
+              poRef,
+              company: poArr[0].company,
+              $inc: { quantity: parseInt(sum) },
+              $setOnInsert: { createdOn: new Date() }
+            },
+            upsert: true
+          }
+        });
+        for (let skuRef of Object.entries(poProductsObj)) {
+          let skuArr = skuRef[1]
+          let currentSku = skuRef[0]
+          let skuSum = skuArr.map(sku => parseInt(sku.quantity)).reduce((acc, cv) => (acc + cv), 0)
+          let scannedSkuSum = skuArr.map(sku => parseInt(sku.scannedQuantity)).reduce((acc, cv) => (acc + cv), 0)
+          let product = skuArr[0]
+          delete product.quantity
+          if (product.sku) {
+            poProductUpdates.push({
+              updateOne: {
+                filter: { skuCompany: currentSku, poRef },
+                update: {
+                  ...product,
+                  $inc: { quantity: parseInt(skuSum), ...scannedSkuSum && { scannedQuantity: parseInt(scannedSkuSum) } },
+                  $setOnInsert: {
+                    createdOn: new Date(),
+                    scannedQuantity: 0
+                  }
+                },
+                upsert: true
+              }
+            });
+            productUpdates.push({
+              updateOne: {
+                filter: { skuCompany: currentSku },
+                update: {
+                  company,
+                  sku: product.sku,
+                  ...product.barcode && { barcodeCompany: product.barcode + "-" + company },
+                  skuCompany: currentSku,
+                  $setOnInsert: { createdOn: new Date(), quantityToShip: 0, ...!product.barcode && { barcodeCompany: product.sku + "-" + company } },
+                  $inc: product.type === 'outbound' ?
+                    { quantity: parseInt(-skuSum) }
+                    :
+                    { quantity: parseInt(skuSum) }
+                },
+                upsert: true,
+              }
+            })
+          }
+        }
+      }
+      let updatedPOs = await db.PurchaseOrder.bulkWrite(poUpdates)
+      let updatedPoProducts = poProductUpdates.length > 0 && await db.PoProduct.bulkWrite(poProductUpdates)
+      let updatedProducts = productUpdates.length > 0 && await db.Product.bulkWrite(productUpdates)
+      if (updatedPoProducts.nUpserted > 0) {
+        //need to add refs for products and pos if we upserted any PoProducts
+        let andQuery = Object.values(updatedPoProducts.upsertedIds).map(val => ({ "_id": val }))
+        let poProducts = await db.PoProduct.find({ company, $and: [{ $or: andQuery }] })
+        let productAndQuery = poProducts.map(doc => ({ skuCompany: doc.skuCompany, company }))
+        let products = await db.Product.find({ company, $and: [{ $or: productAndQuery }] })
+        let poAndQuery = poProducts.map(doc => ({ company, poRef: doc.poRef }))
+        let pos = await db.PurchaseOrder.find({ company, $and: [{ $or: poAndQuery }] })
+        poProductUpdates = []
+        for (let poProduct of poProducts) {
+          poProductUpdates.push({
+            updateOne: {
+              filter: { _id: poProduct._id },
+              update: {
+                product: products.find(p => p.skuCompany === poProduct.skuCompany)._id,
+                po: pos.find(po => po.poRef === poProduct.poRef)._id,
+              },
+            }
+          })
+        }
+        updatedPoProducts = await db.PoProduct.bulkWrite(poProductUpdates)
+      }
+      resolve({
+        updatedPOs,
+        updatedPoProducts,
+        updatedProducts,
+      })
+
+    } catch(err) {
+      console.log(err)
+      reject({
+        status: 404,
+        message: err.toString(),
+      })
+    }
+  })
+}
+
 /*
 * UPDATE/UPSERT Purchase Order, associated PoProducts, and associated Products
 * Accepted Values: name, type, status, sku, quantity, company, skuCompany, poRef
@@ -25,113 +153,117 @@ exports.handlePOImport = async (req, res, next) => {
 			})
 		}
     const company = req.body.company
-    let poData = req.body.json.map((po,i)=>({
-      name: po['name'],
-      type: po['type'],
-      status: po['status'] || 'complete',
-      sku: po['sku'],
-      quantity: po['quantity'] || 0,
-      company: company,
-      skuCompany: `${po['sku']}-${company}`,
-      poRef: `${company}-${po['name']}-${po['type']}`,
-    }))
-    let groupedPOs = groupBy(poData, 'poRef');
-    let poUpdates = [];
-    let poProductUpdates = [];
-    let productUpdates = [];
-    for (let po of Object.entries(groupedPOs)) {
-      let poRef = po[0]
-      let poArr = po[1]
-      let qtyArr = poArr.map(line => parseInt(line.quantity))
-      let sum = qtyArr.reduce((acc, cv) => (acc + cv), 0)
-      let poProductsObj = groupBy(poArr, 'skuCompany')
-      poUpdates.push({
-        updateOne: {
-          filter: { poRef },
-          update: {
-            name: poArr[0].name,
-            type: poArr[0].type,
-            status: poArr[0].status,
-            poRef,
-            company: poArr[0].company,
-            $inc: { quantity: parseInt(sum) },
-            $setOnInsert: { createdOn: new Date() }
-          },
-          upsert: true
-        }
-      });
-      for (let skuRef of Object.entries(poProductsObj)) {
-        let skuArr = skuRef[1]
-        let currentSku = skuRef[0]
-        let skuQtyArr = skuArr.map(sku => parseInt(sku.quantity))
-        let skuSum = skuQtyArr.reduce((acc, cv) => (acc + cv), 0)
-        let product = skuArr[0]
-        delete product.quantity
-        if (product.sku) {
-          poProductUpdates.push({
-            updateOne: {
-              filter: { skuCompany: currentSku, poRef },
-              update: {
-                ...product,
-                $inc: { quantity: parseInt(skuSum) },
-                $setOnInsert: {
-                  createdOn: new Date(),
-                  scannedQuantity: 0
-                }
-              },
-              upsert: true
-            }
-          });
-          productUpdates.push({
-            updateOne: {
-              filter: { skuCompany: currentSku },
-              update: {
-                company,
-                sku: product.sku,
-                ...product.barcode && {barcodeCompany: product.barcode + "-" + company},
-                skuCompany: currentSku,
-                $setOnInsert: { createdOn: new Date(), quantityToShip: 0, ...!product.barcode && { barcodeCompany: product.sku + "-" + company } },
-                $inc: product.type === 'outbound' ?
-                  { quantity: parseInt(-skuSum) }
-                  :
-                  { quantity: parseInt(skuSum) }
-              },
-              upsert: true,
-            }
-          })
-        }
-      }
-    }
-    let updatedPOs = await db.PurchaseOrder.bulkWrite(poUpdates)
-    let updatedPoProducts = poProductUpdates.length > 0 && await db.PoProduct.bulkWrite(poProductUpdates)
-    let updatedProducts = productUpdates.length > 0 && await db.Product.bulkWrite(productUpdates)
-    if (updatedPoProducts.nUpserted > 0) {
-      console.log(updatedPoProducts)
-      //need to add refs for products and pos if we upserted any PoProducts
-      let andQuery = Object.values(updatedPoProducts.upsertedIds).map(val => ({ "_id": val }))
-      let poProducts = await db.PoProduct.find({ company, $and: [{ $or: andQuery }] })
-      let productAndQuery = poProducts.map(doc=>({skuCompany: doc.skuCompany, company}))
-      let products = await db.Product.find({ company, $and: [{ $or: productAndQuery }] })
-      let poAndQuery = poProducts.map(doc=>({company, poRef: doc.poRef}))
-      let pos = await db.PurchaseOrder.find({ company, $and: [{ $or: poAndQuery }] })
-      poProductUpdates = []
-      for (let poProduct of poProducts) {
-        poProductUpdates.push({
-          updateOne: {
-            filter: {_id: poProduct._id},
-            update: {
-              product: products.find(p=>p.skuCompany === poProduct.skuCompany)._id,
-              po: pos.find(po=>po.poRef === poProduct.poRef)._id,
-            },
-          }
-        })
-      }
-      updatedPoProducts = await db.PoProduct.bulkWrite(poProductUpdates)
-    }
+    let result = await upsertPurchaseOrders({
+      data: req.body.json,
+      company
+    })
+
+    // let poData = req.body.json.map((po,i)=>({
+    //   name: po['name'],
+    //   type: po['type'],
+    //   status: po['status'] || 'complete',
+    //   sku: po['sku'],
+    //   quantity: po['quantity'] || 0,
+    //   company: company,
+    //   skuCompany: `${po['sku']}-${company}`,
+    //   poRef: `${company}-${po['name']}-${po['type']}`,
+    // }))
+    // let groupedPOs = groupBy(poData, 'poRef');
+    // let poUpdates = [];
+    // let poProductUpdates = [];
+    // let productUpdates = [];
+    // for (let po of Object.entries(groupedPOs)) {
+    //   let poRef = po[0]
+    //   let poArr = po[1]
+    //   let qtyArr = poArr.map(line => parseInt(line.quantity))
+    //   let sum = qtyArr.reduce((acc, cv) => (acc + cv), 0)
+    //   let poProductsObj = groupBy(poArr, 'skuCompany')
+    //   poUpdates.push({
+    //     updateOne: {
+    //       filter: { poRef },
+    //       update: {
+    //         name: poArr[0].name,
+    //         type: poArr[0].type,
+    //         status: poArr[0].status,
+    //         poRef,
+    //         company: poArr[0].company,
+    //         $inc: { quantity: parseInt(sum) },
+    //         $setOnInsert: { createdOn: new Date() }
+    //       },
+    //       upsert: true
+    //     }
+    //   });
+    //   for (let skuRef of Object.entries(poProductsObj)) {
+    //     let skuArr = skuRef[1]
+    //     let currentSku = skuRef[0]
+    //     let skuQtyArr = skuArr.map(sku => parseInt(sku.quantity))
+    //     let skuSum = skuQtyArr.reduce((acc, cv) => (acc + cv), 0)
+    //     let scannedSkuSum = skuArr.map(sku=> parseInt(sku.scannedQuantity)).reduce((acc,cv => (acc+cv),0))
+    //     let product = skuArr[0]
+    //     delete product.quantity
+    //     if (product.sku) {
+    //       poProductUpdates.push({
+    //         updateOne: {
+    //           filter: { skuCompany: currentSku, poRef },
+    //           update: {
+    //             ...product,
+    //             $inc: { quantity: parseInt(skuSum), ...scannedSkuSum && {scannedQuantity: parseInt(scannedSkuSum)} },
+    //             $setOnInsert: {
+    //               createdOn: new Date(),
+    //               scannedQuantity: 0
+    //             }
+    //           },
+    //           upsert: true
+    //         }
+    //       });
+    //       productUpdates.push({
+    //         updateOne: {
+    //           filter: { skuCompany: currentSku },
+    //           update: {
+    //             company,
+    //             sku: product.sku,
+    //             ...product.barcode && {barcodeCompany: product.barcode + "-" + company},
+    //             skuCompany: currentSku,
+    //             $setOnInsert: { createdOn: new Date(), quantityToShip: 0, ...!product.barcode && { barcodeCompany: product.sku + "-" + company } },
+    //             $inc: product.type === 'outbound' ?
+    //               { quantity: parseInt(-skuSum) }
+    //               :
+    //               { quantity: parseInt(skuSum) }
+    //           },
+    //           upsert: true,
+    //         }
+    //       })
+    //     }
+    //   }
+    // }
+    // let updatedPOs = await db.PurchaseOrder.bulkWrite(poUpdates)
+    // let updatedPoProducts = poProductUpdates.length > 0 && await db.PoProduct.bulkWrite(poProductUpdates)
+    // let updatedProducts = productUpdates.length > 0 && await db.Product.bulkWrite(productUpdates)
+    // if (updatedPoProducts.nUpserted > 0) {
+    //   console.log(updatedPoProducts)
+    //   //need to add refs for products and pos if we upserted any PoProducts
+    //   let andQuery = Object.values(updatedPoProducts.upsertedIds).map(val => ({ "_id": val }))
+    //   let poProducts = await db.PoProduct.find({ company, $and: [{ $or: andQuery }] })
+    //   let productAndQuery = poProducts.map(doc=>({skuCompany: doc.skuCompany, company}))
+    //   let products = await db.Product.find({ company, $and: [{ $or: productAndQuery }] })
+    //   let poAndQuery = poProducts.map(doc=>({company, poRef: doc.poRef}))
+    //   let pos = await db.PurchaseOrder.find({ company, $and: [{ $or: poAndQuery }] })
+    //   poProductUpdates = []
+    //   for (let poProduct of poProducts) {
+    //     poProductUpdates.push({
+    //       updateOne: {
+    //         filter: {_id: poProduct._id},
+    //         update: {
+    //           product: products.find(p=>p.skuCompany === poProduct.skuCompany)._id,
+    //           po: pos.find(po=>po.poRef === poProduct.poRef)._id,
+    //         },
+    //       }
+    //     })
+    //   }
+    //   updatedPoProducts = await db.PoProduct.bulkWrite(poProductUpdates)
+    // }
     return res.status(200).json({
-      updatedPOs,
-      updatedPoProducts,
-      updatedProducts,
+      ...result,
     })
   } catch(err) {
     return next(err)
