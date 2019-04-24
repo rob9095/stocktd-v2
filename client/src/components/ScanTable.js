@@ -40,6 +40,16 @@ class ScanTable extends Component {
     })
   }
 
+  handleImport = async () => {
+    await scanHandlers.importBoxScans([],this.props.currentUser.user)
+    .then(res => {
+      console.log(res)
+    })
+    .catch(err => {
+      console.log(err)
+    })
+  }
+
   render() {
     return(
       <StkdTable
@@ -48,11 +58,12 @@ class ScanTable extends Component {
         title="Scans"
         onRowEditSave={this.handleRowEditSave}
         bulkMenuOptions={[
+          {name: 'Bulk Edit', key: 'bulk-edit'},
           {name: 'Delete', key: 'delete', handler: this.handleDelete},
-          {name: 'Bulk Edit', key: 'bulk-edit'}
         ]}
         tableMenuOptions={[
-          {name: 'Display Options', key: 'Display Options'}
+          {name: 'Import', key: 'import', handler: this.handleImport},
+          {name: 'Display Options', key: 'display-options'},
         ]}
         headers={[
         {id: 'select-all', text: '', width: 75, noSort: true},

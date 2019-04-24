@@ -1,4 +1,26 @@
 const db = require('../models');
+const { validateHeaders, validateInputs } = require('../services/validateArray')
+const { upsertPurchaseOrders } = require('./purchaseOrders')
+
+const boxImportHeaders = [
+  { value: 'sku', required: true },
+  { value: 'name', required: true },
+  { value: 'locations'},
+  { value: 'barcode' },
+  { value: 'quantity', required: true },
+  { value: 'scannedQuantity' },
+  { value: 'prefix' },
+];
+const boxValidInputs = [
+  { value: 'sku', required: true },
+  { value: 'name', required: true },
+  { value: 'locations', type: 'array' },
+  { value: 'barcode', },
+  { value: 'quantity', required: true, type: 'number' },
+  { value: 'scannedQuantity', type: 'number' },
+  { value: 'prefix' },
+];
+
 
 //accepts string array and upserts locations based on filterRef which is name by default 
 const upsertScanLocation = (upsertData) => {
@@ -512,5 +534,52 @@ exports.handleBoxUpdates = async (req, res, next) => {
   } catch (err) {
     console.log({err})
     return next(err);
+  }
+}
+
+exports.importBoxScans = async (req, res, next) => {
+  try {
+    if (req.body.json.length > 7000) {
+      return next({
+        status: 404,
+        message: ['Request to large'],
+      })
+    }
+    let data = req.body.json.map(row => {
+      const inputs = { sku, name, quantity, locations, barcode, prefix } = row
+      return({
+        ...inputs,
+        //if scan from value in row is truthy
+        ...row['scan from'] ? {scannedQuantity: quantity, scanToPo: false} : {scanToPo: true},
+        ...row['po name'] && {poName: row['po name']},
+        ...row['po type'] && {poType: row['po type']},
+        ...row['po name'] && row['po type'] ? { poRef: req.body.company + "-" + ['po name'] + "-" + row['po type'] } : { poRef: req.body.company +'-genericInbound'},
+        company: req.body.company,
+      })
+    })
+    let scanToRows = data.filter(row => row.scanToPo === true)
+    let scanFromRows = data.filter(row => row.scanToPo === false)
+    //validate inputs will go here
+
+    //get existing values
+    let foundPos = await db.PurchaseOrder.find({$and: [{ $or: data.map(row=>({company: row.company, poRef: row.poRef})) }]})
+    let foundPoProducts = await db.PoProduct.find({$and: [{ $or: data.map(row=>({company: row.company, poRef: row.poRef, sku: row.sku}))}]})
+    let foundProducts = await db.Product.find({$and: [{ $or: data.map(row=>({company: row.company, sku: row.sku}))}]})
+    if (scanFromRows.length > 0) {
+      //upsert the pos
+      let result = await upsertPurchaseOrders({
+        company: req.body.company,
+        data: scanFromRows.map(row=>({
+          name: row.poName,
+          type: row.poType,
+          poRef: row.poRef,
+          sku: row.sku,
+          quantity: row.quantity,
+          ...row.scannedQuantity && {scannedQuantity: row.scannedQuantity}
+        }))
+      })
+    }
+  } catch(err){
+    return next(err)
   }
 }

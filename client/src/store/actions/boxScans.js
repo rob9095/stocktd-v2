@@ -37,3 +37,15 @@ export function updateBoxScans(data, user) {
 			})
 	});
 }
+
+export function importBoxScans(data, user) {
+	return new Promise((resolve, reject) => {
+		return apiCall('post', `/api/scans/import`, { data, company: user.company, user: user.id })
+			.then((res) => {
+				resolve(res);
+			})
+			.catch(err => {
+				reject({ ...err });
+			})
+	});
+}

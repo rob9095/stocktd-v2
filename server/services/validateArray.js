@@ -1,13 +1,13 @@
-const validateInputs = (json, validInputs) => {
+exports.validateInputs = (json, validInputs) => {
   return new Promise((resolve, reject) => {
     let errorList = [];
     let reqInputs = validInputs.filter(i => i.required === true)
     let c = 0;
     for (let line of json) {
       for (let input of validInputs) {
-        // check required inputs for empty strings
-        if (line[input.value] === '' && input.required === true && input.type !== 'array') {
-          errorList.push(`Invalid Input: "${input.value}" on line ${c + 1} is empty or missing`)
+        // check required inputs for empty strings, null or undefined
+        if (!line[input.value] && input.required === true) {
+          errorList.push(`Required Input "${input.value}" on line ${c + 1} is invalid`)
           reject({
             errorType: 'error',
             errorHeader: 'Please fix the errors and upload the file again',
@@ -16,8 +16,8 @@ const validateInputs = (json, validInputs) => {
         }
         // check numbers for NaNs
         if (input.type === 'number') {
-          if (!Number.isInteger(parseInt(line[input.value])) && line[input.value] !== undefined) {
-            errorList.push(`Invalid Number: "${line[input.value]}" on line ${c + 1} is not a valid number`)
+          if (!Number.isInteger(parseInt(line[input.value])) || line[input.value] === undefined) {
+            errorList.push(`Number Input "${line[input.value]}" on line ${c + 1} must be a valid whole number`)
             reject({
               errorType: 'error',
               errorHeader: 'Please fix the errors and upload the file again',
@@ -25,16 +25,14 @@ const validateInputs = (json, validInputs) => {
             });
           }
         }
-        //check inputs valid Values if it's an array
-        if (input.type === 'array' && line[input.value] !== undefined) {
-          if (!input.validValues.includes(line[input.value])) {
-            errorList.push(`Invalid Input: "${line[input.value]}" on line ${c + 1} is not a valid ${input.value}`)
-            reject({
-              errorType: 'error',
-              errorHeader: 'Please fix the errors and upload the file again',
-              errorList,
-            });
-          }
+        //check inputs valid Values if it's a controlled value
+        if (input.type === 'controlled' && !input.validValues.includes(line[input.value])) {
+          errorList.push(`Invalid Input "${line[input.value]}" on line ${c + 1} is not a valid ${input.value}`)
+          reject({
+            errorType: 'error',
+            errorHeader: 'Please fix the errors and upload the file again',
+            errorList,
+          });
         }
       }
       c++
@@ -45,7 +43,7 @@ const validateInputs = (json, validInputs) => {
   })
 }
 
-const validateHeaders = (json, headers) => {
+exports.validateHeaders = (json, headers) => {
   return new Promise((resolve, reject) => {
     let inputHeaders = Object.keys(json[0]).filter(iH => !iH.startsWith('field'))
     let reqHeaders = headers.filter(h => h.required === true)

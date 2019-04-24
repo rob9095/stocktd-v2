@@ -193,6 +193,7 @@ class ProductTable extends Component {
     }
 
     handleOptionsMenuClick = async ({ item, key, keyPath }) => {
+      let handler = this.props.tableMenuOptions.find(o => o.handler && o.key === key).handler
       switch(key) {
         case 'add':
         this.setState({
@@ -200,9 +201,10 @@ class ProductTable extends Component {
         })
           break;
         case 'import':
-        this.setState({
-          showImportModal: true,
-        })
+          handler ? handler() :
+            this.setState({
+              showImportModal: true,
+            })
           break;
         default:
           console.log('unknown menu option');
@@ -600,7 +602,7 @@ class ProductTable extends Component {
           {this.state.showImportModal && (
             <ImportModal
               title="Import Products"
-              onClose={this.toggle('showImportModal')}
+              onClose={()=>this.toggle('showImportModal')}
               headers={[
                 {value:'sku', required: true},
                 {value:'title'},
