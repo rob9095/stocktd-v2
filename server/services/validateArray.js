@@ -16,7 +16,7 @@ exports.validateInputs = (json, validInputs) => {
         }
         // check numbers for NaNs
         if (input.type === 'number') {
-          if (!Number.isInteger(parseInt(line[input.value])) || line[input.value] === undefined) {
+          if (!Number.isInteger(parseInt(line[input.value])) && line[input.value] !== undefined) {
             errorList.push(`Number Input "${line[input.value]}" on line ${c + 1} must be a valid whole number`)
             reject({
               errorType: 'error',
@@ -45,7 +45,8 @@ exports.validateInputs = (json, validInputs) => {
 
 exports.validateHeaders = (json, headers) => {
   return new Promise((resolve, reject) => {
-    let inputHeaders = Object.keys(json[0]).filter(iH => !iH.startsWith('field'))
+    headers = headers.map(h => ({ ...h, value: h.value.toLowerCase() }))
+    let inputHeaders = Object.keys(json[0]).filter(iH => !iH.startsWith('field')).map(iH => typeof iH === 'string' && iH.toLowerCase())
     let reqHeaders = headers.filter(h => h.required === true)
     let warnings = [];
     for (let inputHeader of inputHeaders) {

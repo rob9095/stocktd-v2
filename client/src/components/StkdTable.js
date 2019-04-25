@@ -193,7 +193,7 @@ class ProductTable extends Component {
     }
 
     handleOptionsMenuClick = async ({ item, key, keyPath }) => {
-      let handler = this.props.tableMenuOptions.find(o => o.handler && o.key === key).handler
+      let option = this.props.tableMenuOptions.find(o => o.handler && o.key === key) || {}
       switch(key) {
         case 'add':
         this.setState({
@@ -201,10 +201,9 @@ class ProductTable extends Component {
         })
           break;
         case 'import':
-          handler ? handler() :
-            this.setState({
-              showImportModal: true,
-            })
+          this.setState({
+            showImportModal: true,
+          })
           break;
         default:
           console.log('unknown menu option');
@@ -333,13 +332,13 @@ class ProductTable extends Component {
       })
     }
 
-    handleProductImport = (json) => {
-      return new Promise((resolve,reject) => {
-        this.props.importProducts(json, this.props.currentUser)
-        .then(res=>{
+    handleImport = (json) => {
+      return new Promise( async (resolve,reject) => {
+        await this.props.onImport(json)
+        .then(res => {
           resolve(res)
         })
-        .catch(err=>{
+        .catch(err => {
           reject(err)
         })
       })
@@ -601,31 +600,11 @@ class ProductTable extends Component {
           )}
           {this.state.showImportModal && (
             <ImportModal
-              title="Import Products"
+              title="Import File"
               onClose={()=>this.toggle('showImportModal')}
-              headers={[
-                {value:'sku', required: true},
-                {value:'title'},
-                {value: 'barcode'},
-                {value:'quantity'},
-                {value:'price'},
-                {value:'supplier'},
-                {value:'brand'},
-                {value:'weight'},
-                {value:'action'},
-              ]}
-              validInputs={[
-                {value:'sku', required: true},
-                {value:'title'},
-                {value:'barcode'},
-                {value:'quantity', type: 'number'},
-                {value:'price', type: 'number'},
-                {value:'supplier'},
-                {value:'brand'},
-                {value:'weight', type: 'number'},
-                {value:'action', type: 'array', validValues: ['update','delete']},
-              ]}
-              onSubmit={this.handleProductImport}
+              headers={this.props.importHeaders}
+              validInputs={this.props.importValidValues}
+              onSubmit={this.handleImport}
               onSuccess={this.handleDataFetch}
             />
           )}

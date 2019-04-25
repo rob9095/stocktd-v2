@@ -40,13 +40,15 @@ class ScanTable extends Component {
     })
   }
 
-  handleImport = async () => {
-    await scanHandlers.importBoxScans([],this.props.currentUser.user)
-    .then(res => {
-      console.log(res)
-    })
-    .catch(err => {
-      console.log(err)
+  handleImport = (data) => {
+    return new Promise( async (resolve,reject) =>{
+      await scanHandlers.importBoxScans(data, this.props.currentUser.user)
+      .then(res => {
+        resolve(res)
+      })
+      .catch(err => {
+        resolve(err)
+      })
     })
   }
 
@@ -57,12 +59,35 @@ class ScanTable extends Component {
         populateArray={[{path:'po'},{path:'product'},{path:'locations'}]}
         title="Scans"
         onRowEditSave={this.handleRowEditSave}
+        onImport={this.handleImport}
+        importHeaders={[
+          { value: 'sku', required: true },
+          { value: 'box name', required: true },
+          { value: 'locations' },
+          { value: 'barcode' },
+          { value: 'quantity', required: true },
+          { value: 'po name' },
+          { value: 'po type' },
+          { value: 'scan from' },
+          { value: 'prefix' },
+        ]}
+        importValidValues={[
+          { value: 'sku', required: true },
+          { value: 'box name', required: true },
+          { value: 'locations', type: 'stringArray' },
+          { value: 'barcode', },
+          { value: 'quantity', required: true, type: 'number' },
+          { value: 'scan from', type: 'array', validValues: ['yes',''] },
+          { value: 'po type', type: 'array', validValues: ['inbound', 'outbound', ''] },
+          { value: 'name' },
+          { value: 'prefix' },
+        ]}
         bulkMenuOptions={[
           {name: 'Bulk Edit', key: 'bulk-edit'},
           {name: 'Delete', key: 'delete', handler: this.handleDelete},
         ]}
         tableMenuOptions={[
-          {name: 'Import', key: 'import', handler: this.handleImport},
+          {name: 'Import', key: 'import',},
           {name: 'Display Options', key: 'display-options'},
         ]}
         headers={[

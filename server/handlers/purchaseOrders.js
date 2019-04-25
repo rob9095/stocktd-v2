@@ -24,12 +24,13 @@ const upsertPurchaseOrders = (config) => {
       let poData = data.map((po, i) => ({
         name: po['name'],
         type: po['type'],
-        status: po['status'] || 'complete',
+        ...po['status'] && {status: po['status']},
         sku: po['sku'],
         quantity: po['quantity'] || 0,
+        ...po.scannedQuantity && {scannedQuantity: po.scannedQuantity},
         company,
         skuCompany: `${po['sku']}-${company}`,
-        poRef: `${company}-${po['name']}-${po['type']}`,
+        ...po.poRef ? {poRef: po.poRef} : {poRef: `${company}-${po['name']}-${po['type']}`},
       }))
       let groupedPOs = groupBy(poData, 'poRef');
       let poUpdates = [];
@@ -47,11 +48,11 @@ const upsertPurchaseOrders = (config) => {
             update: {
               name: poArr[0].name,
               type: poArr[0].type,
-              status: poArr[0].status,
+              ...poArr[0].status && {status: poArr[0].status},
               poRef,
               company: poArr[0].company,
               $inc: { quantity: parseInt(sum) },
-              $setOnInsert: { createdOn: new Date() }
+              $setOnInsert: { createdOn: new Date(), ...!poArr[0].status && {status: 'processing'} }
             },
             upsert: true
           }
@@ -60,19 +61,21 @@ const upsertPurchaseOrders = (config) => {
           let skuArr = skuRef[1]
           let currentSku = skuRef[0]
           let skuSum = skuArr.map(sku => parseInt(sku.quantity)).reduce((acc, cv) => (acc + cv), 0)
-          let scannedSkuSum = skuArr.map(sku => parseInt(sku.scannedQuantity)).reduce((acc, cv) => (acc + cv), 0)
-          let product = skuArr[0]
-          delete product.quantity
+          let scannedSkuSum = skuArr.filter(sku => (Number.isInteger(parseInt(sku.scannedQuantity)))).length > 0 ? skuArr.map(sku => parseInt(sku.scannedQuantity)).reduce((acc, cv) => (acc + cv), 0) : undefined
+          // pull quantity and scannedQuantity out of product becuase we use $inc to update those
+          let {quantity, scannedQuantity, ...product} = skuArr[0]
           if (product.sku) {
             poProductUpdates.push({
               updateOne: {
                 filter: { skuCompany: currentSku, poRef },
                 update: {
                   ...product,
-                  $inc: { quantity: parseInt(skuSum), ...scannedSkuSum && { scannedQuantity: parseInt(scannedSkuSum) } },
+                  //if scannedSkuSum is not undefined update scannedQuanty otherwise update quantity
+                  $inc: { ...scannedSkuSum ? { scannedQuantity: parseInt(scannedSkuSum) } : {quantity: parseInt(skuSum)} },
                   $setOnInsert: {
                     createdOn: new Date(),
-                    scannedQuantity: 0
+                    //if there is no scannedSkuSum set scannedQuantity to 0 on insert
+                    ...!scannedSkuSum && {scannedQuantity: 0},
                   }
                 },
                 upsert: true
@@ -87,10 +90,14 @@ const upsertPurchaseOrders = (config) => {
                   ...product.barcode && { barcodeCompany: product.barcode + "-" + company },
                   skuCompany: currentSku,
                   $setOnInsert: { createdOn: new Date(), quantityToShip: 0, ...!product.barcode && { barcodeCompany: product.sku + "-" + company } },
-                  $inc: product.type === 'outbound' ?
-                    { quantity: parseInt(-skuSum) }
-                    :
-                    { quantity: parseInt(skuSum) }
+                  //if we are not updating scanned Quanatity and scannedSkuSum is undefined
+                  ...scannedSkuSum === undefined &&
+                  {
+                    $inc: product.type === 'outbound' ?
+                      { quantity: parseInt(-skuSum) }
+                      :
+                      { quantity: parseInt(skuSum) }
+                  }
                 },
                 upsert: true,
               }
@@ -98,7 +105,7 @@ const upsertPurchaseOrders = (config) => {
           }
         }
       }
-      let updatedPOs = await db.PurchaseOrder.bulkWrite(poUpdates)
+      let updatedPOs = poUpdates.length > 0 && await db.PurchaseOrder.bulkWrite(poUpdates)
       let updatedPoProducts = poProductUpdates.length > 0 && await db.PoProduct.bulkWrite(poProductUpdates)
       let updatedProducts = productUpdates.length > 0 && await db.Product.bulkWrite(productUpdates)
       if (updatedPoProducts.nUpserted > 0) {
@@ -378,3 +385,5 @@ exports.removePurchaseOrder = async (req, res, next) => {
     return next(err)
   }
 }
+
+exports.upsertPurchaseOrders = upsertPurchaseOrders

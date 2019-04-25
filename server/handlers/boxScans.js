@@ -4,11 +4,11 @@ const { upsertPurchaseOrders } = require('./purchaseOrders')
 
 const boxImportHeaders = [
   { value: 'sku', required: true },
-  { value: 'name', required: true },
+  { value: 'box name', required: true },
   { value: 'locations'},
   { value: 'barcode' },
   { value: 'quantity', required: true },
-  { value: 'scannedQuantity' },
+  { value: 'scan from', type: 'controlled', validValues: ['yes']},
   { value: 'prefix' },
 ];
 const boxValidInputs = [
@@ -17,7 +17,6 @@ const boxValidInputs = [
   { value: 'locations', type: 'array' },
   { value: 'barcode', },
   { value: 'quantity', required: true, type: 'number' },
-  { value: 'scannedQuantity', type: 'number' },
   { value: 'prefix' },
 ];
 
@@ -539,21 +538,24 @@ exports.handleBoxUpdates = async (req, res, next) => {
 
 exports.importBoxScans = async (req, res, next) => {
   try {
-    if (req.body.json.length > 7000) {
+    if (req.body.data.length > 7000) {
       return next({
         status: 404,
         message: ['Request to large'],
       })
     }
-    let data = req.body.json.map(row => {
+    let data = req.body.data.map(row => {
       const inputs = { sku, name, quantity, locations, barcode, prefix } = row
       return({
         ...inputs,
-        //if scan from value in row is truthy
-        ...row['scan from'] ? {scannedQuantity: quantity, scanToPo: false} : {scanToPo: true},
-        ...row['po name'] && {poName: row['po name']},
-        ...row['po type'] && {poType: row['po type']},
-        ...row['po name'] && row['po type'] ? { poRef: req.body.company + "-" + ['po name'] + "-" + row['po type'] } : { poRef: req.body.company +'-genericInbound'},
+        //if scan from value in row is yes use quantity as scannedQuantity and set scanToPo to false
+        ...row['scan from'] === 'yes' ? {scannedQuantity: quantity, scanToPo: false} : {scanToPo: true},
+        //if we got didn't get a po name and po type set to generic inbound
+        ...row['po name'] && row['po type'] ?
+          { poRef: req.body.company + "-" + row['po name'] + "-" + row['po type'], poName: row['po name'], poType: row['po type'] }
+          :
+          { poRef: req.body.company +'-genericInbound', poName: 'Generic Inbound', poType: 'inbound'},
+        name: row['box name'],
         company: req.body.company,
       })
     })
@@ -565,20 +567,19 @@ exports.importBoxScans = async (req, res, next) => {
     let foundPos = await db.PurchaseOrder.find({$and: [{ $or: data.map(row=>({company: row.company, poRef: row.poRef})) }]})
     let foundPoProducts = await db.PoProduct.find({$and: [{ $or: data.map(row=>({company: row.company, poRef: row.poRef, sku: row.sku}))}]})
     let foundProducts = await db.Product.find({$and: [{ $or: data.map(row=>({company: row.company, sku: row.sku}))}]})
-    if (scanFromRows.length > 0) {
-      //upsert the pos
-      let result = await upsertPurchaseOrders({
-        company: req.body.company,
-        data: scanFromRows.map(row=>({
-          name: row.poName,
-          type: row.poType,
-          poRef: row.poRef,
-          sku: row.sku,
-          quantity: row.quantity,
-          ...row.scannedQuantity && {scannedQuantity: row.scannedQuantity}
-        }))
-      })
-    }
+    //upsert the pos
+    let result = await upsertPurchaseOrders({
+      company: req.body.company,
+      data: data.map(row => ({
+        name: row.poName,
+        type: row.poType,
+        poRef: row.poRef,
+        sku: row.sku,
+        quantity: row.quantity,
+        ...row.scannedQuantity && { scannedQuantity: row.scannedQuantity }
+      }))
+    })
+    return res.status(200).json({ ...result });
   } catch(err){
     return next(err)
   }
