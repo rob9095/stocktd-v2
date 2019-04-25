@@ -536,6 +536,74 @@ exports.handleBoxUpdates = async (req, res, next) => {
   }
 }
 
+const bulkUpsertBoxScans = (config) => {
+  let { data, company, user } = config
+  return new Promise(async (resolve,reject) =>{
+    try {
+      //get existing values
+      let purchaseOrders = await db.PurchaseOrder.find({ $and: [{ $or: data.map(row => ({ company: row.company, poRef: row.poRef })) }] })
+      let poProducts = await db.PoProduct.find({ $and: [{ $or: data.map(row => ({ company: row.company, poRef: row.poRef, sku: row.sku })) }] })
+      let products = await db.Product.find({ $and: [{ $or: data.map(row => ({ company: row.company, sku: row.sku })) }] })
+      //get the first user's prefix for now
+      let [prefix, ...others] = await db.BoxPrefix.find(({user: user}))
+      let boxUpserts = data.map(box => {
+        let po = purchaseOrders.find(po => po.poRef === box.poRef)
+        let poProduct = poProducts.find(p => p.poRef === box.poRef && p.sku === box.sku)
+        let product = products.find(p => p.sku === box.sku)
+        if (!po || !poProduct || !product) {
+          return({updateOne: false, data: { po, poProduct, product}})
+        }
+        return({
+          updateOne: {
+            filter: {
+              name: { $regex: new RegExp(["^", box.name, "$"].join(""), "i") },
+              company,
+              product: product._id,
+              po: po._id,
+            },
+            update: {
+              $inc: {quantity: parseInt(box.quantity)},
+              $setOnInsert: {
+                name: box.name,
+                sku: product.sku,
+                skuCompany: product.skuCompany,
+                company,
+                scanToPo: box.scanToPo,
+                poRef: po.poRef,
+                po: po._id,
+                poProduct: poProduct._id,
+                product: product._id,
+                user,
+                prefix: box.prefix || prefix.name,
+                createdOn: new Date(),
+              }
+            },
+            upsert: true,
+          }
+        })
+      })
+      //get first value from missing data array
+      let missing = boxUpserts.filter(u => u.updateOne === false)
+      if (missing.length > 0){
+        reject({
+          missing: missing.map(m=>m.data),
+          message: 'Import Failed: Missing purchase order or product data, please try again.',
+        })
+        return
+      }
+      let upsertedBoxScans = boxUpserts.length > 0 && await db.BoxScan.bulkWrite(boxUpserts)
+      resolve({
+        upsertedBoxScans,
+      })
+    } catch(err) {
+      reject({
+        ...err,
+        message: err.toString()
+      })
+    }
+  })
+}
+
 exports.importBoxScans = async (req, res, next) => {
   try {
     if (req.body.data.length > 7000) {
@@ -563,12 +631,8 @@ exports.importBoxScans = async (req, res, next) => {
     let scanFromRows = data.filter(row => row.scanToPo === false)
     //validate inputs will go here
 
-    //get existing values
-    let foundPos = await db.PurchaseOrder.find({$and: [{ $or: data.map(row=>({company: row.company, poRef: row.poRef})) }]})
-    let foundPoProducts = await db.PoProduct.find({$and: [{ $or: data.map(row=>({company: row.company, poRef: row.poRef, sku: row.sku}))}]})
-    let foundProducts = await db.Product.find({$and: [{ $or: data.map(row=>({company: row.company, sku: row.sku}))}]})
-    //upsert the pos
-    let result = await upsertPurchaseOrders({
+    //upsert the pos, also upserts poProducts & products
+    let poResult = await upsertPurchaseOrders({
       company: req.body.company,
       data: data.map(row => ({
         name: row.poName,
@@ -579,7 +643,14 @@ exports.importBoxScans = async (req, res, next) => {
         ...row.scannedQuantity && { scannedQuantity: row.scannedQuantity }
       }))
     })
-    return res.status(200).json({ ...result });
+
+    //upsert the boxScans
+    let boxScanResult = await bulkUpsertBoxScans({
+      data,
+      company: req.body.company,
+      user: req.body.user,
+    })
+    return res.status(200).json({ ...poResult, ...boxScanResult });
   } catch(err){
     return next(err)
   }

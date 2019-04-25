@@ -89,9 +89,15 @@ const upsertPurchaseOrders = (config) => {
                   sku: product.sku,
                   ...product.barcode && { barcodeCompany: product.barcode + "-" + company },
                   skuCompany: currentSku,
-                  $setOnInsert: { createdOn: new Date(), quantityToShip: 0, ...!product.barcode && { barcodeCompany: product.sku + "-" + company } },
-                  //if we are not updating scanned Quanatity and scannedSkuSum is undefined
-                  ...scannedSkuSum === undefined &&
+                  $setOnInsert: {
+                    createdOn: new Date(),
+                    quantityToShip: 0,
+                    ...!product.barcode && { barcodeCompany: product.sku + "-" + company },
+                    //if we are inserting and scannedSkuSum is not undefined, we need to set an initial qty value
+                    ...scannedSkuSum && { quantity: product.type === 'outbound' ? parseInt(-skuSum) : parseInt(skuSum)}
+                  },
+                  //if scannedSkuSum is undefined we are just updating scannedQuanatity on poProduct so no need ot update quantity
+                  ...!scannedSkuSum &&
                   {
                     $inc: product.type === 'outbound' ?
                       { quantity: parseInt(-skuSum) }
