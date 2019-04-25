@@ -70,12 +70,12 @@ const upsertPurchaseOrders = (config) => {
                 filter: { skuCompany: currentSku, poRef },
                 update: {
                   ...product,
-                  //if scannedSkuSum is not undefined update scannedQuanty otherwise update quantity
+                  //if scannedSkuSum is defined update scannedQuantity otherwise update quantity
                   $inc: { ...scannedSkuSum ? { scannedQuantity: parseInt(scannedSkuSum) } : {quantity: parseInt(skuSum)} },
                   $setOnInsert: {
                     createdOn: new Date(),
-                    //if there is no scannedSkuSum set scannedQuantity to 0 on insert
-                    ...!scannedSkuSum && {scannedQuantity: 0},
+                    //if there is no scannedSkuSum set scannedQuantity to the 0 on insert otherwise set quantity to skuSum
+                    ...!scannedSkuSum ? { scannedQuantity: 0 } : { quantity: parseInt(skuSum)},
                   }
                 },
                 upsert: true

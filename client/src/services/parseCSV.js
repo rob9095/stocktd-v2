@@ -21,7 +21,7 @@ export const validateInputs = (json, validInputs) => {
             }
             // check numbers for NaNs
             if (input.type === 'number') {
-              if (!Number.isInteger(parseInt(line[input.value])) && line[input.value] !== undefined) {
+              if (!Number.isInteger(parseInt(line[input.value])) && line[input.value]) {
                 errorList.push(`Invalid Number: "${line[input.value]}" on line ${c + 1} is not a valid number`)
                 reject({
                   errorType: 'error',
