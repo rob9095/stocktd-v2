@@ -65,34 +65,35 @@ class NavbarMobile extends Component {
   render() {
     return(
       <span>
+        {this.state.drawerOpen && (
+          <RightDrawer
+            onClose={this.toggleDrawer}
+          />
+        )}
         <Header className="stkd-navbar">
-          <Row className={this.state.collapsed ? 'dash-menu-container-mobile' : 'dash-menu-container-mobile open'}>
-            {this.state.drawerOpen && (
-              <RightDrawer
-                onClose={this.toggleDrawer}
-              />
-            )}
-            <Col span={8}>
+          <div className="dash-menu-container-mobile">
+            <div>
               <Icon
                 className="sidebar-trigger"
-                type={this.state.collapsed ? 'double-right' : 'double-left'}
+                type={'menu'}
                 onClick={this.toggle}
               />
-            </Col>
-            <Col span={8} className="center-a">
+            </div>
+            <div>
               logo
-            </Col>
-            <Col span={8} className="right-a">
+            </div>
+            <div>
               <span className="icon-nav primary-hover">
-                <MenuIcon
+                <Icon
                   onClick={this.toggleDrawer}
+                  type="menu"
                 />
               </span>
               <span className="icon-nav primary-hover">
                 <Icon onClick={this.toggleShowMore} type="ellipsis" className="rotate-90" />
               </span>
-            </Col>
-          </Row>
+            </div>
+          </div>
         </Header>
         {this.state.showMore && (
           <Row className="mobile show-more center-a">

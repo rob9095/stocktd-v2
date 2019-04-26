@@ -276,13 +276,7 @@ i.xl svg {
   flex-shrink: 0;
 }
 
-#app-sidebar .top {
-    flex-shink: 0;
-}
-
 #app-content .top {
-  flex-shrink: 0;
-  display: inline-flex;
 	height: 70px;
 }
 
@@ -479,6 +473,7 @@ input.ant-input.no-border {
   z-index: 1000;
   width: 100%;
   display: flex;
+  min-width: 320px;
 }
 
 .ant-menu-submenu-popup {
@@ -544,24 +539,17 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
 
 /* Navbar -- mobile only styles */
 
-.ant-row.dash-menu-container-mobile {
+.dash-menu-container-mobile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
-}
-
-@media screen and (min-width: 550px) {
-  .dash-menu-container-mobile.open div {
-    width: calc(33% - 85px);
-  }
-  .ant-col-24.slider-open {
-      width: calc(100% - 265px);
-  }
 }
 
 .mobile.show-more {
   padding: 0px 24px;
   height: 37px;
   background: white;
-  margin-top: 56px;
   z-index: 1000;
   position: fixed;
   width: 100%;
