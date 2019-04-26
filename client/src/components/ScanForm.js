@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Alert, Form, Row, Col, Input, Button, Select, Skeleton, Spin, Modal, Table } from 'antd';
+import { Alert, Form, Row, Col, Input, Button, Select, Skeleton, Spin, Modal, Table, Radio, Icon, Tooltip } from 'antd';
 import { getAllModelDocuments, upsertModelDocuments } from '../store/actions/models';
 import InsertDataModal from './InsertDataModal';
 import { connect } from "react-redux";
 import AutoCompleteInput from './AutoCompleteInput';
 
+const RadioGroup = Radio.Group;
 const Option = Select.Option;
 const FormItem = Form.Item;
 
@@ -350,7 +351,7 @@ class ScanForm extends Component {
         <Spin spinning={!this.state.currentPrefix}>
           <Form className="scan-form" onSubmit={this.handleSubmit}>
             <Row gutter={24} style={{ minHeight: 90 }}>
-              <Col s={24} md={12}>
+              <Col s={24} md={9}>
                 <FormItem label="Purchase Order">
                   {getFieldDecorator("currentPOs", {
                     rules: [
@@ -374,7 +375,7 @@ class ScanForm extends Component {
                           </div>
                         </div>
                       )}
-                      mode={this.props.poMode || "default"}
+                      mode={this.props.form.getFieldValue('scanToPo') ? 'default' : 'multiple'}
                       selected={this.props.currentPOs}
                       onUpdate={clicked =>
                         this.handleAutoUpdate(clicked, "currentPOs")
@@ -386,7 +387,7 @@ class ScanForm extends Component {
                   )}
                 </FormItem>
               </Col>
-              <Col s={24} md={12}>
+              <Col s={24} md={9}>
                 <FormItem label="Location">
                   {getFieldDecorator("locations")(
                     <AutoCompleteInput
@@ -400,6 +401,27 @@ class ScanForm extends Component {
                     >
                       <Input style={{ display: "none" }} />
                     </AutoCompleteInput>
+                  )}
+                </FormItem>
+              </Col>
+              <Col s={24} md={6}>
+                <FormItem label="Scan Type" >
+                  {getFieldDecorator("scanToPo", {
+                    initialValue: this.props.scanType || true, rules: [
+                      {
+                        required: true,
+                        message: "Scan type is required"
+                      }
+                    ] })(
+                    <RadioGroup>
+                      <Radio value={true}>Scan to PO</Radio>
+                      <Radio value={false}>Scan from PO</Radio>
+                        <Tooltip overlayStyle={{fontSize: 'small'}} title="What's this?">
+                        <Button size="small" className="no-border">
+                          <Icon type="question-circle" theme="twoTone" twoToneColor="#716aca" />
+                        </Button>
+                      </Tooltip>
+                    </RadioGroup>
                   )}
                 </FormItem>
               </Col>
