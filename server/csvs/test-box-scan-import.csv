@@ -1,6 +1,6 @@
-sku,box name,quantity,po name,po type,scan from
-NEW-SKU,box1,10,first po,inbound,
-RH0135-A-3/4,box3,5,,,
-RH0135-A-2/3,box5,18,second po,outbound,yes
-RH0135-A-1/2,box6,18,second po,outbound,yes
-brandnewSKU,box4,10,second po,outbound,
+sku,box name,quantity,po name,po type,scan from,locations
+NEW-SKU,box1,10,first po,inbound,,"a1,a2,a3"
+RH0135-A-3/4,box3,5,,,,a1
+RH0135-A-2/3,box5,18,second po,outbound,yes,
+RH0135-A-1/2,box6,18,second po,outbound,yes,"d3,a1"
+brandnewSKU,box4,10,second po,outbound,,

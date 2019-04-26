@@ -47,7 +47,7 @@ class ScanTable extends Component {
         resolve(res)
       })
       .catch(err => {
-        resolve(err)
+        reject(err)
       })
     })
   }

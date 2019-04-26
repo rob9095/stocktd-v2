@@ -546,6 +546,11 @@ const bulkUpsertBoxScans = (config) => {
       let products = await db.Product.find({ $and: [{ $or: data.map(row => ({ company: row.company, sku: row.sku })) }] })
       //get the first user's prefix for now
       let [prefix, ...others] = await db.BoxPrefix.find(({user: user}))
+      //upsert the locations with unique set
+      let locations = Array.from(new Set(data.filter(row => row.locations).map(row => row.locations.split(',')).reduce((acc, val) => acc.concat(val), [])))
+      if (locations.length > 0) {
+        locations = await upsertScanLocation({ locations, company, filterRef: 'name' })
+      }
       let boxUpserts = data.map(box => {
         let po = purchaseOrders.find(po => po.poRef === box.poRef)
         let poProduct = poProducts.find(p => p.poRef === box.poRef && p.sku === box.sku)
@@ -553,6 +558,8 @@ const bulkUpsertBoxScans = (config) => {
         if (!po || !poProduct || !product) {
           return({updateOne: false, data: { po, poProduct, product}})
         }
+        let rowLocations = box.locations.split(',')
+        let foundLocations = locations.filter(l=>rowLocations.includes(l.name))
         return({
           updateOne: {
             filter: {
@@ -562,6 +569,7 @@ const bulkUpsertBoxScans = (config) => {
               po: po._id,
             },
             update: {
+              ...foundLocations.length > 0 && { locations: foundLocations.map(l=>l._id) },
               $inc: {quantity: parseInt(box.quantity)},
               $setOnInsert: {
                 name: box.name,
@@ -627,8 +635,6 @@ exports.importBoxScans = async (req, res, next) => {
         company: req.body.company,
       })
     })
-    let scanToRows = data.filter(row => row.scanToPo === true)
-    let scanFromRows = data.filter(row => row.scanToPo === false)
     //validate inputs will go here
 
     //upsert the pos, also upserts poProducts & products
