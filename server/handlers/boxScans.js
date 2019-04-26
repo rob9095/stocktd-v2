@@ -109,21 +109,26 @@ const scanToPO = (boxScan,scanQty) => {
         $inc: { quantity: scanQty },
       }, { upsert: true });
       let poId = updatedPo.upserted ? updatedPo.upserted[0]._id : foundPo._id
-      let foundBoxScan = await db.BoxScan.findOne({ skuCompany: boxScan.skuCompany, name: boxScan.name, po: poId })
-      if (foundBoxScan) {
-        foundBoxScan.quantity += scanQty
-        foundBoxScan.lastScan = new Date()
-        foundBoxScan.save()
-        updatedBoxScan = foundBoxScan
-      } else {
-        updatedBoxScan = await db.BoxScan.create({
-          ...boxScan,
-          poRef: foundPo.poRef,
-          po: poId,
-          createdOn: new Date(),
-          poProduct: updatedPoProduct._id
-        })
-      }
+      delete boxScan.quantity
+      await db.BoxScan.update({
+        skuCompany: { $regex: new RegExp(["^", boxScan.skuCompany, "$"].join(""), "i") },
+        name: { $regex: new RegExp(["^", boxScan.name, "$"].join(""), "i") },
+        po: poId
+      },
+        {
+          lastScan: new Date(),
+          $setOnInsert: {
+            ...boxScan,
+          },
+          $inc: { quantity: scanQty },
+        },
+        { upsert: true }
+      );
+      updatedBoxScan = await db.BoxScan.findOne({
+        skuCompany: { $regex: new RegExp(["^", boxScan.skuCompany, "$"].join(""), "i") },
+        name: { $regex: new RegExp(["^", boxScan.name, "$"].join(""), "i") },
+        po: poId
+      })
       resolve({
         updatedPoProduct,
         updatedProduct,
@@ -202,18 +207,28 @@ const scanFromPO = (scan, scanQty, product) => {
             poRef: po.poRef,
             po: po._id,
             createdOn: new Date(),
-            scanToPo: false,
             poProduct: updatedPoProduct._id,
           }
-          let foundBoxScan = await db.BoxScan.findOne({ skuCompany: boxScan.skuCompany, name: boxScan.name, po: po._id })
-          if (foundBoxScan) {
-            foundBoxScan.quantity += scanQty
-            foundBoxScan.lastScan = new Date()
-            foundBoxScan.save()
-            updatedBoxScan = foundBoxScan
-          } else {
-            updatedBoxScan = await db.BoxScan.create(boxScan)
-          }
+          delete boxScan.quantity
+          await db.BoxScan.update({
+              skuCompany: { $regex: new RegExp(["^", boxScan.skuCompany, "$"].join(""), "i") },
+              name: { $regex: new RegExp(["^", boxScan.name, "$"].join(""), "i") },
+              po: po._id
+            },
+            {
+              lastScan: new Date(),
+              $setOnInsert: {
+                ...boxScan,
+              },
+              $inc: { quantity: scanQty },
+            },
+            { upsert: true }
+            );
+          updatedBoxScan = await db.BoxScan.findOne({
+            skuCompany: { $regex: new RegExp(["^", boxScan.skuCompany, "$"].join(""), "i") },
+            name: { $regex: new RegExp(["^", boxScan.name, "$"].join(""), "i") },
+            po: po._id
+          })
           break;
         }
         poIndex++
@@ -476,7 +491,6 @@ exports.upsertBoxScan = async (req, res, next) => {
       skuCompany: product.skuCompany,
       sku: product.sku,
       company: req.body.company,
-      lastScan: new Date(),
       product: product._id,
     }
     const scanQty = parseInt(req.body.scan.quantity);
