@@ -514,6 +514,7 @@ class PoProductTable extends Component {
               onScan={this.handleScan}
               onCurrentPOUpdate={this.handleCurrentPOUpdate}
               onAddQuantity={this.handleRowEdit}
+              scanToPo={false}
             />
           </div>
           <div style={{padding: '0px 0px 10px'}}>

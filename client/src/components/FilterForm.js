@@ -183,6 +183,7 @@ class FilterForm extends Component {
             onScan={this.handleScan}
             onCurrentPOUpdate={this.props.onCurrentPOUpdate}
             onAddQuantity={this.props.onAddQuantity}
+            scanToPo={this.props.scanToPo}
           />
         )}
       </div>

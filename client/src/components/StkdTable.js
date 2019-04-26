@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { fetchAllProducts, updateProducts, importProducts } from '../store/actions/products';
 import { queryModelData, deleteModelDocuments } from '../store/actions/models';
 import { upsertModelDocuments } from '../store/actions/models';
+import { addBoxScan } from '../store/actions/boxScans';
 import { Button, Pagination, Divider, Icon, Spin, Form, Dropdown, Menu, Modal, message, Row, Col, Skeleton, Input } from 'antd';
 import WrappedFilterForm from './FilterForm';
 import EditItemDrawer from './EditItemDrawer';
@@ -396,6 +397,27 @@ class ProductTable extends Component {
       this.handleDataFetch({ rowIds: [data.rowId] });
     }
 
+    handleScan = (scan) => {
+      this.setState({
+        loading: true,        
+      })
+      return new Promise( async (resolve, reject) => {
+        scan = {
+          ...scan,
+          user: this.props.currentUser.user.id,
+        }
+        await this.props.addBoxScan(scan, this.props.currentUser.user.company)
+        .then(res => {
+          this.handleDataFetch()
+          resolve(res)
+        })
+        .catch(err => {
+          this.setState({loading: false})
+          reject(err);
+        })
+      })
+    }
+
     render() {
       let drawerItem = this.state.data.find(item=>item._id === this.state.drawerItem) || {}
       const bulkMenu = this.props.bulkMenuOptions && (
@@ -542,6 +564,9 @@ class ProductTable extends Component {
           <WrappedFilterForm
             inputs={this.props.headers.filter(h=>h.noSort !== true)}
             onFilterSearch={this.handleFilterSearch}
+            currentPOs={this.state.currentPOs}
+            showScannerForm={this.props.showScannerForm}
+            onScan={this.handleScan}
           />
           {drawerItem._id && (
             <EditItemDrawer
@@ -655,4 +680,4 @@ class ProductTable extends Component {
    };
   }
 
-  export default connect(mapStateToProps, {fetchAllProducts, updateProducts, importProducts, queryModelData, deleteModelDocuments})(ProductTable);
+  export default connect(mapStateToProps, {fetchAllProducts, updateProducts, importProducts, queryModelData, deleteModelDocuments, addBoxScan})(ProductTable);

@@ -411,7 +411,7 @@ class ScanForm extends Component {
               <Col s={24} md={6}>
                 <FormItem label="Scan Type" >
                   {getFieldDecorator("scanToPo", {
-                    initialValue: this.props.scanType || true, rules: [
+                    initialValue: this.props.scanToPo === false  ? false : true, rules: [
                       {
                         required: true,
                         message: "Scan type is required"

@@ -60,6 +60,7 @@ class ScanTable extends Component {
         title="Scans"
         onRowEditSave={this.handleRowEditSave}
         onImport={this.handleImport}
+        showScannerForm
         importHeaders={[
           { value: 'sku', required: true },
           { value: 'box name', required: true },
