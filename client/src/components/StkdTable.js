@@ -65,6 +65,13 @@ class ProductTable extends Component {
     await this.setState({
       ...rowId ? { loadingRows: [...rowIds] } : {loading: true}
     })
+    //if the table is empty add some empty rows
+    if (this.state.data.length === 0) {
+      let data = [1, 2, 3, 4, 5].map(n => ({ ...this.props.headers.map(h => ({ [h.id]: '' })), _id: n, }))
+      this.setState({
+        data,
+      })
+    }
     console.log({loadingRows: this.state.loadingRows, loading: this.state.loading})
     requestedPage = requestedPage || this.state.activePage;
     requestedRowsPerPage = requestedRowsPerPage || this.state.rowsPerPage;
