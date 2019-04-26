@@ -92,8 +92,8 @@ class ScanForm extends Component {
     })
   }
 
-  showErrorModal = (config) => {
-    let { title, action, list, buttons, okText, okType, maskClosable, error } = config
+  showInfoModal = (config) => {
+    let { title, action, list, buttons, message, okText, okType, maskClosable, error } = config
     return new Promise((resolve,reject) => {
       error = error || {}
       list = Array.isArray(list) && list.map((str, i) => <li key={i}>{str}</li>)
@@ -102,10 +102,13 @@ class ScanForm extends Component {
       let sku = error.poProduct ? error.poProduct.sku : error.product && error.product.sku
       let po = error.po || {}
       this.setState({
-        errorModalConfig: {
+        infoModalConfig: {
           title: title || "Scan Error",
           content: (
             <div>
+              <div>
+                {message}
+              </div>
               <ul>{list}</ul>
               <div className="flex space-evenly align-items-center" style={{padding: 5}}>
                 {buttons}
@@ -154,7 +157,7 @@ class ScanForm extends Component {
             </div>
           ),
           footer: null,
-          onCancel: ()=>this.setState({errorModalConfig: null}),
+          onCancel: ()=>this.setState({infoModalConfig: null}),
           maskClosable: maskClosable || false
         }
       });
@@ -218,31 +221,31 @@ class ScanForm extends Component {
         this.setState({showBarcodeModal: true})
         break
       case 'Scanned Quantity exceeds PO Product Quantity':
-        let result = await this.showErrorModal({
+        let result = await this.showInfoModal({
           list: error.message,
           buttons: error.options.map(text=>({text, size: "small",})) || [],
           error,
         })
-        this.setState({ errorModalConfig: null })
+        this.setState({ infoModalConfig: null })
         console.log(result)
         this.handleErrorOption(result,error)
         break
       case 'Product not found on provided POs':
-        result = await this.showErrorModal({
+        result = await this.showInfoModal({
           list: error.message,
           buttons: error.options.map(text => ({ text, size: "small", })) || [],
           error,
         })
-        this.setState({ errorModalConfig: null })
+        this.setState({ infoModalConfig: null })
         console.log(result)
         this.handleErrorOption(result,error);
         break
       default:
         console.log({error: 'unknown error', error})
-        await this.showErrorModal({
+        await this.showInfoModal({
           list: ['Error scanning, please try again'],
         })
-        this.setState({errorModalConfig: null})
+        this.setState({infoModalConfig: null})
     }
 
     setTimeout(() => {
@@ -278,6 +281,7 @@ class ScanForm extends Component {
   }
 
   render() {
+    let showScanFromMore = false
     const { getFieldDecorator } = this.props.form;
     let preFixOptions = this.state.boxPrefixList.map(pf => (
       <Option value={pf.value} key={pf.id}>{pf.value}</Option>
@@ -309,11 +313,11 @@ class ScanForm extends Component {
           />
         )}
         <Modal
-          visible={this.state.errorModalConfig ? true : false}
-          {...this.state.errorModalConfig}
+          visible={this.state.infoModalConfig ? true : false}
+          {...this.state.infoModalConfig}
         >
-          {this.state.errorModalConfig &&
-            this.state.errorModalConfig.content}
+          {this.state.infoModalConfig &&
+            this.state.infoModalConfig.content}
         </Modal>
         {this.state.showBarcodeModal && (
           <InsertDataModal
@@ -356,7 +360,7 @@ class ScanForm extends Component {
                   {getFieldDecorator("currentPOs", {
                     rules: [
                       {
-                        required: this.props.requirePO,
+                        required: this.props.form.getFieldValue('scanToPo') ? false : true,
                         message: "Purchase Order Required"
                       }
                     ]
@@ -417,7 +421,27 @@ class ScanForm extends Component {
                       <Radio value={true}>Scan to PO</Radio>
                       <Radio value={false}>Scan from PO</Radio>
                         <Tooltip overlayStyle={{fontSize: 'small'}} title="What's this?">
-                        <Button size="small" className="no-border">
+                        <Button size="small" className="no-border" onClick={()=>this.showInfoModal({
+                          title: 'Scan Types Explained',
+                          message: (
+                            <div>
+                              <h4>Scan From PO</h4>
+                              <ul>
+                                <li>Scanning from a purchase order <strong>does not affect current inventory levels</strong> and is used to audit inbound and outbound purchase orders.</li>
+                                <li>After a successful scan, the box information is saved and the scanned quantity for the product is updated on the purchase order.</li>
+                                <li>You can scan from multiple purchase orders but at least one purchase order is required to scan from.</li>
+                                <li>If the same product is on multiple purchase orders, the scanner will scan from the purchase order with the largest quantity first.</li>
+                              </ul>
+                              <h4>Scan To PO</h4>
+                              <ul>
+                                <li>Scanning to a purchase order <strong>does affect current inventory levels</strong> and is used for adding inventory and products to purchase orders.</li>
+                                <li>After a successful scan, the box information is saved, the quantity for the product is updated on the purchase order, and the inventory level is updated on the product.</li>
+                                <li>You can only scan to one purchase order at a time and you are not required to choose a purchase order to scan to.</li>
+                                <li>If no purchase order is selected, the scanned inventory and products are added to a generic inbound purchase order.</li>
+                              </ul>
+                            </div>
+                          )
+                        }).then(()=>this.setState({infoModalConfig: null}))}>
                           <Icon type="question-circle" theme="twoTone" twoToneColor="#716aca" />
                         </Button>
                       </Tooltip>
