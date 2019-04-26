@@ -60,6 +60,12 @@ class ProductTable extends Component {
 
   toggle = (key) => this.setState({[key]: !this.state[key]})
 
+  componentDidUpdate(prevProps) {
+    if (this.props.filters[0] !== prevProps.filters[0]) {
+      this.handleDataFetch()
+    }
+  }
+
   handleDataFetch = async (config) => {
     let { requestedPage, requestedRowsPerPage, rowIds } = config || {}
     let rowId = Array.isArray(rowIds) ? rowIds[0] : null
@@ -86,7 +92,8 @@ class ProductTable extends Component {
         return({...pC})
       }
     })
-    await this.props.queryModelData(this.props.queryModel,this.state.query,this.state.column, this.state.direction, requestedPage, requestedRowsPerPage,this.props.currentUser.user.company,populateArray)
+    let query = this.props.filters ? [...this.state.query, ...this.props.filters] : this.state.query
+    await this.props.queryModelData(this.props.queryModel,query,this.state.column, this.state.direction, requestedPage, requestedRowsPerPage,this.props.currentUser.user.company,populateArray)
     .then(({data, activePage, totalPages, rowsPerPage, skip})=>{
       this.setState({
         skip,
@@ -566,6 +573,7 @@ class ProductTable extends Component {
             onFilterSearch={this.handleFilterSearch}
             currentPOs={this.state.currentPOs}
             showScannerForm={this.props.showScannerForm}
+            scanToPo={this.props.filters.find(f => f[0] === 'scanToPo') && this.props.filters.find(f => f[0] === 'scanToPo')[1]}
             onScan={this.handleScan}
           />
           {drawerItem._id && (
