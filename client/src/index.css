@@ -138,6 +138,10 @@ body #root {
   box-shadow: none !important;
 }
 
+.no-bg {
+  background: transparent !important;
+}
+
 a.no-hover {
   color: #716aca !important;
 }

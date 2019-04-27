@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import StkdTable from './StkdTable';
 import { connect } from "react-redux";
-import { Radio } from 'antd'
+import { Radio, Tooltip, Icon, Button } from 'antd'
 import * as scanHandlers from "../store/actions/boxScans";
 
 
@@ -68,11 +68,16 @@ class ScanTable extends Component {
       <div>
         <div>
           <h1>Scans</h1>
-          <Radio.Group defaultValue={true} size="small" onChange={(e)=>this.updateFilters('scanToPo',e.target.value,'=')}>
+          <Radio.Group buttonStyle="solid" style={{fontSize: 'small'}} defaultValue={true} size="small" onChange={(e)=>this.updateFilters('scanToPo',e.target.value,'=')}>
             <Radio.Button value={true}>Scan To</Radio.Button>
             <Radio.Button value={false}>Scan From</Radio.Button>
             <Radio.Button value="">Both</Radio.Button>
           </Radio.Group>
+                      <Tooltip overlayStyle={{ fontSize: 'small' }} title="What's this?">
+              <Button size="small" className="no-border no-bg" onClick={() => console.log('clicked')}>
+                <Icon type="question-circle" theme="twoTone" twoToneColor="#716aca" />
+              </Button>
+            </Tooltip>
         </div>
         <StkdTable
           queryModel="BoxScan"

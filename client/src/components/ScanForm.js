@@ -421,7 +421,7 @@ class ScanForm extends Component {
                       <Radio value={true}>Scan to PO</Radio>
                       <Radio value={false}>Scan from PO</Radio>
                         <Tooltip overlayStyle={{fontSize: 'small'}} title="What's this?">
-                        <Button size="small" className="no-border" onClick={()=>this.showInfoModal({
+                        <Button size="small" className="no-border no-bg" onClick={()=>this.showInfoModal({
                           title: 'Scan Types Explained',
                           message: (
                             <div>
