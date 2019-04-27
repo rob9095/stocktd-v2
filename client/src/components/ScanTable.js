@@ -66,18 +66,20 @@ class ScanTable extends Component {
   render() {
     return(
       <div>
-        <div>
-          <h1>Scans</h1>
-          <Radio.Group buttonStyle="solid" style={{fontSize: 'small'}} defaultValue={true} size="small" onChange={(e)=>this.updateFilters('scanToPo',e.target.value,'=')}>
-            <Radio.Button value={true}>Scan To</Radio.Button>
-            <Radio.Button value={false}>Scan From</Radio.Button>
-            <Radio.Button value="">Both</Radio.Button>
-          </Radio.Group>
-                      <Tooltip overlayStyle={{ fontSize: 'small' }} title="What's this?">
+        <div className="flex align-items-center space-between">
+          <h1 style={{display: 'inline', margin: 0}}>Scans</h1>
+          <div>
+            <Radio.Group buttonStyle="solid" style={{ fontSize: 'small' }} defaultValue={true} size="small" onChange={(e) => this.updateFilters('scanToPo', e.target.value, '=')}>
+              <Radio.Button value={true}>Scan To</Radio.Button>
+              <Radio.Button value={false}>Scan From</Radio.Button>
+              <Radio.Button value="">Both</Radio.Button>
+            </Radio.Group>
+            <Tooltip overlayStyle={{ fontSize: 'small' }} title="What's this?">
               <Button size="small" className="no-border no-bg" onClick={() => console.log('clicked')}>
                 <Icon type="question-circle" theme="twoTone" twoToneColor="#716aca" />
               </Button>
             </Tooltip>
+          </div>
         </div>
         <StkdTable
           queryModel="BoxScan"
