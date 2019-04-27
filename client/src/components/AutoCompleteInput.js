@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { AutoComplete, Select, Avatar, Form, Skeleton } from 'antd';
+import { Select, Empty, Form, Skeleton } from 'antd';
 import { getAllModelDocuments } from '../store/actions/models';
 import { connect } from "react-redux";
 
@@ -104,11 +104,12 @@ class AutoCompleteInputForm extends Component {
       getFieldDecorator("selected", { initialValue: this.props.selected && this.state.selected})(
         <Select
           allowClear
-          style={{ minWidth: 250 }}
+          style={{ minWidth: 200 }}
           showSearch
           showArrow
           placeholder={this.props.placeholder}
-          notFoundContent={this.state.loading ? <Skeleton active loading paragraph={false} /> : this.props.notFound || 'No Results'}
+          notFoundContent={this.state.loading ? <Skeleton active loading paragraph={false} /> : this.props.notFound || <Empty imageStyle={{height: 20}} />}
+          onDropdownVisibleChange={()=>this.state.data.length === 0 && this.handleDataFetch()}
           filterOption={false}
           onSearch={this.handleType}
           onChange={this.handleChange}
