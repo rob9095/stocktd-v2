@@ -45,7 +45,14 @@ const purchaseOrderSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-})
+}, { toJSON: { virtuals: true } })
+
+purchaseOrderSchema.virtual('boxscans', {
+  ref: 'BoxScan', // The model to use
+  localField: '_id', // Find people where `localField`
+  foreignField: 'po', // is equal to `foreignField`
+  options: {} // Query options, see http://bit.ly/mongoose-query-options
+});
 
 const PurchaseOrder = mongoose.model("PurchaseOrder", purchaseOrderSchema);
 

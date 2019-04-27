@@ -58,9 +58,16 @@ const poProductSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   },
-})
+}, { toJSON: { virtuals: true } })
 
 poProductSchema.index({ poRef: 1, company: 1, sku: 1, }, { unique: true });
+
+poProductSchema.virtual('boxscans', {
+  ref: 'BoxScan', // The model to use
+  localField: '_id', // Find people where `localField`
+  foreignField: 'poProduct', // is equal to `foreignField`
+  options: {} // Query options, see http://bit.ly/mongoose-query-options
+});
 
 const PoProduct = mongoose.model("PoProduct", poProductSchema);
 

@@ -58,9 +58,16 @@ const productSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   }
-})
+},{ toJSON: { virtuals: true } })
 
 productSchema.index({ company: 1, sku: 1, }, { unique: true });
+
+productSchema.virtual('boxscans', {
+  ref: 'BoxScan', // The model to use
+  localField: '_id', // Find people where `localField`
+  foreignField: 'product', // is equal to `foreignField`
+  options: {} // Query options, see http://bit.ly/mongoose-query-options
+});
 
 const Product = mongoose.model("Product", productSchema);
 
