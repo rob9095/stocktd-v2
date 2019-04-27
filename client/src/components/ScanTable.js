@@ -119,11 +119,11 @@ class ScanTable extends Component {
           ]}
           headers={[
             { id: 'select-all', text: '', width: 75, noSort: true },
-            { id: 'sku', text: 'SKU', width: 175, span: 8, className: 'no-wrap', disabled: true },
-            { id: 'name', text: 'Box Name', width: 175, span: 8, className: 'no-wrap', required: true },
-            { id: 'prefix', text: 'Box Prefix', width: 175, span: 8, className: 'no-wrap', required: true, },
-            { id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 4, className: 'no-wrap', required: true },
-            { id: 'scanToPo', text: 'Scan Type', width: 175, span: 4, className: 'no-wrap', disabled: true, render: (val)=>(val === true ? 'Scan To' : 'Scan From') },
+            { id: 'sku', text: 'SKU', width: 175, span: 6, className: 'no-wrap', disabled: true },
+            { id: 'name', text: 'Box Name', width: 175, span: 6, className: 'no-wrap', required: true },
+            { id: 'prefix', text: 'Box Prefix', width: 175, span: 6, className: 'no-wrap', required: true, },
+            { id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 6, className: 'no-wrap', required: true },
+            { id: 'scanToPo', text: 'Scan Type', width: 175, span: 6, className: 'no-wrap', disabled: true, render: (val)=>(val === true ? 'Scan To' : 'Scan From'), noFilter: true},
             { id: 'po', nestedKey: 'name', text: 'PO Name', width: 175, span: 8, className: 'no-wrap', disabled: true },
             { id: 'po', nestedKey: 'type', text: 'PO Type', width: 175, span: 8, className: 'no-wrap', disabled: true },
             { id: 'locations', type: 'autoComplete', autoCompleteMode: 'tags', nestedKey: 'name', refModel: 'BoxScan', queryModel: 'Location', text: 'Location', width: 175, span: 8, className: 'no-wrap', },

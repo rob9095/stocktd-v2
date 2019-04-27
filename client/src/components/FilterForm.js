@@ -128,6 +128,20 @@ class FilterForm extends Component {
             </FormItem>
           </Col>
         )
+      } else if (i.type === 'dropdown') {
+        return (
+          <Col xs={i.span * 3} sm={i.span} key={id}>
+            <FormItem label={`${i.text}`}>
+              {getFieldDecorator(id)(
+                <Select key={`${id}Select`} size="large">
+                  {i.values.map(val => (
+                    <Option key={id+val.id+"Select"} value={val.id}>{val.text}</Option>
+                  ))}
+                </Select>
+              )}
+            </FormItem>
+          </Col>
+        )
       } else {
         return (
           <Col xs={i.span*3} md={i.span} key={id}>
@@ -165,14 +179,14 @@ class FilterForm extends Component {
             onSubmit={this.handleSubmit}
           >
             <Row gutter={24}>{inputs}</Row>
-            <Row gutter={24}>
-              <Col span={24} className="center-a" style={{ margin: '20px 10px' }}>
+            <div>
+              <div span={24} className="flex justify-content-center" style={{ margin: '20px 10px' }}>
                 <Button type="primary" htmlType="submit">Search</Button>
                 <Button style={{ marginLeft: 8 }} onClick={this.handleReset}>
                   Clear
                 </Button>
-              </Col>
-            </Row>
+              </div>
+            </div>
           </Form>
         )}
         {this.state.showScannerForm && (
