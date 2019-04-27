@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Alert, Form, Row, Col, Input, Button, Select, Skeleton, Spin, Modal, Table, Radio, Icon, Tooltip } from 'antd';
+import { Alert, Form, Row, Col, Input, Button, Select, Empty, Text, Spin, Modal, Table, Radio, Icon, Tooltip } from 'antd';
 import { getAllModelDocuments, upsertModelDocuments } from '../store/actions/models';
 import InsertDataModal from './InsertDataModal';
 import { connect } from "react-redux";
@@ -385,6 +385,16 @@ class ScanForm extends Component {
                         this.handleAutoUpdate(clicked, "currentPOs")
                       }
                       setFocus={this.state.poFocus || false}
+                      notFound={(
+                        <Empty
+                          imageStyle={{ height: 20 }}
+                          description={(
+                            <span>
+                              <Link to="/app/purchase-orders" style={{fontSize: 'small', opacity: '.8'}}>Add Purchase Order</Link>
+                            </span>
+                          )}
+                        />
+                      )}
                     >
                       <Input style={{ display: "none" }} />
                     </AutoCompleteInput>

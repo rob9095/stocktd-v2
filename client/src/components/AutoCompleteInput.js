@@ -91,6 +91,13 @@ class AutoCompleteInputForm extends Component {
     this.props.onUpdate({ id, data })
   }
 
+  handleVisibleChange = () => {
+    this.setState({
+      loading: true,
+    })
+    this.state.data.length === 0 && this.handleDataFetch()
+  }
+
   render() {
     const { getFieldDecorator } = this.props.form;
     const children = this.state.data.map(item => (
@@ -109,7 +116,7 @@ class AutoCompleteInputForm extends Component {
           showArrow
           placeholder={this.props.placeholder}
           notFoundContent={this.state.loading ? <Skeleton active loading paragraph={false} /> : this.props.notFound || <Empty imageStyle={{height: 20}} />}
-          onDropdownVisibleChange={()=>this.state.data.length === 0 && this.handleDataFetch()}
+          onDropdownVisibleChange={this.handleVisibleChange}
           filterOption={false}
           onSearch={this.handleType}
           onChange={this.handleChange}
