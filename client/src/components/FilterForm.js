@@ -30,8 +30,9 @@ class FilterForm extends Component {
   }
 
   handleSelect = (value, select) => {
+    console.log({value,select})
     this.setState({
-      selects: {[select.props.id]: value},
+      selects: {...this.state.selects, [select.props.id]: value},
     })
   }
 
@@ -52,9 +53,9 @@ class FilterForm extends Component {
       console.log('Received values of form: ', values);
       // fitler out any empty entries
       let query = Object.entries(values).filter(val=>val[1] !== '' && val[1] !== undefined && val[1].length > 0).map(val=>{
-        //check if we have a select for the query value, if we do add it to the element in the query array
-        if(this.props.form[val[0]+"Select"]) {
-          return [...val,this.props.form[val[0]+"Select"]]
+        //check if we have a select for the query value, if we do add it to the third element in the query array
+        if(this.props.inputs.find(i=>i.type === 'number' && i.id === val[0])) {
+          return [...val, this.state.selects[val[0] + "Select"] || "="]
         } else if(Array.isArray(val[1])) {
           return [[val[0]],this.state.dates]
         } else {

@@ -27,8 +27,8 @@ const buildQuery = (queryArr) => {
 					...query,
 					[val[0]]: { $gte: startDate, $lt: endDate }
 				}
-				// numbers, if we get a third array item that isn't 'array' use it as $lte,$gte,$gt,$lt, otherwise use non Regex check
-			} else if (val[2] !== undefined) {
+				// numbers, query array has thrid array element for numbers and we use it as $lte,$gte,$gt,$lt, or strict equal to
+			} else if (val[2]) {
 				query = val[2] === "=" ?
 					{
 						...query,
