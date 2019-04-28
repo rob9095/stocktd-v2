@@ -75,7 +75,18 @@ exports.queryModelData = async (req, res, next) => {
 					...match,
 					company: req.body.company,
 				}
-				console.log({match})
+				if (Array.isArray(popConfig.populate)) {
+					let i = 0
+					for (let nestedPop of popConfig.populate) {
+						let match = nestedPop.query && await buildQuery(nestedPop.query) || {}
+						match = {
+							...match,
+							company: req.body.company,
+						}
+						popConfig.populate[i].match = match
+						i++
+					}
+				}
 				populateArray.push({
 					...popConfig,
 					match,
@@ -101,6 +112,20 @@ exports.queryModelData = async (req, res, next) => {
 			if (Object.keys(popConfig.match).length > 0) {
 				console.log('removing null data for key '+ popConfig.path)
 				data = data.filter(doc => doc[popConfig.path] !== null && doc[popConfig.path].length !== 0)
+			}
+			//check nested populates
+			if (Array.isArray(popConfig.populate)) {
+				for (let nestedPop of popConfig.populate) {
+					delete nestedPop.match.company
+					if (Object.keys(nestedPop.match).length > 0) {
+						console.log('removing nested empty data for key ' + nestedPop.path)
+						data = data.filter(doc => {
+							if (doc[popConfig.path].filter(nestedDoc=>nestedDoc[nestedPop.path] !== null && nestedDoc[nestedPop.path].length !== 0).length > 0){
+								return doc
+							}
+						})
+					}
+				}
 			}
 		}
 		return res.status(200).json({
