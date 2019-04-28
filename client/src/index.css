@@ -824,6 +824,13 @@ i.sort-icon {
   margin: 16px 10px;
 }
 
+/* table pagination select */
+.ant-select-sm.ant-pagination-options-size-changer.ant-select.ant-select-enabled .ant-select-selection {
+  min-height: 24px !important;
+  height: 24px;
+  padding: 1px 7px;
+}
+
 /* Sidebar */
 
 #app-sidebar {

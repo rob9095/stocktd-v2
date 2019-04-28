@@ -543,7 +543,7 @@ class ProductTable extends Component {
         return (
           <td key={`${r._id}-${col.id}-${col.nestedKey || i}`} className={col.className}>
             <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
-              {col.render ? col.render(r[col.id]) : col.nestedKey && r[col.id] ? r[col.id][col.nestedKey] : r[col.id] || 'error'}
+              {col.render ? col.render(r[col.id]) : col.nestedKey && r[col.id] ? r[col.id][col.nestedKey] : r[col.id] || ''}
             </Skeleton>
           </td>
         )

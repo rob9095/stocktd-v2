@@ -6,6 +6,7 @@ import Navbar from './Navbar';
 import NavbarMobile from './NavbarMobile';
 import NotFound from '../components/NotFound';
 import ProductTable from '../components/ProductTable';
+import ProductTableNew from '../components/ProductTableNew';
 import PurchaseOrderTable from '../components/PurchaseOrderTable';
 import PoProductTable from '../components/PoProductTable';
 import ProductTableLegacy from '../components/ProductTableLegacy';
@@ -164,6 +165,9 @@ class Dashboard extends Component {
               )} />
               <Route exact path="/app/products" render={props => (
                 <ProductTable {...props} />
+              )} />
+              <Route exact path="/app/products-new" render={props => (
+                <ProductTableNew {...props} />
               )} />
               <Route exact path="/app/receive-inventory" render={props => (
                 <ReceiveInventory {...props} />

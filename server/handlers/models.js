@@ -86,7 +86,7 @@ const buildPopulateArray = (popArray,company) => {
 exports.queryModelData = async (req, res, next) => {
 	try {
 		// query is a object built from the incoming query array. incoming query array is an array of arrays and structure looks like [['searchKey','searchValue' || searchArr', '=,lte,gte,etc'],[],etc]
-		let query = buildQuery(req.body.query)
+		let query = Array.isArray(req.bodyquery) && req.body.query.length > 0 && buildQuery(req.body.query) || {}
 		query = {
 			...query,
 			company: req.body.company,
@@ -114,7 +114,7 @@ exports.queryModelData = async (req, res, next) => {
 					if (Object.keys(nestedPop.match).length > 0) {
 						console.log('removing nested empty data for key ' + nestedPop.path)
 						data = data.filter(doc => {
-							if (doc[popConfig.path].filter(nestedDoc=>nestedDoc[nestedPop.path] !== null && nestedDoc[nestedPop.path].length !== 0).length > 0){
+							if (Array.isArray(doc[popConfig.path]) && doc[popConfig.path].filter(nestedDoc=>nestedDoc[nestedPop.path] !== null && nestedDoc[nestedPop.path].length !== 0).length > 0){
 								return doc
 							}
 						})

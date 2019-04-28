@@ -10,25 +10,26 @@ exports.processProductImport = async (req, res, next) => {
 				message: ['Request to large']
 			})
 		}
+		let company = req.body.company;
 		let updates = req.body.products.map(p => {
 			if(p.action === 'delete') {
 				return {
 					deleteOne: {
-						filter: { skuCompany: `${p.sku}-${req.body.company}`},
+						filter: { skuCompany: `${p.sku}-${company}`},
 					}
 				}
 			} else {
 				return {
 					updateOne: {
-						filter: { skuCompany: `${p.sku}-${req.body.company}`},
+						filter: { skuCompany: `${p.sku}-${company}`},
 						update: {
 							...p,
-							...p.barcode && { barcodeCompany: p.barcode + "-" + req.body.company },
-							...p.sku && { skuCompany: p.sku + "-" + req.body.company },
-							company: req.body.company
+							...p.barcode && { barcodeCompany: p.barcode + "-" + company },
+							...p.sku && { skuCompany: p.sku + "-" + company },
+							company
 						},
 						upsert: true,
-						$setOnInsert: { createdOn: new Date(), quantityToShip: 0, skuCompany: p.sku +"-"+req.body.company, barcodeCompany: p.barcode || p.sku + "-" + company  },
+						$setOnInsert: { createdOn: new Date(), quantityToShip: 0, skuCompany: p.sku +"-"+company, barcodeCompany: p.barcode || p.sku + "-" + company  },
 					}
 				}
 			}
