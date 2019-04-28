@@ -2,10 +2,10 @@ const db = require('../models');
 
 
 const buildQuery = (queryArr) => {
-	return new Promise((resolve,reject) => {
-		if (!Array.isArray(queryArr) || queryArr.filter(val=>!Array.isArray(val)).length > 0) {
+	try {
+		if (!Array.isArray(queryArr) || queryArr.filter(val => !Array.isArray(val)).length > 0) {
 			console.log(queryArr)
-			reject({message: 'Please provide query with array of arrays'})
+			throw 'Please provide query with array of arrays'
 		}
 		let removeKeys = []
 		let query = {}
@@ -50,8 +50,32 @@ const buildQuery = (queryArr) => {
 		for (let key of removeKeys) {
 			delete query[key]
 		}
-		resolve({...query})
-	})
+		return(query)
+	} catch(err) {
+		throw err.toString()
+	}
+}
+
+const buildPopulateArray = (popArray,company) => {
+	try {
+		return popArray.map(popConfig=> {
+			//create a match with the query if it exists otherwise just add the company
+			let match = popConfig.query && buildQuery(popConfig.query) || {}
+			match = {
+				...match,
+				company
+			}
+			//build the nested populate array if its an array otherwise leave it be
+			let populate = Array.isArray(popConfig.populate) ? buildPopulateArray(popConfig.populate, company) : popConfig.populate
+			return({
+				...popConfig,
+				match,
+				populate
+			})
+		})
+	} catch(err) {
+		throw err.toString()
+	}
 }
 
 /*
@@ -62,44 +86,14 @@ const buildQuery = (queryArr) => {
 exports.queryModelData = async (req, res, next) => {
 	try {
 		// query is a object built from the incoming query array. incoming query array is an array of arrays and structure looks like [['searchKey','searchValue' || searchArr', '=,lte,gte,etc'],[],etc]
-		let query = await buildQuery(req.body.query)
+		let query = buildQuery(req.body.query)
 		query = {
 			...query,
 			company: req.body.company,
 		}
-		let populateArray = []
-		if (Array.isArray(req.body.populateArray) && req.body.populateArray.length > 0) {
-			for (let popConfig of req.body.populateArray) {
-				let match = popConfig.query && await buildQuery(popConfig.query) || {}
-				match = {
-					...match,
-					company: req.body.company,
-				}
-				if (Array.isArray(popConfig.populate)) {
-					let i = 0
-					for (let nestedPop of popConfig.populate) {
-						let match = nestedPop.query && await buildQuery(nestedPop.query) || {}
-						match = {
-							...match,
-							company: req.body.company,
-						}
-						popConfig.populate[i].match = match
-						i++
-					}
-				}
-				populateArray.push({
-					...popConfig,
-					match,
-				})
-			}
-			// populateArray = req.body.populateArray.map(async pC=>{
-			// 	let query = pC.query && await buildQuery(pC.query) || {}
-			// 	return ({
-			// 		...pC,
-			// 		...pC.query && { match: {...query, company: req.body.company} },
-			// 	})
-			// })
-		}
+		let populateArray = Array.isArray(req.body.populateArray) && req.body.populateArray.length > 0
+			? buildPopulateArray(req.body.populateArray, req.body.company)
+			: []
 		console.log({populateArray})
 		let count = await db[req.body.model].count(query)
 		const limit = req.body.rowsPerPage
