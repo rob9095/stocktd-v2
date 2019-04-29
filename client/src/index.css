@@ -257,17 +257,17 @@ i.xl svg {
 }
 
 .app-dashboard {
-    height: 100%;
-    overflow: hidden;
-    margin: 0px;
-    display: flex;
-    box-sizing: border-box;
+  height: 100%;
+  overflow: hidden;
+  margin: 0px;
+  display: flex;
+  box-sizing: border-box;
 }
 
 .app-column {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 

@@ -107,27 +107,31 @@ class AutoCompleteInputForm extends Component {
         : item[this.props.searchKey]}
       </Option>
     ));
+    const id = this.props.key || this.props.placeholder + 'auto-complete'
     return (
-      getFieldDecorator("selected", { initialValue: this.props.selected && this.state.selected})(
-        <Select
-          allowClear
-          style={{ minWidth: 200 }}
-          showSearch
-          showArrow
-          placeholder={this.props.placeholder}
-          notFoundContent={this.state.loading ? <Skeleton active loading paragraph={false} /> : this.props.notFound || <Empty imageStyle={{height: 20}} />}
-          onDropdownVisibleChange={this.handleVisibleChange}
-          filterOption={false}
-          onSearch={this.handleType}
-          onChange={this.handleChange}
-          mode={this.props.mode || "default"}
-          labelInValue
-          ref={node => (this.selectRef = node)}
-          onMouseLeave={(e)=> e.stopPropagation()}
-        >
-          {children}
-        </Select>
-      )
+      <div id={id}>
+        {getFieldDecorator("selected", { initialValue: this.props.selected && this.state.selected })(
+          <Select
+            allowClear
+            style={{ minWidth: 200 }}
+            showSearch
+            showArrow
+            placeholder={this.props.placeholder}
+            notFoundContent={this.state.loading ? <Skeleton active loading paragraph={false} /> : this.props.notFound || <Empty imageStyle={{ height: 20 }} />}
+            onDropdownVisibleChange={this.handleVisibleChange}
+            filterOption={false}
+            onSearch={this.handleType}
+            onChange={this.handleChange}
+            mode={this.props.mode || "default"}
+            labelInValue
+            ref={node => (this.selectRef = node)}
+            onMouseLeave={(e) => e.stopPropagation()}
+            getPopupContainer={() => document.getElementById(id)}
+          >
+            {children}
+          </Select>
+        )}
+      </div>
     );
   }
 }
