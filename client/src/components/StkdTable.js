@@ -383,25 +383,36 @@ class ProductTable extends Component {
     }
 
     handleAutoCompleteUpdate = async (data) => {
-      this.setState({
+      data.handler || data.upsert && this.setState({
         loadingRows: [...this.state.loadingRows, data.rowId]
       })
-      let refUpdates = data.refModel && [{
-        _id: data.rowId,
-        filterRef: '_id',
-        ref: data.colId,
-        refArray: true,
-      }]
-      // clicked.id and clicked.data are not an array when select is empty
-      let update = Array.isArray(data.clicked.id) ? data.clicked.id.map(val => ({ [data.nestedKey]: val.id })) : []
-      await upsertModelDocuments(data.queryModel, update, this.props.currentUser.user.company, data.nestedKey, refUpdates, data.refModel)
-      .then(res => {
-        console.log(res)
-      })
-      .catch(err => {
-        console.log(err)
-      })
-      this.handleDataFetch({ rowIds: [data.rowId] });
+      //use custom handler if provided
+      if (data.handler) {
+        await data.handler(data).then(res=>console.log(res)).catch(err=>console.log(err))
+        this.handleDataFetch({ rowIds: [data.rowId] });
+        return
+      }
+      //upsert if upsert on change is true
+      if (data.upsertOnChange) {
+        //upsert the changes
+        let refUpdates = data.refModel && [{
+          _id: data.rowId,
+          filterRef: '_id',
+          ref: data.colId,
+          refArray: true,
+        }]
+        // clicked.id and clicked.data are not an array when select is empty
+        let update = Array.isArray(data.clicked.id) ? data.clicked.id.map(val => ({ [data.nestedKey]: val.id })) : []
+        await upsertModelDocuments(data.queryModel, update, this.props.currentUser.user.company, data.nestedKey, refUpdates, data.refModel)
+          .then(res => {
+            console.log(res)
+          })
+          .catch(err => {
+            console.log(err)
+          })
+        this.handleDataFetch({ rowIds: [data.rowId] });
+        return
+      }
     }
 
     handleScan = (scan) => {

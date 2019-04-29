@@ -128,7 +128,7 @@ class ScanTable extends Component {
             { id: 'scanToPo', text: 'Scan Type', width: 175, span: 6, className: 'no-wrap', disabled: true, render: (val)=>(val === true ? 'Scan To' : 'Scan From'), noFilter: true},
             { id: 'po', nestedKey: 'name', text: 'PO Name', width: 175, span: 8, className: 'no-wrap', disabled: true },
             { id: 'po', nestedKey: 'type', text: 'PO Type', width: 175, span: 8, className: 'no-wrap', disabled: true },
-            { id: 'locations', type: 'autoComplete', autoCompleteMode: 'tags', nestedKey: 'name', refModel: 'BoxScan', queryModel: 'Location', text: 'Location', width: 175, span: 8, className: 'no-wrap', },
+            { id: 'locations', type: 'autoComplete', autoCompleteMode: 'tags', nestedKey: 'name', refModel: 'BoxScan', queryModel: 'Location', upsertOnChange: true,text: 'Location', width: 175, span: 8, className: 'no-wrap', },
             { id: 'actions', text: 'Actions', width: 100, noSort: true, actionOptions: [{ name: 'Delete', key: 'delete', }] },
           ]}
         />
