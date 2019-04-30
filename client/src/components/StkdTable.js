@@ -10,6 +10,7 @@ import EditItemDrawer from './EditItemDrawer';
 import ImportModal from './ImportModal';
 import InsertDataModal from './InsertDataModal';
 import AutoCompleteInput from './AutoCompleteInput';
+import TreeSelectSearch from './SimpleTreeSelect';
 
 const confirm = Modal.confirm;
 const FormItem = Form.Item;
@@ -211,9 +212,9 @@ class ProductTable extends Component {
       let option = this.props.tableMenuOptions.find(o => o.handler && o.key === key) || {}
       switch(key) {
         case 'add':
-        this.setState({
-          showCreateItemDrawer: true,
-        })
+          this.setState({
+            showCreateItemDrawer: true,
+          })
           break;
         case 'import':
           this.setState({
@@ -531,9 +532,27 @@ class ProductTable extends Component {
             </td>
           )
         }
-        if (Array.isArray(r[col.id])) {
+        if (col.type === 'tree-select') {
           return (
-            <td key={`${r._id}-${col.id}`} className="stkd-td actions center-a no-wrap">
+            <td key={`${r._id}-${col.id}`} className="stkd-td no-wrap">
+              <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
+                <TreeSelectSearch
+                  data={Array.isArray(r[col.id]) ? r[col.id] : []}
+                  parentTitle={'name'}
+                  parentValue={'name'}
+                  childTitle={'name'}
+                  childValue={'name'}
+                  childArray={'locations'}
+                >
+                  <Input style={{ display: "none" }} />
+                </TreeSelectSearch>
+              </Skeleton>
+            </td>
+          )
+        }
+        if (Array.isArray(r[col.id]) || col.type === 'autoComplete') {
+          return (
+            <td key={`${r._id}-${col.id}`} className="stkd-td no-wrap">
               <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
                 <AutoCompleteInput
                   key={`${r._id}-${col.id}-auto-complete`}
