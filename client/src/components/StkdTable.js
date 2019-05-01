@@ -537,12 +537,14 @@ class ProductTable extends Component {
             <td key={`${r._id}-${col.id}`} className="stkd-td no-wrap">
               <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
                 <TreeSelectSearch
+                  id={`${r._id}-${col.id}-tree-select`}
                   data={Array.isArray(r[col.id]) ? r[col.id] : []}
                   parentTitle={'name'}
                   parentValue={'name'}
                   childTitle={'name'}
                   childValue={'name'}
                   childArray={'locations'}
+                  reverseTree
                 >
                   <Input style={{ display: "none" }} />
                 </TreeSelectSearch>
