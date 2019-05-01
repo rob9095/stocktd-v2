@@ -123,7 +123,7 @@ class ProductTableNew extends Component {
             // { id: 'po', nestedKey: 'type', text: 'PO Type', width: 175, span: 8, className: 'no-wrap', disabled: true },
             // { id: 'locations', type: 'autoComplete', autoCompleteMode: 'tags', nestedKey: 'name', refModel: 'BoxScan', queryModel: 'Location', text: 'Location', width: 175, span: 8, className: 'no-wrap', },
             //{ id: 'boxscans', type: 'autoComplete', autoCompleteMode: 'default', nestedKey: 'name', queryModel: 'Location', text: 'Location', width: 175, span: 8, className: 'no-wrap', },
-            { id: 'boxscans', type: 'tree-select', autoCompleteMode: 'default', nestedKey: 'name', queryModel: 'Location', text: 'Location', width: 175, span: 8, className: 'no-wrap', },
+            { id: 'boxscans', type: 'cascader', autoCompleteMode: 'default', nestedKey: 'name', queryModel: 'Location', text: 'Location', width: 175, span: 8, className: 'no-wrap', },
             { id: 'actions', text: 'Actions', width: 100, noSort: true, actionOptions: [{ name: 'Add to Order', key: 'add-to-order', },{ name: 'Copy', key: 'copy', },{ name: 'Delete', key: 'delete', }] },
           ]}
         />

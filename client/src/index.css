@@ -416,6 +416,31 @@ i.xl svg {
 
 /* Selects */
 
+.cascader-popup {
+  min-width: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cascader-popup > div {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.cascader-popup > div.ant-empty {
+  display: inherit;
+}
+
+.cascader-popup ul {
+  width: 100%;
+}
+
+.cascader-popup .ant-cascader-menu {
+  height: auto;
+}
+
 .ant-select-selection__placeholder {
   font-family: 'Work Sans', sans-serif;
   top: 14px;

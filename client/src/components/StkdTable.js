@@ -10,7 +10,7 @@ import EditItemDrawer from './EditItemDrawer';
 import ImportModal from './ImportModal';
 import InsertDataModal from './InsertDataModal';
 import AutoCompleteInput from './AutoCompleteInput';
-import TreeSelectSearch from './SimpleTreeSelect';
+import CascaderSelect from './CascaderSelect';
 
 const confirm = Modal.confirm;
 const FormItem = Form.Item;
@@ -532,11 +532,11 @@ class ProductTable extends Component {
             </td>
           )
         }
-        if (col.type === 'tree-select') {
+        if (col.type === 'cascader') {
           return (
             <td key={`${r._id}-${col.id}`} className="stkd-td no-wrap">
               <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
-                <TreeSelectSearch
+                <CascaderSelect
                   id={`${r._id}-${col.id}-tree-select`}
                   data={Array.isArray(r[col.id]) ? r[col.id] : []}
                   parentTitle={'name'}
@@ -544,10 +544,10 @@ class ProductTable extends Component {
                   childTitle={'name'}
                   childValue={'name'}
                   childArray={'locations'}
-                  reverseTree
+                  reverseData={true}
                 >
                   <Input style={{ display: "none" }} />
-                </TreeSelectSearch>
+                </CascaderSelect>
               </Skeleton>
             </td>
           )
