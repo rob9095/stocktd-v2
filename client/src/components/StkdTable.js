@@ -537,14 +537,11 @@ class ProductTable extends Component {
             <td key={`${r._id}-${col.id}`} className="stkd-td no-wrap">
               <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
                 <CascaderSelect
-                  id={`${r._id}-${col.id}-tree-select`}
+                  id={`${r._id}-${col.id}-cascader-select`}
                   data={Array.isArray(r[col.id]) ? r[col.id] : []}
-                  parentTitle={'name'}
-                  parentValue={'name'}
-                  childTitle={'name'}
-                  childValue={'name'}
-                  childArray={'locations'}
-                  reverseData={true}
+                  parent={col.parent}
+                  child={col.child}
+                  reverseData={col.reverseData}
                 >
                   <Input style={{ display: "none" }} />
                 </CascaderSelect>

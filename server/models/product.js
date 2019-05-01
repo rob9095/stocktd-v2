@@ -54,6 +54,14 @@ const productSchema = new mongoose.Schema({
   asin: {
     type: String,
   },
+  defaultLocation: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Location'
+  },
+  defaultBox: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'BoxScan'
+  },
   createdOn: {
     type: Date,
     default: Date.now,

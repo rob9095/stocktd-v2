@@ -12,28 +12,29 @@ class CascaderSelect extends Component {
   componentDidMount() {
     //loop through provided data and configure options
     let data = this.props.data.map((option,i) => ({
-      label: option[this.props.parentTitle] || option._id || i,
-      value: option[this.props.parentValue] || option._id || i,
-      ...this.props.labelProp && {[this.props.labelProp]: option[this.props.parentValue] || option._id || i},
+      label: option[this.props.parent.label] || option._id || i,
+      value: option[this.props.parent.value] || option._id || i,
       key: option._id || i,
-      children: option[this.props.childArray].map((child,ci) => ({
-        label: child[this.props.childTitle] || child[this.props.parentTitle] || child._id || ci,
-        value: child[this.props.childValue] || child[this.props.parentValue] || child._id || ci,
+      children: option[this.props.child.arrayKey].map((child,ci) => ({
+        label: child[this.props.child.label] || child[this.props.parent.label] || child._id || ci,
+        value: child[this.props.child.label] || child[this.props.parent.value] || child._id || ci,
         key: child._id || ci,
       }))
     }))
     if (this.props.reverseData) {
       //reverse the data, set children to parents and vise versa
       for (let option of this.props.data) {
-        data = option[this.props.childArray].map((child, ci) => {
+        data = option[this.props.child.arrayKey].map((child, ci) => {
           return ({
-            label: child[this.props.childTitle] || child[this.props.parentTitle] || child._id || ci,
-            value: child[this.props.childValue] || child[this.props.parentValue] || child._id || ci,
+            label: child[this.props.child.title] || child[this.props.parent.label] || child._id || ci,
+            value: child[this.props.child.label] || child[this.props.parent.value] || child._id || ci,
             key: child._id || ci,
-            children: this.props.data.filter(box => box.locations.map(l => l[this.props.childTitle]).includes(child[this.props.childTitle])).map((box, bi) => ({
-              label: box[this.props.parentTitle] || box._id + child._id || ci + bi,
-              value: box[this.props.parentValue] + " " + child[this.props.childValue] || box._id + child._id || ci + bi,
-              key: box._id +"-"+ child._id || ci + bi,
+            id: child._id,
+            children: this.props.data.filter(parent => parent[this.props.child.arrayKey].map(val => val[this.props.child.title]).includes(child[this.props.child.title])).map((parent, pi) => ({
+              label: parent[this.props.parent.label] || parent._id + child._id || ci + pi,
+              value: parent[this.props.parent.value] + " " + child[this.props.child.label] || parent._id + child._id || ci + pi,
+              key: parent._id +"-"+ child._id || ci + pi,
+              id: parent._id,
             })),
           })
         })
@@ -44,9 +45,10 @@ class CascaderSelect extends Component {
     })
   }
  
-  onChange = (value) => {
-    console.log('onChange ', value);
+  onChange = (value,options) => {
+    console.log('onChange ', {value,options});
     this.setState({ value });
+    this.props.onChange && this.props.onChange(value,options)
   }
 
   filter(inputValue, path) {
