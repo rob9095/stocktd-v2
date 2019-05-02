@@ -456,34 +456,40 @@ class ProductTable extends Component {
         if (i === 0 && h.id=== 'select-all') {
           return (
             <th key="select-all" id="select-all" width="100" className="ant-table-selection-column">
-              <label className="container">
-                <input
-                  className="ant-checkbox-input" onChange={this.handleSelectAllClick} checked={this.state.selectAll} type="checkbox"
-                />
-                <span className="checkmark"></span>
-              </label>
+              <Skeleton paragraph={false} loading={this.state.loading} active>
+                <label className="container">
+                  <input
+                    className="ant-checkbox-input" onChange={this.handleSelectAllClick} checked={this.state.selectAll} type="checkbox"
+                  />
+                  <span className="checkmark"></span>
+                </label>
+              </Skeleton>
             </th>
           )
         } else if (h.noSort) {
           return (
             <th key={h.id+h.nestedKey || i} id={h.id} width={h.width}>
-              {h.text}
+              <Skeleton paragraph={false} loading={this.state.loading} active>
+                {h.text}
+              </Skeleton>
             </th>
           )
         } else {
           return (
             <th key={h.id+h.nestedKey || i} id={h.id} width={h.width} onClick={this.handleSort} className="stkd-table header">
-              <span id={h.id} onClick={this.handleSort}>
-                {h.text}
-                {this.state.column === h.id && (
-                  <Icon
-                    onClick={this.handleSort}
-                    id={h.id}
-                    type={this.state.direction === 'ascending' ? 'caret-down' : 'caret-up'}
-                    className="sort-icon primary-color"
-                  />
-                )}
-              </span>
+              <Skeleton paragraph={false} loading={this.state.loading} active>
+                <span id={h.id} onClick={this.handleSort}>
+                  {h.text}
+                  {this.state.column === h.id && (
+                    <Icon
+                      onClick={this.handleSort}
+                      id={h.id}
+                      type={this.state.direction === 'ascending' ? 'caret-down' : 'caret-up'}
+                      className="sort-icon primary-color"
+                    />
+                  )}
+                </span>
+              </Skeleton>
             </th>
           )
         }
@@ -678,9 +684,9 @@ class ProductTable extends Component {
             />
           )}
           <div className="ant-table stkd-content no-pad contain">
-            <Spin spinning={false}>
-              <div className="table-options">
-                <div>
+            <div className="table-options">
+              <div className="flex" style={{ minWidth: '20%', padding: '0px 20px' }}>
+                <Skeleton paragraph={false} loading={this.state.loading} active>
                   {bulkMenu && (
                     <Dropdown className="bulk-dropdown" overlay={bulkMenu} disabled={this.state.selected.length === 0}>
                       <Button size="small">
@@ -688,22 +694,24 @@ class ProductTable extends Component {
                       </Button>
                     </Dropdown>
                   )}
-                </div>
-                <div>
-                  <Pagination className="ant-table-pagination" {...this.state.pagination} />
-                </div>
+                </Skeleton>
               </div>
-                <table>
-                  <thead className="ant-table-thead">
-                    <tr>
-                      {headers}
-                    </tr>
-                  </thead>
-                  <tbody className="ant-table-tbody">
-                    {rows}
-                  </tbody>
-                </table>
-            </Spin>
+              <div className="flex" style={{minWidth: '40%', padding: '0px 20px'}}>
+                <Skeleton paragraph={false} loading={this.state.loading} active>
+                  <Pagination className="ant-table-pagination" {...this.state.pagination} />
+                </Skeleton>
+              </div>
+            </div>
+            <table>
+              <thead className="ant-table-thead">
+                <tr>
+                  {headers}
+                </tr>
+              </thead>
+              <tbody className="ant-table-tbody">
+                {rows}
+              </tbody>
+            </table>
           </div>
         </div>
       )
