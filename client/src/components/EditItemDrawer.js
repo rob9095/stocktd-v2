@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Alert, Drawer, Form, Button, Col, Row, Input, Select, DatePicker } from 'antd';
 import AutoCompleteInput from './AutoCompleteInput';
+import CascaderSelect from "./CascaderSelect";
 const moment = require('moment');
 
 const Option = Select.Option;
@@ -131,6 +132,13 @@ class DrawerForm extends Component {
     this.props.form.setFieldsValue({ [id]: Array.isArray(clicked.id) && clicked.id.map(c =>c.id) || [] })
   }
 
+  handlerCascaderUpdate = (data) => {
+    return new Promise((resolve,reject) => {
+      this.props.form.setFieldsValue(data)
+      resolve('success')
+    })
+  }
+
   render() {
     const { getFieldDecorator } = this.props.form;
     let { item, inputs } = this.props
@@ -153,6 +161,40 @@ class DrawerForm extends Component {
                    disabled={i.disabled}
                   />
                )}
+            </FormItem>
+          </Col>
+        )
+      } else if (i.type === 'cascader') {
+        return (
+          <Col xs={i.span * 3} sm={i.span} key={id}>
+            <FormItem label={`${i.text}`}>
+              {getFieldDecorator(i.id, {
+                rules: [{
+                  required: i.required,
+                  message: i.message,
+                }],
+              })(
+                <CascaderSelect
+                  id={`${i.id}-cascader-select`}
+                  data={Array.isArray(item[i.id]) ? item[i.id].map(box => ({ ...box, [i.parent.defaultKey]: item[i.parent.defaultKey], [i.child.defaultKey]: item[i.child.defaultKey] })).filter(box => box.scanToPo == true) : []}
+                  parent={i.parent}
+                  child={i.child}
+                  reverseData={i.reverseData}
+                  onUpdate={(value, options) => this.handlerCascaderUpdate({[i.parent.defaultKey]: options[i.reverseData ? 1 : 0].id, [i.child.defaultKey]: options[i.reverseData ? 0 : 1].id})}
+                >
+                  <Input style={{ display: "none" }} />
+                </CascaderSelect>
+              )}
+            </FormItem>
+            <FormItem style={{display: 'none'}}>
+              {getFieldDecorator(i.parent.defaultKey, { initialValue: item[i.parent.defaultKey] })(
+                <Input style={{ display: "none" }} />
+              )}
+            </FormItem>
+            <FormItem style={{ display: 'none' }}>
+              {getFieldDecorator(i.child.defaultKey, { initialValue: item[i.child.defaultKey] })(
+                <Input style={{ display: "none" }} />
+              )}
             </FormItem>
           </Col>
         )

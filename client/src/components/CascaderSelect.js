@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Cascader, Empty, Skeleton } from 'antd';
 
 class CascaderSelect extends Component {
+  _isMounted = false;
   constructor(props) {
     super(props)
     this.state = {
@@ -10,6 +11,7 @@ class CascaderSelect extends Component {
   }
 
   componentDidMount() {
+    this._isMounted = true;
     //loop through provided data and configure options
     let data = this.props.data.map((option,i) => ({
       label: option[this.props.parent.label] || option._id || i,
@@ -56,14 +58,19 @@ class CascaderSelect extends Component {
       value,
     })
   }
+
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
  
   onChange = async (value,options) => {
-    this.setState({loading: true})
-    if (this.props.onChange) {
-      await this.props.onChange(value, options).then(res => console.log(res)).catch(err => console.log(err))
+    if (this.props.onUpdate) {
+      this.setState({ loading: true })
+      await this.props.onUpdate(value, options).then(res => console.log(res)).catch(err => console.log(err))
+      this._isMounted && this.setState({ loading: false, value })
       return
     }
-    this.setState({ loading: false, value })
+    this.setState({ value })
   }
 
   filter(inputValue, path) {

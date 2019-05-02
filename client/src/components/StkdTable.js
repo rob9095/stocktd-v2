@@ -541,7 +541,7 @@ class ProductTable extends Component {
                   parent={col.parent}
                   child={col.child}
                   reverseData={col.reverseData}
-                  onChange={(value, options) => this.handleAutoCompleteUpdate({ rowId: r._id, handler: col.handler, clicked: {value, options}, colId: col.id, })}
+                  onUpdate={(value, options) => this.handleAutoCompleteUpdate({ rowId: r._id, handler: col.handler, clicked: {value, options}, colId: col.id, })}
                 >
                   <Input style={{ display: "none" }} />
                 </CascaderSelect>

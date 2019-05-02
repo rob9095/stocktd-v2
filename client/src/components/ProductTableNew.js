@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 import StkdTable from './StkdTable';
 import { connect } from "react-redux";
-import { Radio, Tooltip, Icon, Button } from 'antd'
-import * as scanHandlers from "../store/actions/boxScans";
 import { importProducts } from "../store/actions/products";
 
 
@@ -15,8 +13,9 @@ class ProductTableNew extends Component {
   }
 
   handleDelete = (ids) => {
-    return new Promise(async(resolve,reject) => {
-      await scanHandlers.deleteBoxScans(ids,this.props.currentUser.user.company)
+    return new Promise((resolve,reject) => {
+      const updates = ids.map(id=>({id, action: 'delete'}))
+      return this.handleImport(updates)
       .then(res=>{
         console.log(res)
         resolve(res)
@@ -29,8 +28,8 @@ class ProductTableNew extends Component {
   }
 
   handleRowEditSave = (updates, id) => {
-    return new Promise(async (resolve,reject) => {
-      await scanHandlers.updateBoxScans(updates,this.props.currentUser.user)
+    return new Promise((resolve,reject) => {
+      return this.handleImport(updates)
       .then(res=>{
         console.log(res)
         resolve(res)
