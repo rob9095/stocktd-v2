@@ -59,7 +59,7 @@ class AutoCompleteInputForm extends Component {
 
   handleDataFetch = async (value) => {
     const searchKey = this.props.searchKey;
-    await getAllModelDocuments({model: this.props.queryModel, documentRef: {[searchKey]: value},groupBy: searchKey, company: this.props.currentUser.user.company, regex:true, limit: 15})
+    await getAllModelDocuments({model: this.props.queryModel, documentRef: {[searchKey]: value, ...this.props.query},groupBy: searchKey, company: this.props.currentUser.user.company, regex:true, limit: 15})
     .then((res)=>{
       //remove duplicates based on searchKey if in tags mode
       let data =

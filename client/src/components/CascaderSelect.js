@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Cascader, Empty, Skeleton } from 'antd';
+import { Cascader, Empty, Skeleton, Divider, Icon } from 'antd';
 
 class CascaderSelect extends Component {
   _isMounted = false;
@@ -7,6 +7,17 @@ class CascaderSelect extends Component {
     super(props)
     this.state = {
       data: [],
+      emptyOption: { label: (<span><Empty imageStyle={{ height: 20 }} /></span>), value: 'empty', key: 'empty', disabled: true },
+      addNewOption: {
+        label: (
+          <div>
+            <Divider style={{ margin: '-5px 0px 5px 0px' }} />
+            <div className="flex align-items-center justify-content-center">
+              <Icon type="plus" style={{ marginRight: 5, fontSize: 'small' }} /> {this.props.addOptionText || 'Add'}
+            </div>
+          </div>
+        ), value: 'addNewItem', key: 'addNewItem',
+      },
     }
   }
 
@@ -64,6 +75,10 @@ class CascaderSelect extends Component {
   }
  
   onChange = async (value,options) => {
+    if (options[0] && options[0].key === 'addNewItem') {
+      this.props.onAddNewItem && this.props.onAddNewItem()
+      return
+    }
     if (this.props.onUpdate) {
       this.setState({ loading: true })
       await this.props.onUpdate(value, options).then(res => console.log(res)).catch(err => console.log(err))
@@ -83,7 +98,7 @@ class CascaderSelect extends Component {
       <div id={id}>
         <Skeleton paragraph={false} loading={this.state.loading} active>
           <Cascader
-            options={this.state.data.length > 0 ? this.state.data : [{ label: (<span><Empty imageStyle={{ height: 20 }} /></span>), value: 'empty', key: 'empty', disabled: true }]}
+            options={this.state.data.length > 0 ? this.props.showAddOption ? [...this.state.data, this.state.addNewOption] : this.state.data : [this.state.emptyOption, this.state.addNewOption]}
             onChange={this.onChange}
             placeholder={this.props.placeholder || "Please select"}
             showSearch={this.state.data.length > 0 ? { filter: this.filter } : false}

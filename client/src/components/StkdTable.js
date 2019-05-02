@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { fetchAllProducts, updateProducts, importProducts } from '../store/actions/products';
 import { queryModelData, deleteModelDocuments } from '../store/actions/models';
 import { upsertModelDocuments } from '../store/actions/models';
 import { addBoxScan } from '../store/actions/boxScans';
-import { Button, Pagination, Divider, Icon, Spin, Form, Dropdown, Menu, Modal, message, Row, Col, Skeleton, Input } from 'antd';
+import { Button, Pagination, Divider, Icon, Spin, Form, Dropdown, Menu, Modal, message, Empty, Skeleton, Input } from 'antd';
 import WrappedFilterForm from './FilterForm';
 import EditItemDrawer from './EditItemDrawer';
 import ImportModal from './ImportModal';
@@ -201,7 +202,16 @@ class ProductTable extends Component {
           }
           break;
         case 'bulk-edit':
-          this.toggle('showInsertDataModal')
+          //this.toggle('showInsertDataModal')
+          this.setState({
+            insertDataModal: {
+              title: "Bulk Edit",
+              inputs: this.props.headers.filter(h => !h.noSort && !h.disabled).map(h => ({ ...h, required: false })),
+              okText: "Save",
+              cancelText: "Cancel",
+              onSave: this.handleInsertDataSave,
+            }
+          })
           break;
         default:
           console.log('unknown menu option');
@@ -548,6 +558,85 @@ class ProductTable extends Component {
                   child={col.child}
                   reverseData={col.reverseData}
                   onUpdate={(value, options) => this.handleAutoCompleteUpdate({ rowId: r._id, handler: col.handler, clicked: {value, options}, colId: col.id, })}
+                  showAddOption={true}
+                  onAddNewItem={()=>{
+                    this.setState({
+                      insertDataModal: {
+                        title: "Add New Box",
+                        inputs: [
+                          {
+                            span: 24,
+                            id: "sku",
+                            text: "SKU",
+                            required: true,
+                            message: "SKU is required",
+                            type: 'autoComplete',
+                            queryModel: "Product",
+                            selected: [this.state.data.find(row=>row._id === r._id)]
+                          },
+                          {
+                            span: 24,
+                            id: "po",
+                            queryModel: "PurchaseOrder",
+                            searchKey: "name",
+                            text: "Purchase Order",
+                            type: 'autoComplete',
+                            selected: [],
+                            renderOption: item => (
+                              <div style={{ maxHeight: 40, overflow: "hidden" }}>
+                              <div style={{ fontSize: "small" }}>
+                                {item["name"]}
+                              </div>
+                              <div style={{ fontSize: 10, color: "grey" }}>
+                                {item["type"]}
+                              </div>
+                            </div>
+                            ),
+                            notFound: (
+                              <Empty
+                                imageStyle={{ height: 20 }}
+                                description={(
+                                  <span>
+                                    <Link to="/app/purchase-orders" style={{ fontSize: 'small', opacity: '.8' }}>Add Purchase Order</Link>
+                                  </span>
+                                )}
+                              />
+                            )
+                          },
+                          {
+                            span: 24,
+                            id: "prefix",
+                            searchKey: "name",
+                            text: "Prefix",
+                            required: false,
+                            type: 'autoComplete',
+                            queryModel: "BoxPrefix",
+                          },
+                          {
+                            span: 24,
+                            id: "box",
+                            searchKey: "name",
+                            text: "Box Name",
+                            required: true,
+                            message: "Box name is required",
+                          },
+                          {
+                            span: 24,
+                            id: "location",
+                            searchKey: "name",
+                            text: "Location",
+                            required: false,
+                            type: 'autoComplete',
+                            queryModel: "Location",
+                            mode: 'tags',
+                          },
+                        ],
+                        okText: "Save",
+                        cancelText: "Cancel",
+                        onSave: this.handleInsertDataSave, 
+                      }
+                    })
+                  }}
                 >
                   <Input style={{ display: "none" }} />
                 </CascaderSelect>
@@ -630,6 +719,12 @@ class ProductTable extends Component {
               cancelText={"Cancel"}
               onClose={() => this.toggle("showInsertDataModal")}
               onSave={this.handleInsertDataSave}
+            />
+          )}
+          {this.state.insertDataModal && (
+            <InsertDataModal
+              {...this.state.insertDataModal}
+              onClose={() => this.setState({insertDataModal: null})}
             />
           )}
           {this.state.showEditItemDrawer && (

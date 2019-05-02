@@ -281,7 +281,6 @@ class ScanForm extends Component {
   }
 
   render() {
-    let showScanFromMore = false
     const { getFieldDecorator } = this.props.form;
     let preFixOptions = this.state.boxPrefixList.map(pf => (
       <Option value={pf.value} key={pf.id}>{pf.value}</Option>

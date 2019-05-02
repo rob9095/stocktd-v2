@@ -85,9 +85,12 @@ class ModalForm extends Component {
                })(
                 <AutoCompleteInput
                    queryModel={i.queryModel}
-                   searchKey={i.nestedKey || i.id}
+                   searchKey={i.nestedKey || i.searchKey || i.id}
                    placeholder={i.text}
-                   mode={i.autoCompleteMode}
+                   mode={i.autoCompleteMode || i.mode}
+                   selected={i.selected}
+                   renderOption={i.renderOption || false}
+                   notFound={i.notFound || false}
                    onUpdate={(clicked) => this.handleAutoUpdate(clicked, i.id, i.nestedKey)}
                 >
                   <Input style={{display: 'none'}} />
