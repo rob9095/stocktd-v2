@@ -64,6 +64,20 @@ class ProductTableNew extends Component {
     this.setState({filters})
   }
 
+  handleCascaderUpdate = (data) => {
+    console.log({data})
+    return new Promise((resolve,reject) => {
+      let [location,box, ...rest] = data.clicked.options
+      let update = [{
+        id: data.rowId,
+        defaultLocation: location ? location.id : null,
+        defaultBox: box ? box.id : null,
+      }]
+      console.log(update)
+      this.handleImport(update).then(res=>resolve(res)).catch(err=>reject(err))
+    })
+  }
+
   render() {
     return(
       <div>
@@ -123,7 +137,7 @@ class ProductTableNew extends Component {
             // { id: 'po', nestedKey: 'type', text: 'PO Type', width: 175, span: 8, className: 'no-wrap', disabled: true },
             // { id: 'locations', type: 'autoComplete', autoCompleteMode: 'tags', nestedKey: 'name', refModel: 'BoxScan', queryModel: 'Location', text: 'Location', width: 175, span: 8, className: 'no-wrap', },
             //{ id: 'boxscans', type: 'autoComplete', autoCompleteMode: 'default', nestedKey: 'name', queryModel: 'Location', text: 'Location', width: 175, span: 8, className: 'no-wrap', },
-            { id: 'boxscans', type: 'cascader', autoCompleteMode: 'default', text: 'Locations', width: 175, span: 8, className: 'no-wrap', reverseData: true, parent: {label: 'name', value: 'name'}, child: {label: 'name',value: 'name', arrayKey: 'locations'} },
+            { id: 'boxscans', type: 'cascader', autoCompleteMode: 'default', text: 'Locations', width: 175, span: 8, className: 'no-wrap', reverseData: true, parent: {label: 'name', value: 'name', defaultKey: 'defaultBox'}, child: {label: 'name',value: 'name', arrayKey: 'locations', defaultKey: 'defaultLocation'}, handler: this.handleCascaderUpdate, },
             { id: 'actions', text: 'Actions', width: 100, noSort: true, actionOptions: [{ name: 'Add to Order', key: 'add-to-order', },{ name: 'Copy', key: 'copy', },{ name: 'Delete', key: 'delete', }] },
           ]}
         />
