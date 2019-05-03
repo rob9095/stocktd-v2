@@ -132,9 +132,15 @@ class DrawerForm extends Component {
     this.props.form.setFieldsValue({ [id]: Array.isArray(clicked.id) && clicked.id.map(c =>c.id) || [] })
   }
 
-  handlerCascaderUpdate = (data) => {
+  handlerCascaderUpdate = (value, options, i) => {
     return new Promise((resolve,reject) => {
-      this.props.form.setFieldsValue(data)
+      let parentValue = options[i.reverseData ? 1 : 0] ? options[i.reverseData ? 1 : 0].id : null;
+      let childValue = options[i.reverseData ? 0 : 1] ? options[i.reverseData ? 0 : 1].id : null;
+      let update = {
+        [i.parent.defaultKey]: parentValue,
+        [i.child.defaultKey]: childValue
+      }
+      this.props.form.setFieldsValue(update)
       resolve('success')
     })
   }
@@ -180,7 +186,7 @@ class DrawerForm extends Component {
                   parent={i.parent}
                   child={i.child}
                   reverseData={i.reverseData}
-                  onUpdate={(value, options) => this.handlerCascaderUpdate({[i.parent.defaultKey]: options[i.reverseData ? 1 : 0].id, [i.child.defaultKey]: options[i.reverseData ? 0 : 1].id})}
+                  onUpdate={(v,o)=>this.handlerCascaderUpdate(v,o,i)}
                 >
                   <Input style={{ display: "none" }} />
                 </CascaderSelect>
