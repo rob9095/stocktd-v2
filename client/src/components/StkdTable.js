@@ -576,7 +576,7 @@ class ProductTable extends Component {
                           },
                           {
                             span: 24,
-                            id: "po",
+                            id: "currentPOs",
                             queryModel: "PurchaseOrder",
                             searchKey: "name",
                             text: "Purchase Order",
