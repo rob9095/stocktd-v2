@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Select, Empty, Form, Skeleton } from 'antd';
+import { Button, Select, Empty, Form, Skeleton, Divider, Icon, Input } from 'antd';
 import { getAllModelDocuments } from '../store/actions/models';
 import { connect } from "react-redux";
+import InsertDataModal from './InsertDataModal';
 
 const Option = Select.Option;
 
@@ -12,6 +13,7 @@ class AutoCompleteInputForm extends Component {
     this.timeout = 0;
     this.state = {
       data: [],
+      addItem: false,
     }
   }
 
@@ -57,6 +59,19 @@ class AutoCompleteInputForm extends Component {
     }, 300);
   }
 
+  handleTransition = async () => {
+    console.log('click tranny')
+    await this.setState({
+      transition: true,
+      addItem: !this.state.addItem,
+    })
+    setTimeout(()=>{
+      this.setState({
+        transition: false,
+      })
+    },400)
+  }
+
   handleDataFetch = async (value) => {
     const searchKey = this.props.searchKey;
     await getAllModelDocuments({model: this.props.queryModel, documentRef: {[searchKey]: value, ...this.props.query},groupBy: searchKey, company: this.props.currentUser.user.company, regex:true, limit: 15})
@@ -98,39 +113,89 @@ class AutoCompleteInputForm extends Component {
     this.state.data.length === 0 && this.handleDataFetch()
   }
 
+  handleSubmit = () => {
+    this.props.form.validateFields((err, values) => {
+      console.log('Received values of form: ', values);
+      if (err) {
+        console.log({err})
+        return
+      }
+      this.setState({
+        transition: true,
+      })
+      this.handleTransition()
+    });
+  }
+
   render() {
     const { getFieldDecorator } = this.props.form;
     const children = this.state.data.map(item => (
       // use item._id as value if not in tags mode
       <Option key={item._id} value={this.props.mode === 'tags' ? item[this.props.searchKey] : item._id} data={{ ...item }}>
-        {this.props.renderOption ? this.props.renderOption(item) 
-        : item[this.props.searchKey]}
+        {this.props.renderOption ? this.props.renderOption(item) : item[this.props.searchKey]}
       </Option>
     ));
     const id = this.props.key || this.props.placeholder + 'auto-complete'
     return (
       <div id={id}>
-        {getFieldDecorator("selected", { initialValue: this.props.selected && this.state.selected })(
-          <Select
-            allowClear
-            style={{ minWidth: 200 }}
-            showSearch
-            showArrow
-            placeholder={this.props.placeholder}
-            notFoundContent={this.state.loading ? <Skeleton active loading paragraph={false} /> : this.props.notFound || <Empty imageStyle={{ height: 20 }} />}
-            onDropdownVisibleChange={this.handleVisibleChange}
-            filterOption={false}
-            onSearch={this.handleType}
-            onChange={this.handleChange}
-            mode={this.props.mode || "default"}
-            labelInValue
-            ref={node => (this.selectRef = node)}
-            onMouseLeave={(e) => e.stopPropagation()}
-            getPopupContainer={() => document.getElementById(id)}
-          >
-            {children}
-          </Select>
-        )}
+        <Skeleton paragraph={false} loading={this.state.transition} active>
+          {this.state.addItem ?
+            <div>
+              {this.props.addItemInputs.map(i => (
+                getFieldDecorator(i.id, {
+                    rules: [{
+                      required: i.required,
+                      message: i.message,
+                  }],
+                })(
+                  <Form.Item key={i.id}>
+                    <Input
+                      type={i.type}
+                      placeholder={i.text}
+                    />
+                  </Form.Item>
+                )
+              ))}
+              <Button size="small" type="primary" style={{marginRight: 5}} onClick={this.handleSubmit}>Save</Button>
+              <Button size="small" onClick={this.handleTransition}>Cancel</Button>
+            </div>
+            :
+            getFieldDecorator("selected", { initialValue: this.props.selected && this.state.selected })(
+              <Select
+                allowClear
+                style={{ minWidth: 200 }}
+                showSearch
+                showArrow
+                placeholder={this.props.placeholder}
+                notFoundContent={this.state.loading ? <Skeleton active loading paragraph={false} /> : this.props.notFound || <Empty imageStyle={{ height: 20 }} />}
+                onDropdownVisibleChange={this.handleVisibleChange}
+                filterOption={false}
+                onSearch={this.handleType}
+                onChange={this.handleChange}
+                mode={this.props.mode || "default"}
+                labelInValue
+                ref={node => (this.selectRef = node)}
+                onMouseLeave={(e) => e.stopPropagation()}
+                getPopupContainer={() => document.getElementById(id)}
+                dropdownRender={(menu) => (
+                  <div>
+                    {menu}
+                    {this.props.showAddOption && (
+                      <div>
+                        <Divider style={{ margin: '4px 0' }} />
+                        <div style={{ padding: '8px', cursor: 'pointer', width: '100%' }} onMouseDown={this.handleTransition}>
+                          <Icon type="plus" /> Add item
+                        </div>
+                      </div>
+                      )}
+                  </div>
+                )}
+              >
+                {children}
+              </Select>
+            )
+          }
+        </Skeleton>
       </div>
     );
   }

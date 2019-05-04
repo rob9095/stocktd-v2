@@ -572,7 +572,7 @@ class ProductTable extends Component {
                             message: "SKU is required",
                             type: 'autoComplete',
                             queryModel: "Product",
-                            selected: [this.state.data.find(row=>row._id === r._id)]
+                            selected: [this.state.data.find(row=>row._id === r._id)],
                           },
                           {
                             span: 24,
@@ -611,6 +611,16 @@ class ProductTable extends Component {
                             required: false,
                             type: 'autoComplete',
                             queryModel: "BoxPrefix",
+                            showAddOption: true,
+                            addItemInputs: [
+                              {
+                                span: 24,
+                                id: "prefix-name",
+                                text: "Box Prefix",
+                                required: true,
+                                message: "Box Prefix is required"
+                              }
+                            ],
                           },
                           {
                             span: 24,

@@ -416,21 +416,9 @@ i.xl svg {
 
 /* Selects */
 
-.cascader-popup {
-  min-width: 200px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .cascader-popup > div {
   display: flex;
   justify-content: center;
-  width: 100%;
-}
-
-.cascader-popup > div.ant-empty {
-  display: inherit;
 }
 
 .cascader-popup ul {

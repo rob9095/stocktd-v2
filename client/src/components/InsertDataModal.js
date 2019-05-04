@@ -92,6 +92,8 @@ class ModalForm extends Component {
                    renderOption={i.renderOption || false}
                    notFound={i.notFound || false}
                    onUpdate={(clicked) => this.handleAutoUpdate(clicked, i.id, i.nestedKey)}
+                   addItemInputs={i.addItemInputs || []}
+                   showAddOption={i.showAddOption}
                 >
                   <Input style={{display: 'none'}} />
                 </AutoCompleteInput>

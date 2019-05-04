@@ -7,7 +7,7 @@ class CascaderSelect extends Component {
     super(props)
     this.state = {
       data: [],
-      emptyOption: { label: (<span><Empty imageStyle={{ height: 20 }} /></span>), value: 'empty', key: 'empty', disabled: true },
+      emptyOption: { label: (<div style={{minWidth: 176}}><Empty imageStyle={{ height: 20 }} /></div>), value: 'empty', key: 'empty', disabled: true },
       addNewOption: {
         label: (
           <div>
