@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Alert, Modal, Form, Row, Col, Input } from 'antd';
+import { Alert, Modal, Form, Row, Col, Input, Skeleton } from 'antd';
 import AutoCompleteInput from './AutoCompleteInput';
 
 const FormItem = Form.Item;
@@ -64,9 +64,8 @@ class ModalForm extends Component {
     })
   }
 
-  handleAutoUpdate = (clicked, id) => {
-    console.log(clicked)
-    this.props.form.setFieldsValue({ [id]: Array.isArray(clicked.id) && clicked.id.map(c => c.id) || clicked.data[id] || ''})
+  handleAutoUpdate = (clicked, id, nestedKey) => {
+    this.props.form.setFieldsValue({ [id]: Array.isArray(clicked.id) && clicked.id.map(c => c.id) || clicked.data[nestedKey || id] || ''})
   }
 
   render() {
@@ -77,13 +76,13 @@ class ModalForm extends Component {
         return (
           <Col xs={i.span*3} key={id}>
             <FormItem key={i.id} label={`${i.text}`}>
-              {getFieldDecorator(i.id, {
+              {getFieldDecorator(id, {
                  rules: [{
                   required: i.required,
                   message: i.message,
                  }],
                })(
-                <AutoCompleteInput
+                 <AutoCompleteInput
                    queryModel={i.queryModel}
                    searchKey={i.nestedKey || i.searchKey || i.id}
                    placeholder={i.text}
@@ -91,12 +90,12 @@ class ModalForm extends Component {
                    selected={i.selected}
                    renderOption={i.renderOption || false}
                    notFound={i.notFound || false}
-                   onUpdate={(clicked) => this.handleAutoUpdate(clicked, i.id, i.nestedKey)}
-                   addItemInputs={i.addItemInputs || []}
+                   onUpdate={(clicked) => this.handleAutoUpdate(clicked, id, i.nestedKey || i.searchKey)}
+                   onAddItemInputChange={(value) => this.props.form.setFieldsValue({ [id]: value })}
                    showAddOption={i.showAddOption}
-                >
-                  <Input style={{display: 'none'}} />
-                </AutoCompleteInput>
+                 >
+                   <Input style={{ display: 'none' }} />
+                 </AutoCompleteInput>
                )}
             </FormItem>
           </Col>

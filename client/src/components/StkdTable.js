@@ -608,19 +608,10 @@ class ProductTable extends Component {
                             id: "prefix",
                             searchKey: "name",
                             text: "Prefix",
-                            required: false,
+                            required: true,
                             type: 'autoComplete',
                             queryModel: "BoxPrefix",
                             showAddOption: true,
-                            addItemInputs: [
-                              {
-                                span: 24,
-                                id: "prefix-name",
-                                text: "Box Prefix",
-                                required: true,
-                                message: "Box Prefix is required"
-                              }
-                            ],
                           },
                           {
                             span: 24,
@@ -628,7 +619,10 @@ class ProductTable extends Component {
                             searchKey: "name",
                             text: "Box Name",
                             required: true,
+                            type: 'autoComplete',
+                            queryModel: 'BoxScan',
                             message: "Box name is required",
+                            showAddOption: true,
                           },
                           {
                             span: 24,
@@ -643,7 +637,7 @@ class ProductTable extends Component {
                         ],
                         okText: "Save",
                         cancelText: "Cancel",
-                        onSave: this.handleInsertDataSave, 
+                        onSave: this.props.onInsertDataSave, 
                       }
                     })
                   }}

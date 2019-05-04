@@ -77,6 +77,13 @@ class ProductTableNew extends Component {
     })
   }
 
+  onInsertDataSave = (data) => {
+    console.log({data})
+    return new Promise((resolve,reject) => {
+      resolve('success')
+    })
+  }
+
   render() {
     return(
       <div>
@@ -87,6 +94,7 @@ class ProductTableNew extends Component {
           title={"Products New"}
           onRowEditSave={this.handleRowEditSave}
           onImport={this.handleImport}
+          onInsertDataSave={this.onInsertDataSave}
           showScannerForm
           importHeaders={[
             { value: 'sku', required: true },

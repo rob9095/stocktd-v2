@@ -17,17 +17,19 @@ class AutoCompleteInputForm extends Component {
     }
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     this._isMounted = true;
     if (this.props.selected) {
-      const selected = this.props.selected.map(item=>(
+      let selected = this.props.selected.map(item=>(
         {props: 
           {data: {...item}},
           ...this.props.mode === 'tags' ? { key: item[this.props.searchKey] } : { key: item._id },
-          label: item[this.props.searchKey]}
+          label: item[this.props.searchKey]
+        }
         ))
       this.setState({selected})
       if (this.props.skipSelectedCallback !== true) {
+        selected = selected.length > 1 ? selected : selected[0]
         this.handleChange(selected, selected);
       }
     }
@@ -63,7 +65,7 @@ class AutoCompleteInputForm extends Component {
     console.log('click tranny')
     await this.setState({
       transition: true,
-      addItem: !this.state.addItem,
+      addItem: true,
     })
     setTimeout(()=>{
       this.setState({
@@ -113,20 +115,6 @@ class AutoCompleteInputForm extends Component {
     this.state.data.length === 0 && this.handleDataFetch()
   }
 
-  handleSubmit = () => {
-    this.props.form.validateFields((err, values) => {
-      console.log('Received values of form: ', values);
-      if (err) {
-        console.log({err})
-        return
-      }
-      this.setState({
-        transition: true,
-      })
-      this.handleTransition()
-    });
-  }
-
   render() {
     const { getFieldDecorator } = this.props.form;
     const children = this.state.data.map(item => (
@@ -140,25 +128,9 @@ class AutoCompleteInputForm extends Component {
       <div id={id}>
         <Skeleton paragraph={false} loading={this.state.transition} active>
           {this.state.addItem ?
-            <div>
-              {this.props.addItemInputs.map(i => (
-                getFieldDecorator(i.id, {
-                    rules: [{
-                      required: i.required,
-                      message: i.message,
-                  }],
-                })(
-                  <Form.Item key={i.id}>
-                    <Input
-                      type={i.type}
-                      placeholder={i.text}
-                    />
-                  </Form.Item>
-                )
-              ))}
-              <Button size="small" type="primary" style={{marginRight: 5}} onClick={this.handleSubmit}>Save</Button>
-              <Button size="small" onClick={this.handleTransition}>Cancel</Button>
-            </div>
+            <Input
+              onChange={(e) => this.props.onAddItemInputChange(e.target.value)}
+            />
             :
             getFieldDecorator("selected", { initialValue: this.props.selected && this.state.selected })(
               <Select
