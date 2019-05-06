@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
 import { fetchAllProducts, updateProducts, importProducts } from '../store/actions/products';
 import { queryModelData, deleteModelDocuments } from '../store/actions/models';
 import { upsertModelDocuments } from '../store/actions/models';
@@ -560,85 +559,13 @@ class ProductTable extends Component {
                   onUpdate={(value, options) => this.handleAutoCompleteUpdate({ rowId: r._id, handler: col.handler, clicked: {value, options}, colId: col.id, })}
                   showAddOption={true}
                   onAddNewItem={()=>{
+                    let insertDataModal = this.props.onGetInsertDataConfig(this.state.data.filter(row => row._id === r._id), 'addNewBox')
+                    insertDataModal = {
+                      ...insertDataModal,
+                      ...!insertDataModal.onSave && { onSave: this.props.onInsertDataSave} 
+                    }
                     this.setState({
-                      insertDataModal: {
-                        title: "Add New Box",
-                        inputs: [
-                          {
-                            span: 24,
-                            id: "sku",
-                            text: "SKU",
-                            required: true,
-                            message: "SKU is required",
-                            type: 'autoComplete',
-                            queryModel: "Product",
-                            selected: [this.state.data.find(row=>row._id === r._id)],
-                          },
-                          {
-                            span: 24,
-                            id: "currentPOs",
-                            queryModel: "PurchaseOrder",
-                            searchKey: "name",
-                            text: "Purchase Order",
-                            type: 'autoComplete',
-                            selected: [],
-                            renderOption: item => (
-                              <div style={{ maxHeight: 40, overflow: "hidden" }}>
-                              <div style={{ fontSize: "small" }}>
-                                {item["name"]}
-                              </div>
-                              <div style={{ fontSize: 10, color: "grey" }}>
-                                {item["type"]}
-                              </div>
-                            </div>
-                            ),
-                            notFound: (
-                              <Empty
-                                imageStyle={{ height: 20 }}
-                                description={(
-                                  <span>
-                                    <Link to="/app/purchase-orders" style={{ fontSize: 'small', opacity: '.8' }}>Add Purchase Order</Link>
-                                  </span>
-                                )}
-                              />
-                            )
-                          },
-                          {
-                            span: 24,
-                            id: "prefix",
-                            searchKey: "name",
-                            text: "Prefix",
-                            required: true,
-                            type: 'autoComplete',
-                            queryModel: "BoxPrefix",
-                            showAddOption: true,
-                          },
-                          {
-                            span: 24,
-                            id: "box",
-                            searchKey: "name",
-                            text: "Box Name",
-                            required: true,
-                            type: 'autoComplete',
-                            queryModel: 'BoxScan',
-                            message: "Box name is required",
-                            showAddOption: true,
-                          },
-                          {
-                            span: 24,
-                            id: "location",
-                            searchKey: "name",
-                            text: "Location",
-                            required: false,
-                            type: 'autoComplete',
-                            queryModel: "Location",
-                            mode: 'tags',
-                          },
-                        ],
-                        okText: "Save",
-                        cancelText: "Cancel",
-                        onSave: this.props.onInsertDataSave, 
-                      }
+                      insertDataModal,
                     })
                   }}
                 >

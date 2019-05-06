@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import StkdTable from './StkdTable';
 import { connect } from "react-redux";
+import { Link } from 'react-router-dom';
+import { Empty } from 'antd';
 import { importProducts } from "../store/actions/products";
 
 
@@ -80,8 +82,99 @@ class ProductTableNew extends Component {
   onInsertDataSave = (data) => {
     console.log({data})
     return new Promise((resolve,reject) => {
-      resolve('success')
+      resolve({text: 'Sucess', status:'success'})
     })
+  }
+
+  getInsertDataConfig = (items,insertType) => {
+    switch (insertType) {
+      case 'addNewBox' :
+        return ({
+          title: "Add New Box",
+          inputs: [
+            {
+              span: 24,
+              id: "sku",
+              text: "SKU",
+              required: true,
+              message: "SKU is required",
+              type: 'autoComplete',
+              queryModel: "Product",
+              selected: items,
+            },
+            {
+              span: 24,
+              id: "currentPOs",
+              queryModel: "PurchaseOrder",
+              searchKey: "name",
+              text: "Purchase Order",
+              type: 'autoComplete',
+              selected: [],
+              renderOption: item => (
+                <div style={{ maxHeight: 40, overflow: "hidden" }}>
+                  <div style={{ fontSize: "small" }}>
+                    {item["name"]}
+                  </div>
+                  <div style={{ fontSize: 10, color: "grey" }}>
+                    {item["type"]}
+                  </div>
+                </div>
+              ),
+              notFound: (
+                <Empty
+                  imageStyle={{ height: 20 }}
+                  description={(
+                    <span>
+                      <Link to="/app/purchase-orders" style={{ fontSize: 'small', opacity: '.8' }}>Add Purchase Order</Link>
+                    </span>
+                  )}
+                />
+              )
+            },
+            {
+              span: 24,
+              id: "prefix",
+              searchKey: "name",
+              text: "Prefix",
+              required: true,
+              type: 'autoComplete',
+              queryModel: "BoxPrefix",
+              showAddOption: true,
+            },
+            {
+              span: 24,
+              id: "box",
+              searchKey: "name",
+              text: "Box Name",
+              required: true,
+              type: 'autoComplete',
+              queryModel: 'BoxScan',
+              message: "Box name is required",
+              showAddOption: true,
+            },
+            {
+              span: 24,
+              id: "location",
+              searchKey: "name",
+              text: "Location",
+              required: false,
+              type: 'autoComplete',
+              queryModel: "Location",
+              mode: 'tags',
+            },
+          ],
+          okText: "Save",
+          cancelText: "Cancel",
+          // onSave: this.test,
+        })
+        default :
+          console.log('unknown insertType '+ insertType)
+          return({})
+    }
+  }
+
+  test = () => {
+    console.log('a test!')
   }
 
   render() {
@@ -95,6 +188,7 @@ class ProductTableNew extends Component {
           onRowEditSave={this.handleRowEditSave}
           onImport={this.handleImport}
           onInsertDataSave={this.onInsertDataSave}
+          onGetInsertDataConfig={this.getInsertDataConfig}
           showScannerForm
           importHeaders={[
             { value: 'sku', required: true },
