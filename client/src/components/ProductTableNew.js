@@ -4,13 +4,15 @@ import { connect } from "react-redux";
 import { Link } from 'react-router-dom';
 import { Empty } from 'antd';
 import { importProducts } from "../store/actions/products";
+import { addBoxScan } from '../store/actions/boxScans';
 
 
 class ProductTableNew extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      filters: []
+      filters: [],
+      fetchData: 0,
     }
   }
 
@@ -104,6 +106,14 @@ class ProductTableNew extends Component {
             },
             {
               span: 24,
+              id: "quantity",
+              text: "Quantity",
+              required: true,
+              message: "Quantity is required",
+              type: 'number',
+            },
+            {
+              span: 24,
               id: "currentPOs",
               queryModel: "PurchaseOrder",
               searchKey: "name",
@@ -143,7 +153,7 @@ class ProductTableNew extends Component {
             },
             {
               span: 24,
-              id: "box",
+              id: "name",
               searchKey: "name",
               text: "Box Name",
               required: true,
@@ -154,7 +164,7 @@ class ProductTableNew extends Component {
             },
             {
               span: 24,
-              id: "location",
+              id: "locations",
               searchKey: "name",
               text: "Location",
               required: false,
@@ -165,7 +175,7 @@ class ProductTableNew extends Component {
           ],
           okText: "Save",
           cancelText: "Cancel",
-          // onSave: this.test,
+          onSave: this.handleNewBoxScan,
         })
         default :
           console.log('unknown insertType '+ insertType)
@@ -173,8 +183,22 @@ class ProductTableNew extends Component {
     }
   }
 
-  test = () => {
-    console.log('a test!')
+  handleNewBoxScan = (data) => {
+    return new Promise((resolve,reject) => {
+      let scan = {
+        ...data,
+        currentPOs: Array.isArray(data.currentPOs) ? data.currentPOs : [],
+        scanToPo: true,
+      }
+      addBoxScan(scan, this.props.currentUser.user.company)
+      .then(res => {
+        this.setState({ fetchData: this.state.fetchData + 1 })
+        resolve({text: 'Box Added', status: 'success' })
+      })
+      .catch(err => {
+        reject({ text: 'Failed to Add Box', status: 'error' });
+      })
+    })
   }
 
   render() {
@@ -185,6 +209,7 @@ class ProductTableNew extends Component {
           populateArray={[{ path: 'boxscans', populate: [{path: 'locations'}] }]}
           filters={this.state.filters}
           title={"Products New"}
+          fetchData={this.state.fetchData}
           onRowEditSave={this.handleRowEditSave}
           onImport={this.handleImport}
           onInsertDataSave={this.onInsertDataSave}

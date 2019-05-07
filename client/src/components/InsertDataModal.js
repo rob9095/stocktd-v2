@@ -65,7 +65,7 @@ class ModalForm extends Component {
   }
 
   handleAutoUpdate = (clicked, id, nestedKey) => {
-    let poArr = id === 'po' && [clicked.data]
+    let poArr = id === 'currentPOs' && [clicked.data]
     this.props.form.setFieldsValue({ [id]: poArr || Array.isArray(clicked.id) && clicked.id.map(c => c.id) || clicked.data[nestedKey || id] || ''})
   }
 

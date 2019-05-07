@@ -65,6 +65,9 @@ class ProductTable extends Component {
     if (this.props.filters[0] !== prevProps.filters[0]) {
       this.handleDataFetch()
     }
+    if (this.props.fetchData > prevProps.fetchData) {
+      this.handleDataFetch()
+    }
   }
 
   handleDataFetch = async (config) => {

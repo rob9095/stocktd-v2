@@ -34,7 +34,7 @@ const upsertScanLocation = (upsertData) => {
       let updates = locations.map(name => ({
         updateOne: {
           filter: { 
-            [filterRef]: { $regex: new RegExp(["^", name, "$"].join(""), "i") },
+            [filterRef]: { $regex: new RegExp(name, "i") },
             company,
           },
           update: {
@@ -73,8 +73,8 @@ const scanToPO = (boxScan,scanQty) => {
         let locations = await upsertScanLocation({ ...boxScan, filterRef: 'name' })
         boxScan.locations = locations.length > 0 ? locations.map(l=>l._id) : []
       }
-      //define the current po, first array item if array, otherwise find in boxScan, if undefined in boxScan set to generic inbound po
-      const currentPO = Array.isArray(boxScan.currentPOs) ? boxScan.currentPOs[0] : boxScan.currentPOs || genericInboundPo
+      //define the current po, first array item if array, otherwise set to generic inbound po
+      const currentPO = Array.isArray(boxScan.currentPOs) ? boxScan.currentPOs[0] : genericInboundPo
       // find the po, otherwise set it to generic inbound defaults above to upsert
       let foundPo = await db.PurchaseOrder.findOne({ poRef: currentPO.poRef }) || genericInboundPo
       //upsert poProduct, update Product, upsert Purchase Order, upsert boxScan
@@ -111,9 +111,11 @@ const scanToPO = (boxScan,scanQty) => {
       let poId = updatedPo.upserted ? updatedPo.upserted[0]._id : foundPo._id
       delete boxScan.quantity
       await db.BoxScan.update({
-        skuCompany: { $regex: new RegExp(["^", boxScan.skuCompany, "$"].join(""), "i") },
-        name: { $regex: new RegExp(["^", boxScan.name, "$"].join(""), "i") },
-        po: poId
+        skuCompany: { $regex: new RegExp(boxScan.skuCompany, "i") },
+        name: { $regex: new RegExp(boxScan.name, "i") },
+        po: poId,
+        poProduct: updatedPoProduct._id,
+        scanToPo: boxScan.scanToPo,
       },
         {
           lastScan: new Date(),
@@ -125,8 +127,8 @@ const scanToPO = (boxScan,scanQty) => {
         { upsert: true }
       );
       updatedBoxScan = await db.BoxScan.findOne({
-        skuCompany: { $regex: new RegExp(["^", boxScan.skuCompany, "$"].join(""), "i") },
-        name: { $regex: new RegExp(["^", boxScan.name, "$"].join(""), "i") },
+        skuCompany: { $regex: new RegExp(boxScan.skuCompany, "i") },
+        name: { $regex: new RegExp(boxScan.name, "i") },
         po: poId
       })
       resolve({
@@ -211,9 +213,10 @@ const scanFromPO = (scan, scanQty, product) => {
           }
           delete boxScan.quantity
           await db.BoxScan.update({
-              skuCompany: { $regex: new RegExp(["^", boxScan.skuCompany, "$"].join(""), "i") },
-              name: { $regex: new RegExp(["^", boxScan.name, "$"].join(""), "i") },
-              po: po._id
+              skuCompany: { $regex: new RegExp(boxScan.skuCompany, "i") },
+              name: { $regex: new RegExp(boxScan.name, "i") },
+              po: po._id,
+              scanToPo: boxScan.scanToPo,
             },
             {
               lastScan: new Date(),
@@ -225,8 +228,8 @@ const scanFromPO = (scan, scanQty, product) => {
             { upsert: true }
             );
           updatedBoxScan = await db.BoxScan.findOne({
-            skuCompany: { $regex: new RegExp(["^", boxScan.skuCompany, "$"].join(""), "i") },
-            name: { $regex: new RegExp(["^", boxScan.name, "$"].join(""), "i") },
+            skuCompany: { $regex: new RegExp(boxScan.skuCompany, "i") },
+            name: { $regex: new RegExp(boxScan.name, "i") },
             po: po._id
           })
           break;
@@ -478,7 +481,8 @@ exports.upsertBoxScan = async (req, res, next) => {
   try {
     let [product, ...products] = await db.Product.find({
       company: req.body.company,
-      barcode: { $regex: new RegExp(["^", req.body.scan.barcode, "$"].join(""), "i") }
+      ...req.body.scan.barcode && {barcode: { $regex: new RegExp(req.body.scan.barcode, "i") }},
+      ...req.body.scan.sku && { barcode: { $regex: new RegExp(req.body.scan.sku, "i") } }
     })
     if (!product) {
       return next({
@@ -577,7 +581,7 @@ const bulkUpsertBoxScans = (config) => {
         return({
           updateOne: {
             filter: {
-              name: { $regex: new RegExp(["^", box.name, "$"].join(""), "i") },
+              name: { $regex: new RegExp(box.name, "i") },
               company,
               product: product._id,
               po: po._id,
