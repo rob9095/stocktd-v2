@@ -30,11 +30,10 @@ const upsertScanLocation = (upsertData) => {
       if (locations.filter(l => typeof l !== 'string').length > 0) {
         throw 'Invalid locations array, please provide string array'
       }
-      filterRef = filterRef || 'name'
       let updates = locations.map(name => ({
         updateOne: {
           filter: { 
-            [filterRef]: { $regex: new RegExp(name, "i") },
+            [filterRef || 'name']: name,
             company,
           },
           update: {
@@ -482,7 +481,7 @@ exports.upsertBoxScan = async (req, res, next) => {
     let [product, ...products] = await db.Product.find({
       company: req.body.company,
       ...req.body.scan.barcode && {barcode: { $regex: new RegExp(req.body.scan.barcode, "i") }},
-      ...req.body.scan.sku && { barcode: { $regex: new RegExp(req.body.scan.sku, "i") } }
+      ...req.body.scan.sku && { sku: { $regex: new RegExp(req.body.scan.sku, "i") } }
     })
     if (!product) {
       return next({

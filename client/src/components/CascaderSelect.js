@@ -41,8 +41,9 @@ class CascaderSelect extends Component {
     }))
     if (this.props.reverseData) {
       //reverse the data, set children to parents and vise versa
+      data = []
       for (let option of this.props.data) {
-        data = option[this.props.child.arrayKey].map((child, ci) => {
+        let options = option[this.props.child.arrayKey].map((child, ci) => {
           return ({
             label: child[this.props.child.title] || child[this.props.parent.label] || child._id || ci,
             value: child[this.props.child.label] || child[this.props.parent.value] || child._id || ci,
@@ -59,6 +60,7 @@ class CascaderSelect extends Component {
             })),
           })
         })
+        data.push(...options)
       }
     }
     let defaultParent = data.find(parent=>parent.isDefault) || {children: []}
