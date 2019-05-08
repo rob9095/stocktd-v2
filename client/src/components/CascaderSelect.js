@@ -63,6 +63,19 @@ class CascaderSelect extends Component {
         data.push(...options)
       }
     }
+    data = data.reduce((acc,cv)=>{
+      const foundIndex = acc.map(option=>option.id).indexOf(cv.id)
+      if (foundIndex !== -1) {
+        //push the chilren to the existing option
+        acc[foundIndex].children = [...acc[foundIndex].children, ...cv.children]
+        //need to remove duplicates here
+        //.reduce((cAcc,cCv)=>{cAcc.map(c=>c.id).indexOf(cCv.id) !== -1 ? [...cAcc] : [...cAcc, ...cCv]},[])
+        return [...acc]
+      } else {
+        return [...acc, cv]
+      }
+    },[])
+    console.log({data})
     let defaultParent = data.find(parent=>parent.isDefault) || {children: []}
     let defaultChild = defaultParent.children.find(child=>child.isDefault) || {}
     let value = [defaultParent.value, defaultChild.value]
