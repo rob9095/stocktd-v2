@@ -30,54 +30,18 @@ class CascaderSelect extends Component {
       key: option._id || i,
       id: option._id,
       isDefault: option._id === option[this.props.parent.defaultKey],
-      [[this.props.parent.defaultKey]]: option[this.props.parent.defaultKey],
+      ...this.props.parent.sortKey && {[this.props.parent.sortKey]: option[this.props.parent.sortKey]},
       children: option[this.props.child.arrayKey].map((child,ci) => ({
         label: child[this.props.child.label] || child[this.props.parent.label] || child._id || ci,
         value: child[this.props.child.label] || child[this.props.parent.value] || child._id || ci,
         key: child._id || ci,
         id: child._id,
-        isDefault: child._id === child[this.props.child.defaultKey],
+        isDefault: child._id === option[this.props.child.defaultKey],
       }))
-    }))
-    if (this.props.reverseData) {
-      //reverse the data, set children to parents and vise versa
-      data = []
-      for (let option of this.props.data) {
-        let options = option[this.props.child.arrayKey].map((child, ci) => {
-          return ({
-            label: child[this.props.child.title] || child[this.props.parent.label] || child._id || ci,
-            value: child[this.props.child.label] || child[this.props.parent.value] || child._id || ci,
-            key: child._id || ci,
-            id: child._id,
-            isDefault: child._id === option[this.props.child.defaultKey],
-            [[this.props.child.defaultKey]]: option[this.props.child.defaultKey],
-            children: this.props.data.filter(parent => parent[this.props.child.arrayKey].map(val => val[this.props.child.title]).includes(child[this.props.child.title])).map((parent, pi) => ({
-              label: parent[this.props.parent.label] || parent._id + child._id || ci + pi,
-              value: parent[this.props.parent.value] + " " + child[this.props.child.label] || parent._id + child._id || ci + pi,
-              key: parent._id +"-"+ child._id || ci + pi,
-              id: parent._id,
-              isDefault: parent._id === option[this.props.parent.defaultKey],
-            })),
-          })
-        })
-        data.push(...options)
-      }
-    }
-    data = data.reduce((acc,cv)=>{
-      const foundIndex = acc.map(option=>option.id).indexOf(cv.id)
-      if (foundIndex !== -1) {
-        //push the chilren to the existing option
-        acc[foundIndex].children = [...acc[foundIndex].children, ...cv.children]
-        //need to remove duplicates here
-        //.reduce((cAcc,cCv)=>{cAcc.map(c=>c.id).indexOf(cCv.id) !== -1 ? [...cAcc] : [...cAcc, ...cCv]},[])
-        return [...acc]
-      } else {
-        return [...acc, cv]
-      }
-    },[])
-    console.log({data})
-    let defaultParent = data.find(parent=>parent.isDefault) || {children: []}
-    let defaultChild = defaultParent.children.find(child=>child.isDefault) || {}
+    })).reduce((acc, cv) => acc.map(option => option.label).indexOf(cv.label) !== -1 ? [...acc] : [...acc, cv],[])
+    //get defaults, use empty option if no data, otherwise check for default, otherwise use sortKey provided to parent
+    let defaultParent = data.length === 0 ? { children: [] } : data.find(parent=>parent.isDefault) || data.sort((a,b)=>b[this.props.parent.sortKey] - a[this.props.parent.sortKey])[0]
+    let defaultChild = defaultParent.children.length === 0 ? {} : defaultParent.children.find(child => child.isDefault) || defaultParent.children[0]
     let value = [defaultParent.value, defaultChild.value]
     this.setState({
       data,
