@@ -560,6 +560,7 @@ class ProductTable extends Component {
                   child={col.child}
                   onUpdate={(value, options) => this.handleAutoCompleteUpdate({ rowId: r._id, handler: col.handler, clicked: {value, options}, colId: col.id, })}
                   showAddOption={true}
+                  reverseData={col.reverseData}
                   onAddNewItem={()=>{
                     let insertDataModal = this.props.onGetInsertDataConfig(this.state.data.filter(row => row._id === r._id), 'addNewBox')
                     insertDataModal = {

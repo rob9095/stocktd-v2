@@ -33,7 +33,7 @@ class ReceiveInventory extends Component {
         scanToPo: true,
       };
       console.log(scan)
-      this.props.addBoxScan(scan, this.props.currentUser.user.company)
+      addBoxScan(scan, this.props.currentUser.user.company)
         .then(res => {
           resolve(res)
         })

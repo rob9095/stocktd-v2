@@ -25,8 +25,8 @@ class CascaderSelect extends Component {
     this._isMounted = true;
     //loop through provided data and configure options
     let data = this.props.data.map((option,i) => ({
-      label: option[this.props.parent.label] || option._id || i,
-      value: option[this.props.parent.value] || option._id || i,
+      label: option[this.props.parent.label] + option.po.name || option._id || i,
+      value: option[this.props.parent.value] + option.po.name || option._id || i,
       key: option._id || i,
       id: option._id,
       isDefault: option._id === option[this.props.parent.defaultKey],
@@ -38,12 +38,12 @@ class CascaderSelect extends Component {
         id: child._id,
         isDefault: child._id === option[this.props.child.defaultKey],
       }))
-    }))
-    .reduce((acc, cv) => acc.map(option => option.label).indexOf(cv.label) !== -1 ? [...acc] : [...acc, cv],[])
+    })).reduce((acc, cv) => acc.map(option => option.label).indexOf(cv.label) !== -1 ? [...acc] : [...acc, cv],[])
 
     //reverse the data
-    let newData = data.map(option=>[...option.children]).flat().map(option=>({...option,children: data.filter(parent=>parent.children.map(c=>c.value).indexOf(option.value) !== -1).map(parent=>({...parent, children: null}))}))
-    data = newData.reduce((acc, cv) => acc.map(option => option.label).indexOf(cv.label) !== -1 ? [...acc] : [...acc, cv], [])
+    if (this.props.reverseData) {
+      data = data.map(option => [...option.children]).flat().map(option => ({ ...option, children: data.filter(parent => parent.children.map(c => c.value).indexOf(option.value) !== -1).map(parent => ({ ...parent, children: null })) })).reduce((acc, cv) => acc.map(option => option.label).indexOf(cv.label) !== -1 ? [...acc] : [...acc, cv], [])
+    }
 
     //get defaults, use empty option if no data, otherwise check for default, otherwise use sortKey provided to parent
     let defaultParent = data.length === 0 ? { children: [] } : data.find(parent=>parent.isDefault) || data.sort((a,b)=>b[this.props.parent.sortKey] - a[this.props.parent.sortKey])[0]

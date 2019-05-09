@@ -321,7 +321,7 @@ class PoProductTable extends Component {
         }
         let poRefs = this.state.currentPOs.sort((a,b)=>(b.quantity - a.quantity))
         console.log(poRefs)
-        this.props.addBoxScan(scan, this.props.currentUser.user.company)
+        addBoxScan(scan, this.props.currentUser.user.company)
         .then(res => {
           let data = this.state.data.map(p => {
             if (p._id === res.updatedPoProduct._id) {

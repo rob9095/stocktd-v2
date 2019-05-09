@@ -70,7 +70,7 @@ class ProductTableNew extends Component {
   handleCascaderUpdate = (data) => {
     console.log({data})
     return new Promise((resolve,reject) => {
-      let [box,location, ...rest] = data.clicked.options
+      let [location,box, ...rest] = data.clicked.options
       let update = [{
         id: data.rowId,
         defaultLocation: location ? location.id : null,
@@ -206,7 +206,7 @@ class ProductTableNew extends Component {
       <div>
         <StkdTable
           queryModel="Product"
-          populateArray={[{ path: 'boxscans', populate: [{path: 'locations'}] }]}
+          populateArray={[{ path: 'boxscans', populate: [{path: 'locations'},{path: 'po'}] }]}
           filters={this.state.filters}
           title={"Products New"}
           fetchData={this.state.fetchData}
@@ -263,7 +263,7 @@ class ProductTableNew extends Component {
             // { id: 'po', nestedKey: 'type', text: 'PO Type', width: 175, span: 8, className: 'no-wrap', disabled: true },
             // { id: 'locations', type: 'autoComplete', autoCompleteMode: 'tags', nestedKey: 'name', refModel: 'BoxScan', queryModel: 'Location', text: 'Location', width: 175, span: 8, className: 'no-wrap', },
             //{ id: 'boxscans', type: 'autoComplete', autoCompleteMode: 'default', nestedKey: 'name', queryModel: 'Location', text: 'Location', width: 175, span: 8, className: 'no-wrap', },
-            { id: 'boxscans', type: 'cascader', autoCompleteMode: 'default', text: 'Locations', width: 175, span: 8, className: 'no-wrap', parent: {label: 'name', value: 'name', defaultKey: 'defaultBox', sortKey: 'quantity'}, child: {label: 'name',value: 'name', arrayKey: 'locations', defaultKey: 'defaultLocation'}, handler: this.handleCascaderUpdate, },
+            { id: 'boxscans', type: 'cascader', autoCompleteMode: 'default', text: 'Locations', width: 175, span: 8, className: 'no-wrap', reverseData: true, parent: {label: 'name', value: 'name', defaultKey: 'defaultBox', sortKey: 'quantity'}, child: {label: 'name',value: 'name', arrayKey: 'locations', defaultKey: 'defaultLocation'}, handler: this.handleCascaderUpdate, },
             { id: 'actions', text: 'Actions', width: 100, noSort: true, actionOptions: [{ name: 'Add to Order', key: 'add-to-order', },{ name: 'Copy', key: 'copy', },{ name: 'Delete', key: 'delete', }] },
           ]}
         />
