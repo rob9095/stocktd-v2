@@ -425,10 +425,11 @@ i.xl svg {
   width: 100%;
 }
 
-.cascader-popup .ant-cascader-menu-item.ant-cascader-menu-item-expand {
+.cascader-popup .ant-cascader-menu-item {
   display: flex;
   align-items: center;
   white-space: normal;
+  width: 100%;
 }
 
 .cascader-popup .ant-cascader-menu {

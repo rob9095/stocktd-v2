@@ -21,7 +21,7 @@ class ProductTable extends Component {
     this.state = {
       loading: true,
       loadingRows: [],
-      rowsPerPage: 100,
+      rowsPerPage: 10,
       activePage: 1,
       totalPages: 0,
       skip: 0,
@@ -436,7 +436,7 @@ class ProductTable extends Component {
           ...scan,
           user: this.props.currentUser.user.id,
         }
-        await this.props.addBoxScan(scan, this.props.currentUser.user.company)
+        await addBoxScan(scan, this.props.currentUser.user.company)
         .then(res => {
           this.handleDataFetch()
           resolve(res)

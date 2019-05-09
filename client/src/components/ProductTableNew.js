@@ -263,7 +263,7 @@ class ProductTableNew extends Component {
             // { id: 'po', nestedKey: 'type', text: 'PO Type', width: 175, span: 8, className: 'no-wrap', disabled: true },
             // { id: 'locations', type: 'autoComplete', autoCompleteMode: 'tags', nestedKey: 'name', refModel: 'BoxScan', queryModel: 'Location', text: 'Location', width: 175, span: 8, className: 'no-wrap', },
             //{ id: 'boxscans', type: 'autoComplete', autoCompleteMode: 'default', nestedKey: 'name', queryModel: 'Location', text: 'Location', width: 175, span: 8, className: 'no-wrap', },
-            { id: 'boxscans', type: 'cascader', autoCompleteMode: 'default', text: 'Locations', width: 175, span: 8, className: 'no-wrap', reverseData: true, parent: {label: 'name', value: 'name', defaultKey: 'defaultBox', sortKey: 'quantity'}, child: {label: 'name',value: 'name', arrayKey: 'locations', defaultKey: 'defaultLocation'}, handler: this.handleCascaderUpdate, },
+            { id: 'boxscans', type: 'cascader', autoCompleteMode: 'default', text: 'Locations', width: 175, span: 8, className: 'no-wrap', reverseData: true, parent: {label: 'name', value: 'name', defaultKey: 'defaultBox', sortKey: 'quantity', subChild: {key: 'po', label: 'name', value: 'name', defaultKey: 'po'}}, child: {label: 'name',value: 'name', arrayKey: 'locations', defaultKey: 'defaultLocation'}, handler: this.handleCascaderUpdate, },
             { id: 'actions', text: 'Actions', width: 100, noSort: true, actionOptions: [{ name: 'Add to Order', key: 'add-to-order', },{ name: 'Copy', key: 'copy', },{ name: 'Delete', key: 'delete', }] },
           ]}
         />
