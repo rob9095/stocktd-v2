@@ -418,7 +418,7 @@ class ScanForm extends Component {
                 </FormItem>
               </Col>
               <Col s={24} md={6}>
-                <FormItem label="Scan Type" >
+                <FormItem label="Scan Type" add >
                   {getFieldDecorator("scanToPo", {
                     initialValue: this.props.scanToPo === false  ? false : true, rules: [
                       {
@@ -426,36 +426,36 @@ class ScanForm extends Component {
                         message: "Scan type is required"
                       }
                     ] })(
-                    <RadioGroup>
-                      <Radio value={true}>Scan to PO</Radio>
-                      <Radio value={false}>Scan from PO</Radio>
-                        <Tooltip overlayStyle={{fontSize: 'small'}} title="What's this?">
-                        <Button size="small" className="no-border no-bg" onClick={()=>this.showInfoModal({
-                          title: 'Scan Types Explained',
-                          message: (
-                            <div>
-                              <h4>Scan From PO</h4>
-                              <ul>
-                                <li>Scanning from a purchase order <strong>does not affect current inventory levels</strong> and is used to audit inbound and outbound purchase orders.</li>
-                                <li>After a successful scan, the box information is saved and the scanned quantity for the product is updated on the purchase order.</li>
-                                <li>You can scan from multiple purchase orders but at least one purchase order is required to scan from.</li>
-                                <li>If the same product is on multiple purchase orders, the scanner will scan from the purchase order with the largest quantity first.</li>
-                              </ul>
-                              <h4>Scan To PO</h4>
-                              <ul>
-                                <li>Scanning to a purchase order <strong>does affect current inventory levels</strong> and is used for adding inventory and products to purchase orders.</li>
-                                <li>After a successful scan, the box information is saved, the quantity for the product is updated on the purchase order, and the inventory level is updated on the product.</li>
-                                <li>You can only scan to one purchase order at a time and you are not required to choose a purchase order to scan to.</li>
-                                <li>If no purchase order is selected, the scanned inventory and products are added to a generic inbound purchase order.</li>
-                              </ul>
-                            </div>
-                          )
-                        }).then(()=>this.setState({infoModalConfig: null}))}>
-                          <Icon type="question-circle" theme="twoTone" twoToneColor="#716aca" />
-                        </Button>
-                      </Tooltip>
+                    <RadioGroup buttonStyle="solid" size="small">
+                      <Radio.Button value={true}>Scan to PO</Radio.Button>
+                      <Radio.Button value={false}>Scan from PO</Radio.Button>
                     </RadioGroup>
                   )}
+                  <Tooltip overlayStyle={{ fontSize: 'small' }} title="What's this?">
+                    <Button size="small" className="no-border no-bg" onClick={() => this.showInfoModal({
+                      title: 'Scan Types Explained',
+                      message: (
+                        <div>
+                          <h4>Scan From PO</h4>
+                          <ul>
+                            <li>Scanning from a purchase order <strong>does not affect current inventory levels</strong> and is used to audit inbound and outbound purchase orders.</li>
+                            <li>After a successful scan, the box information is saved and the scanned quantity for the product is updated on the purchase order.</li>
+                            <li>You can scan from multiple purchase orders but at least one purchase order is required to scan from.</li>
+                            <li>If the same product is on multiple purchase orders, the scanner will scan from the purchase order with the largest quantity first.</li>
+                          </ul>
+                          <h4>Scan To PO</h4>
+                          <ul>
+                            <li>Scanning to a purchase order <strong>does affect current inventory levels</strong> and is used for adding inventory and products to purchase orders.</li>
+                            <li>After a successful scan, the box information is saved, the quantity for the product is updated on the purchase order, and the inventory level is updated on the product.</li>
+                            <li>You can only scan to one purchase order at a time and you are not required to choose a purchase order to scan to.</li>
+                            <li>If no purchase order is selected, the scanned inventory and products are added to a generic inbound purchase order.</li>
+                          </ul>
+                        </div>
+                      )
+                    }).then(() => this.setState({ infoModalConfig: null }))}>
+                      <Icon type="question-circle" theme="twoTone" twoToneColor="#716aca" />
+                    </Button>
+                  </Tooltip>
                 </FormItem>
               </Col>
             </Row>
