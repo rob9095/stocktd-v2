@@ -425,6 +425,12 @@ i.xl svg {
   width: 100%;
 }
 
+.cascader-popup .ant-cascader-menu-item.ant-cascader-menu-item-expand {
+  display: flex;
+  align-items: center;
+  white-space: normal;
+}
+
 .cascader-popup .ant-cascader-menu {
   height: auto;
 }

@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import { Button, Select, Empty, Form, Skeleton, Divider, Icon, Input } from 'antd';
+import { Button, Select, Empty, Form, Skeleton, Divider, Icon, Input, Tooltip } from 'antd';
 import { getAllModelDocuments } from '../store/actions/models';
 import { connect } from "react-redux";
-import InsertDataModal from './InsertDataModal';
 
 const Option = Select.Option;
 
@@ -62,10 +61,9 @@ class AutoCompleteInputForm extends Component {
   }
 
   handleTransition = async () => {
-    console.log('click tranny')
     await this.setState({
       transition: true,
-      addItem: true,
+      addItem: !this.state.addItem,
     })
     setTimeout(()=>{
       this.setState({
@@ -130,6 +128,11 @@ class AutoCompleteInputForm extends Component {
           {this.state.addItem ?
             <Input
               onChange={(e) => this.props.onAddItemInputChange(e.target.value)}
+              suffix={
+                <Tooltip title="Cancel">
+                  <Icon type="close-circle" style={{ color: 'rgba(0,0,0,.45)', cursor: 'pointer' }} onClick={this.handleTransition} />
+                </Tooltip>
+              }
             />
             :
             getFieldDecorator("selected", { initialValue: this.props.selected && this.state.selected })(

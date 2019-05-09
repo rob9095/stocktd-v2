@@ -38,7 +38,13 @@ class CascaderSelect extends Component {
         id: child._id,
         isDefault: child._id === option[this.props.child.defaultKey],
       }))
-    })).reduce((acc, cv) => acc.map(option => option.label).indexOf(cv.label) !== -1 ? [...acc] : [...acc, cv],[])
+    }))
+    .reduce((acc, cv) => acc.map(option => option.label).indexOf(cv.label) !== -1 ? [...acc] : [...acc, cv],[])
+
+    //reverse the data
+    let newData = data.map(option=>[...option.children]).flat().map(option=>({...option,children: data.filter(parent=>parent.children.map(c=>c.value).indexOf(option.value) !== -1).map(parent=>({...parent, children: null}))}))
+    data = newData.reduce((acc, cv) => acc.map(option => option.label).indexOf(cv.label) !== -1 ? [...acc] : [...acc, cv], [])
+
     //get defaults, use empty option if no data, otherwise check for default, otherwise use sortKey provided to parent
     let defaultParent = data.length === 0 ? { children: [] } : data.find(parent=>parent.isDefault) || data.sort((a,b)=>b[this.props.parent.sortKey] - a[this.props.parent.sortKey])[0]
     let defaultChild = defaultParent.children.length === 0 ? {} : defaultParent.children.find(child => child.isDefault) || defaultParent.children[0]
