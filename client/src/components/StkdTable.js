@@ -90,6 +90,7 @@ class ProductTable extends Component {
       const foundPc = this.state.populateArray.find(p => p.path === pC.path)
       if (foundPc) {
         return ({
+          ...pC,
           ...foundPc
         })
       } else {
@@ -555,7 +556,7 @@ class ProductTable extends Component {
               <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
                 <CascaderSelect
                   id={`${r._id}-${col.id}-cascader-select`}
-                  data={Array.isArray(r[col.id]) ? r[col.id].map(option => ({ ...r, ...option, })).filter(option=>option.scanToPo === true) : []}
+                  data={Array.isArray(r[col.id]) ? col.filter ? col.filter(r[col.id].map(option => ({ ...r, ...option, }))) : r[col.id].map(option => ({ ...r, ...option, })) : []}
                   parent={col.parent}
                   child={col.child}
                   onUpdate={(value, options) => this.handleAutoCompleteUpdate({ rowId: r._id, handler: col.handler, clicked: {value, options}, colId: col.id, })}

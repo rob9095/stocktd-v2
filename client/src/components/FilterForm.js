@@ -70,7 +70,8 @@ class FilterForm extends Component {
           if (match) {
             query = query.filter(val => val[0] !== match[0])
             match[0] = input.nestedKey
-            populateArray.push({ path: input.id, query: [match] })
+            let defaultQuery = input.defaultQuery || []
+            populateArray.push({ path: input.id, query: [match, ...defaultQuery] })
           }
         }
       }
