@@ -109,6 +109,8 @@ const scanToPO = (boxScan,scanQty) => {
       }, { upsert: true });
       let poId = updatedPo.upserted ? updatedPo.upserted[0]._id : foundPo._id
       delete boxScan.quantity
+      let locations = boxScan.locations
+      delete boxScan.locations
       await db.BoxScan.update({
         skuCompany: { $regex: new RegExp(boxScan.skuCompany, "i") },
         name: { $regex: new RegExp(boxScan.name, "i") },
@@ -118,6 +120,7 @@ const scanToPO = (boxScan,scanQty) => {
       },
         {
           lastScan: new Date(),
+          ...locations && { locations },
           $setOnInsert: {
             ...boxScan,
           },
@@ -211,6 +214,8 @@ const scanFromPO = (scan, scanQty, product) => {
             poProduct: updatedPoProduct._id,
           }
           delete boxScan.quantity
+          let locations = boxScan.locations
+          delete boxScan.locations
           await db.BoxScan.update({
               skuCompany: { $regex: new RegExp(boxScan.skuCompany, "i") },
               name: { $regex: new RegExp(boxScan.name, "i") },
@@ -219,6 +224,7 @@ const scanFromPO = (scan, scanQty, product) => {
             },
             {
               lastScan: new Date(),
+              ...locations && { locations },
               $setOnInsert: {
                 ...boxScan,
               },
