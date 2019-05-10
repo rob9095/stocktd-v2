@@ -59,10 +59,13 @@ class CascaderSelect extends Component {
 
     //reverse the data
     if (this.props.reverseData) {
-      data = data.map(option => [...option.children]).flat().map(option => ({
+      data = data.map(option => option.children.length === 0 ? [{ label: 'N/A', value:'N/A-stkd', key: 'N/A-stkd'}] : [...option.children]).flat().map(option => ({
          ...option,
-         children: data.filter(parent => parent.children.map(c => c.value).indexOf(option.value) !== -1)
-         .map(parent => ({ ...parent, children: parent.subChildren ? parent.subChildren.filter(sc=>sc.childrenValues.includes(option.value)) : null })) }))
+        children: 
+          option.value === 'N/A-stkd' ? data.filter(parent => parent.children.length === 0)
+          .map(parent => ({ ...parent, children: null }))
+          : data.filter(parent => parent.children.map(c => c.value).indexOf(option.value) !== -1)
+          .map(parent => ({ ...parent, children: null })) }))
          .reduce((acc, cv) => acc.map(option => option.value).indexOf(cv.value) !== -1 ? [...acc] : [...acc, cv], [])
     }
 
@@ -123,8 +126,8 @@ class CascaderSelect extends Component {
             getPopupContainer={() => document.getElementById(id)}
             value={this.state.value}
             displayRender={(label) => {
-              if (label[1]) {
-                label[1] = label[1].props.children[0].props.children
+              if (label[this.props.reverseData ? 1 : 0]) {
+                label[this.props.reverseData ? 1 : 0] = label[this.props.reverseData ? 1 : 0].props.children[0].props.children
                 return label.join(' / ')
               }
             }}
