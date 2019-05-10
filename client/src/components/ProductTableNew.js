@@ -208,6 +208,28 @@ class ProductTableNew extends Component {
           queryModel="Product"
           populateArray={[{ path: 'boxscans', populate: [{path: 'locations'},{path: 'po'}] }]}
           filters={this.state.filters}
+          additionalSearchInputs={[
+            {
+              id: 'boxscans',
+              text: 'Box Name',
+              width: 175,
+              span: 8,
+              className: 'no-wrap',
+              nestedKey: 'name',
+              defaultQuery: [['scanToPo', 'true', '=']],
+            },
+            {
+              id: 'locations',
+              text: 'Location',
+              width: 175,
+              span: 8,
+              className: 'no-wrap',
+              nestedKey: 'name',
+              populatePath: 'boxscans',
+              defaultPopulateArray: [{ path: 'po' }],
+              defaultQuery: [['scanToPo', 'true', '=']],
+            }
+          ]}
           title={"Products New"}
           fetchData={this.state.fetchData}
           onRowEditSave={this.handleRowEditSave}
@@ -272,8 +294,8 @@ class ProductTableNew extends Component {
               className: 'no-wrap',
               reverseData: true,
               nestedKey: 'name',
+              noFilter: true,
               filter: (arr)=>arr.filter(item=>item.scanToPo === true),
-              defaultQuery: [['scanToPo','true','=']],
               parent: {
                 label: 'name',
                 value: 'name',

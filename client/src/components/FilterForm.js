@@ -71,7 +71,10 @@ class FilterForm extends Component {
             query = query.filter(val => val[0] !== match[0])
             match[0] = input.nestedKey
             let defaultQuery = input.defaultQuery || []
-            populateArray.push({ path: input.id, query: [match, ...defaultQuery] })
+            input.populatePath ? 
+              populateArray.push({ path: input.populatePath, populate: [{ path: input.id, query: [match] }, ...input.defaultPopulateArray], query: defaultQuery })
+             :
+              populateArray.push({ path: input.id, query: [match, ...defaultQuery] })
           }
         }
       }
@@ -180,7 +183,7 @@ class FilterForm extends Component {
             className="ant-advanced-search-form"
             onSubmit={this.handleSubmit}
           >
-            <Row gutter={24}>{inputs}</Row>
+            <Row gutter={24} style={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap'}}>{inputs}</Row>
             <div>
               <div span={24} className="flex justify-content-center" style={{ margin: '20px 10px' }}>
                 <Button type="primary" htmlType="submit">Search</Button>
