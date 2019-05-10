@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Alert, Form, Row, Col, Input, Button, Select, Empty, Text, Spin, Modal, Table, Radio, Icon, Tooltip } from 'antd';
+import { Form, Row, Col, Input, Button, Select, Empty, Collapse, Spin, Modal, Table, Radio, Icon, Tooltip, List, Avatar } from 'antd';
 import { getAllModelDocuments, upsertModelDocuments } from '../store/actions/models';
 import InsertDataModal from './InsertDataModal';
 import { connect } from "react-redux";
 import AutoCompleteInput from './AutoCompleteInput';
+import InfiniteList from './InfiniteList';
 
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
@@ -179,6 +180,9 @@ class ScanForm extends Component {
         })
         .then(res=>{
           console.log(res)
+          this.setState({
+            lastScan: res.updatedBoxScan,
+          })
         })
         .catch((error)=>{
           console.log(error)
@@ -523,6 +527,44 @@ class ScanForm extends Component {
               </Col>
             </Row>
           </Form>
+          {!this.props.hideScanLog && (
+            <div id="scan-log" style={{position: 'relative'}}>
+              <Collapse bordered={false} style={{ background: 'transparent'}}>
+                <Collapse.Panel header="Scan Log" key="1" style={{
+                  background: 'transparent',
+                  borderRadius: 4,
+                  marginBottom: 24,
+                  border: 0,
+                  overflow: 'hidden',
+                }}>
+                  <InfiniteList
+                    lastItem={this.state.lastScan}
+                    id="scan-log"
+                    sortColumn="lastScanned"
+                    sortDir="descending"
+                    queryModel="BoxScan"
+                    populateArray={[{ path: 'locations' }, { path: 'po' }]}
+                    itemTitle={'sku'}
+                    itemDescription={'po.name'}
+                    itemContent={'lastScan'}
+                    renderItem={item=>
+                      <List.Item key={item._id}>
+                        <List.Item.Meta
+                          style={{ alignItems: 'center' }}
+                          avatar={<Avatar>{this.props.currentUser.user.email[0]}</Avatar>}
+                          title={item.name}
+                          description={item.po.name}
+                        />
+                        <div>
+                          {item.lastScan}
+                        </div>
+                      </List.Item>
+                    }
+                  />
+                </Collapse.Panel>
+              </Collapse>
+            </div>
+          )}
         </Spin>
       </div>
     );

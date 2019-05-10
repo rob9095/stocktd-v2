@@ -414,6 +414,10 @@ i.xl svg {
   color: #6f727d;
 }
 
+.ant-message {
+  position: absolute !important;
+}
+
 /* Selects */
 
 .cascader-popup > div {
