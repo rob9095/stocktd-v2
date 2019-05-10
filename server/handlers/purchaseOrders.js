@@ -317,7 +317,7 @@ exports.updatePurchaseOrder = async (req, res, next) => {
       }))
       poProductUpdates.push(...ppUpdates);
       //update quantity on main product if new po.type is different than current poProduct type
-      let pUpdates = products.filter(p=>p.po.type !== po.type).map(poLine => ({
+      let pUpdates = products.filter(p=>p.type !== po.type).map(poLine => ({
         updateOne: {
           filter: {skuCompany: poLine.skuCompany},
           update: {
