@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { List, message, Avatar, Spin } from 'antd';
+import { List, message, Avatar, Spin, Skeleton } from 'antd';
 import { connect } from 'react-redux';
 import { queryModelData } from '../store/actions/models';
 
@@ -56,8 +56,10 @@ class InfiniteListExample extends Component {
   handleDataFetch = async (config) => {
     let { requestedPage, requestedRowsPerPage, rowIds } = config || {}
     let rowId = Array.isArray(rowIds) ? rowIds[0] : null
+    let skeletons = [1,2,3,4,5].map(n=>({_id: n+'skel', docType:'skeleton'}))
     await this.setState({
-      ...rowId ? { loadingRows: [...rowIds] } : { loading: true }
+      ...rowId ? { loadingRows: [...rowIds] } : { loading: true },
+      data: [...this.state.data, ...skeletons]
     })
     requestedPage = requestedPage || this.state.activePage;
     requestedRowsPerPage = requestedRowsPerPage || this.state.rowsPerPage;
@@ -75,7 +77,7 @@ class InfiniteListExample extends Component {
     let query = this.props.filters ? [...this.state.query, ...this.props.filters] : this.state.query
     await this.props.queryModelData(this.props.queryModel, query, this.state.column, this.state.direction, requestedPage, requestedRowsPerPage, this.props.currentUser.user.company, populateArray)
       .then(({ data, activePage, totalPages, rowsPerPage, skip }) => {
-        data = [...this.state.data, ...data].reduce((acc,cv)=>acc.map(doc=>doc._id).indexOf(cv._id) !== -1 ? [...acc] : [...acc,cv],[])
+        data = [...this.state.data.filter(d=>d.docType !== 'skeleton'), ...data].reduce((acc,cv)=>acc.map(doc=>doc._id).indexOf(cv._id) !== -1 ? [...acc] : [...acc,cv],[])
         const hasMore = data.length >= rowsPerPage * totalPages ? false : true
         this.setState({
           skip,
@@ -122,7 +124,7 @@ class InfiniteListExample extends Component {
 
   render() {
     return (
-      <div className="contain stkd-content stkd-widget" style={{height: 300, padding: '0px 24px'}}>
+      <div className="contain" style={{height: 300,}}>
         <InfiniteScroll
           initialLoad={false}
           pageStart={0}
@@ -135,9 +137,10 @@ class InfiniteListExample extends Component {
             dataSource={this.state.data}
             renderItem={item => 
             this.props.renderItem ?
-              this.props.renderItem(item)
+                this.props.renderItem(item, this.state.loading)
               :
               <List.Item key={item._id}>
+                <Skeleton paragraph={{ rows: 1, width: '100%' }} title={false} loading={this.state.loading} active>
                 <List.Item.Meta
                   style={{alignItems: 'center'}}
                   avatar={<Avatar>{this.props.currentUser.user.email[0]}</Avatar>}
@@ -147,14 +150,15 @@ class InfiniteListExample extends Component {
                 <div>
                   {this.props.itemContent.split('.').reduce((p, c) => p && p[c] || null, item)}
                 </div>
+                </Skeleton>
               </List.Item>
             }
           >
-            {this.state.loading && this.state.hasMore && (
-              <div className="demo-loading-container">
+            {/* {this.state.loading && this.state.hasMore && (
+              <div className="flex justify-content-center align-items-center" style={{width: '100%', height: '100%'}}>
                 <Spin />
               </div>
-            )}
+            )} */}
           </List>
         </InfiniteScroll>
       </div>

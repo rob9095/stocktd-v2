@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Form, Row, Col, Input, Button, Select, Empty, Collapse, Spin, Modal, Table, Radio, Icon, Tooltip, List, Avatar } from 'antd';
+import { Form, Row, Col, Input, Button, Select, Empty, Collapse, Spin, Modal, Table, Radio, Icon, Tooltip, List, Avatar, Skeleton } from 'antd';
 import { getAllModelDocuments, upsertModelDocuments } from '../store/actions/models';
 import InsertDataModal from './InsertDataModal';
 import { connect } from "react-redux";
@@ -17,6 +17,7 @@ class ScanForm extends Component {
     super(props);
     this.state = {
       showBoxPrefixModal: false,
+      logOpen: false,
       boxPrefixList: [
         { value: 'Add New', id: 'Add New' },
       ],
@@ -516,9 +517,10 @@ class ScanForm extends Component {
                 md={2}
                 style={{
                   display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: 115
+                  justifyContent: "flex-end",
+                  alignItems: "flex-end",
+                  height: 75,
+                  flexDirection: 'column'
                 }}
               >
                 <Button type="primary" htmlType="submit">
@@ -528,41 +530,55 @@ class ScanForm extends Component {
             </Row>
           </Form>
           {!this.props.hideScanLog && (
-            <div id="scan-log" style={{position: 'relative'}}>
-              <Collapse bordered={false} style={{ background: 'transparent'}}>
-                <Collapse.Panel header="Scan Log" key="1" style={{
-                  background: 'transparent',
-                  borderRadius: 4,
-                  marginBottom: 24,
-                  border: 0,
-                  overflow: 'hidden',
-                }}>
-                  <InfiniteList
-                    lastItem={this.state.lastScan}
-                    id="scan-log"
-                    sortColumn="lastScanned"
-                    sortDir="descending"
-                    queryModel="BoxScan"
-                    populateArray={[{ path: 'locations' }, { path: 'po' }]}
-                    itemTitle={'sku'}
-                    itemDescription={'po.name'}
-                    itemContent={'lastScan'}
-                    renderItem={item=>
-                      <List.Item key={item._id}>
+            <div id="scan-log" style={{position: 'relative', padding: '0px 0px 24px 0px'}}>
+              <Button
+                size="small"
+                type={this.state.logOpen ? 'primary' : 'default'}
+                onClick={()=>this.setState({logOpen: !this.state.logOpen})}
+                style={{marginBottom: 10}}
+              >
+                Recent Scans {this.state.logOpen && <Icon type="close" />}
+              </Button>
+              {this.state.logOpen && (
+                <InfiniteList
+                  lastItem={this.state.lastScan}
+                  id="scan-log"
+                  sortColumn="lastScan"
+                  sortDir="descending"
+                  queryModel="BoxScan"
+                  populateArray={[{ path: 'locations' }, { path: 'po' }]}
+                  itemTitle={'sku'}
+                  itemDescription={'po.name'}
+                  itemContent={'lastScan'}
+                  renderItem={(item, itemLoading) =>
+                      <List.Item key={item._id}
+                        style={{
+                          borderBottom: '0px',
+                          background: '#fff',
+                          ...itemLoading ? {padding: 10, height: 47, paddingTop: 25} : {padding: 0},
+                          margin: '10px 0px',
+                          
+                          }}
+                      >
+                      <Skeleton paragraph={{ rows: 1, width: '100%' }} title={false} loading={itemLoading} active>
                         <List.Item.Meta
                           style={{ alignItems: 'center' }}
-                          avatar={<Avatar>{this.props.currentUser.user.email[0]}</Avatar>}
-                          title={item.name}
-                          description={item.po.name}
+                          // avatar={<Avatar>{this.props.currentUser.user.email[0]}</Avatar>}
+                          // title={item.name}
+                          description={(
+                            <Collapse bordered={false} defaultActiveKey={['1']}>
+                              <Collapse.Panel header={item.sku} key={item._id} style={{border: 0}}>
+                                {item.po && item.po.name}
+                                {new Date(item.lastScan).toLocaleString()}
+                              </Collapse.Panel>
+                            </Collapse>
+                          )}
                         />
-                        <div>
-                          {item.lastScan}
-                        </div>
+                      </Skeleton>
                       </List.Item>
-                    }
-                  />
-                </Collapse.Panel>
-              </Collapse>
+                  }
+                />
+              )}
             </div>
           )}
         </Spin>
