@@ -516,17 +516,10 @@ class ScanForm extends Component {
                 s={24}
                 md={3}
                 lg={2}
-                style={{
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  alignItems: "flex-start",
-                  height: 75,
-                  flexDirection: 'column'
-                }}
               >
-                <Button type="primary" htmlType="submit">
-                  Scan
-                </Button>
+                <FormItem label=" " colon={false}>
+                  <Button type="primary" htmlType="submit">Scan</Button>
+                </FormItem>
               </Col>
             </Row>
           </Form>
@@ -568,7 +561,17 @@ class ScanForm extends Component {
                           // title={item.name}
                           description={(
                             <Collapse bordered={false} defaultActiveKey={['1']}>
-                              <Collapse.Panel header={item.sku} key={item._id} style={{border: 0}}>
+                              <Collapse.Panel header={(
+                                <div className="flex align-items-center space-between">
+                                  <div>
+                                    {item.sku}
+                                    <i style={{fontSize: 'small'}}> scanned {item.scanToPo ? 'to' : 'from'}</i> {item.po && item.po.name}
+                                  </div>
+                                  <div>
+                                    {new Date(item.lastScan).toLocaleString()}
+                                  </div>
+                                </div>
+                                )} key={item._id} style={{border: 0}}>
                                 {item.po && item.po.name}
                                 {new Date(item.lastScan).toLocaleString()}
                               </Collapse.Panel>
