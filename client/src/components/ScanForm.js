@@ -359,7 +359,7 @@ class ScanForm extends Component {
         <Spin spinning={!this.state.currentPrefix}>
           <Form className="scan-form" onSubmit={this.handleSubmit}>
             <Row gutter={24} style={{ minHeight: 90 }}>
-              <Col s={24} md={9}>
+              <Col s={24} md={8} lg={8}>
                 <FormItem label="Purchase Order">
                   {getFieldDecorator("currentPOs", {
                     rules: [
@@ -405,7 +405,7 @@ class ScanForm extends Component {
                   )}
                 </FormItem>
               </Col>
-              <Col s={24} md={9}>
+              <Col s={24} md={7} lg={9}>
                 <FormItem label="Location">
                   {getFieldDecorator("locations")(
                     <AutoCompleteInput
@@ -422,7 +422,7 @@ class ScanForm extends Component {
                   )}
                 </FormItem>
               </Col>
-              <Col s={24} md={6}>
+              <Col s={24} md={9} lg={7}>
                 <FormItem label="Scan Type" add >
                   {getFieldDecorator("scanToPo", {
                     initialValue: this.props.scanToPo === false  ? false : true, rules: [
@@ -465,7 +465,7 @@ class ScanForm extends Component {
               </Col>
             </Row>
             <Row gutter={24}>
-              <Col s={24} md={8}>
+              <Col s={24} md={8} lg={8}>
                 <FormItem label="Box Name">
                   {getFieldDecorator("name", {
                     rules: [
@@ -479,7 +479,7 @@ class ScanForm extends Component {
                   )}
                 </FormItem>
               </Col>
-              <Col s={24} md={10}>
+              <Col s={24} md={9} lg={10}>
                 <FormItem label="Scan ID">
                   {getFieldDecorator("barcode", {
                     rules: [
@@ -514,11 +514,12 @@ class ScanForm extends Component {
               </Col>
               <Col
                 s={24}
-                md={2}
+                md={3}
+                lg={2}
                 style={{
                   display: "flex",
                   justifyContent: "flex-end",
-                  alignItems: "flex-end",
+                  alignItems: "flex-start",
                   height: 75,
                   flexDirection: 'column'
                 }}
