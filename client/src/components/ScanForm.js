@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Form, Row, Col, Input, Button, Select, Empty, Collapse, Spin, Modal, Table, Radio, Icon, Tooltip, List, Avatar, Skeleton } from 'antd';
+import { Form, Row, Col, Input, Button, Select, Empty, Collapse, Modal, Table, Radio, Icon, Tooltip, List, Avatar, Skeleton } from 'antd';
 import { getAllModelDocuments, upsertModelDocuments } from '../store/actions/models';
-import InsertDataModal from './InsertDataModal';
 import { connect } from "react-redux";
+import InsertDataModal from './InsertDataModal';
 import AutoCompleteInput from './AutoCompleteInput';
 import InfiniteList from './InfiniteList';
 
@@ -357,7 +357,7 @@ class ScanForm extends Component {
           />
         )}
           <Form className="scan-form" onSubmit={this.handleSubmit}>
-            <Row gutter={24} style={{ minHeight: 90 }}>
+            <Row gutter={24}>
               <Col s={24} md={8} lg={8}>
                 <FormItem label="Purchase Order">
                   {getFieldDecorator("currentPOs", {
@@ -373,11 +373,11 @@ class ScanForm extends Component {
                       searchKey={"name"}
                       placeholder={"Search by PO Name"}
                       renderOption={item => (
-                        <div style={{ maxHeight: 40, overflow: "hidden" }}>
+                        <div style={{ maxHeight: 35, overflow: "hidden" }}>
                           <div style={{ fontSize: "small" }}>
                             {item["name"]}
                           </div>
-                          <div style={{ fontSize: 10, color: "grey" }}>
+                          <div style={{ marginTop: -5, fontSize: 10, color: "grey" }}>
                             {item["type"]}
                           </div>
                         </div>
@@ -539,56 +539,60 @@ class ScanForm extends Component {
               >
                 Recent Scans {this.state.logOpen && <Icon type="close" />}
               </Button>
-              {this.state.logOpen && (
-                <InfiniteList
-                  lastItem={this.state.lastScan}
-                  id="scan-log"
-                  sortColumn="lastScan"
-                  sortDir="descending"
-                  queryModel="BoxScan"
-                  populateArray={[{ path: 'locations' }, { path: 'po' }]}
-                  itemTitle={'sku'}
-                  itemDescription={'po.name'}
-                  itemContent={'lastScan'}
-                  renderItem={(item, itemLoading) =>
-                    <List.Item
-                      key={item._id}
-                      style={{
-                        borderBottom: '0px',
-                        background: '#fff',
-                        ...itemLoading ? { padding: 10, height: 47, paddingTop: 25 } : { padding: 0 },
-                        margin: '10px 0px',
-                      }}
-                    >
-                      <Skeleton paragraph={{ rows: 1, width: '100%' }} title={false} loading={itemLoading} active>
-                        <List.Item.Meta
-                          style={{ alignItems: 'center' }}
-                          // avatar={<Avatar>{this.props.currentUser.user.email[0]}</Avatar>}
-                          // title={item.name}
-                          description={
-                            <Collapse bordered={false} defaultActiveKey={['1']}>
-                              <Collapse.Panel header={(
-                                <div className="flex align-items-center space-between">
-                                  <div>
-                                    {item.sku}
-                                    <i style={{ fontSize: 'small' }}> scanned {item.scanToPo ? 'to' : 'from'}</i> {item.po && item.po.name}
-                                  </div>
-                                  <div>
-                                    {new Date(item.lastScan).toLocaleString()}
-                                  </div>
+            {this.state.logOpen && (
+              <InfiniteList
+                lastItem={this.state.lastScan}
+                id="scan-log"
+                sortColumn="lastScan"
+                sortDir="descending"
+                queryModel="BoxScan"
+                populateArray={[{ path: 'locations' }, { path: 'po' }, { path: 'user' }]}
+                itemTitle={'sku'}
+                itemDescription={'po.name'}
+                itemContent={'lastScan'}
+                renderItem={(item, itemLoading) =>
+                  <List.Item
+                    key={item._id}
+                    style={{
+                      borderBottom: '0px',
+                      background: '#fff',
+                      ...itemLoading ? { padding: 10, height: 47, paddingTop: 25 } : { padding: 0 },
+                      margin: '10px 0px',
+                    }}
+                  >
+                    <Skeleton paragraph={{ rows: 1, width: '100%' }} title={false} loading={itemLoading} active>
+                      <List.Item.Meta
+                        style={{ alignItems: 'center' }}
+                        description={
+                          <Collapse bordered={false} defaultActiveKey={['1']}>
+                            <Collapse.Panel header={(
+                              <div className="flex align-items-center space-between">
+                                <div>
+                                  {item.sku}
+                                  <i style={{ fontSize: 12, color: 'grey' }}> scanned {item.scanToPo ? 'to' : 'from'}</i> {item.po && item.po.name}
                                 </div>
-                              )} key={item._id} style={{ border: 0 }}>
-                                {item.po && item.po.name}
-                                {new Date(item.lastScan).toLocaleString()}
-                              </Collapse.Panel>
-                            </Collapse>
-                          }
-                        />
-                      </Skeleton>
-                    </List.Item>
-                  }
-                />
-              )}
+                                <div style={{ fontSize: 12, color: 'grey' }}>
+                                  {new Date(item.lastScan).toLocaleString()}
+                                </div>
+                              </div>
+                            )} key={item._id} style={{ border: 0, }}>
+                              <div className="flex" style={{ flexDirection: 'column' }}>
+                                <span><strong>SKU: </strong>{item.sku}</span>
+                                <span><strong>Scanned Quantity: </strong>{item.lastScanQuantity}</span>
+                                <span><strong>Purchase Order: </strong>{item.po && item.po.name}</span>
+                                <span><strong>Box: </strong>{item.name}</span>
+                                <span><strong>User: </strong>{item.user && item.user.email}</span>
+                                <span><strong>Date: </strong>{new Date(item.lastScan).toLocaleString()}</span>
+                              </div>
+                            </Collapse.Panel>
+                          </Collapse>
+                        }
+                      />
+                    </Skeleton>
+                  </List.Item>
+                }
+              />
+            )}
             </div>
           )}
       </div>

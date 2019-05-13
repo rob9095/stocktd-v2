@@ -414,6 +414,8 @@ i.xl svg {
   color: #6f727d;
 }
 
+
+/* Ant Messages */
 .ant-message {
   position: absolute !important;
 }
@@ -443,6 +445,10 @@ i.xl svg {
 .ant-select-selection__placeholder {
   font-family: 'Work Sans', sans-serif;
   top: 14px;
+}
+
+.ant-select-selection--multiple .ant-select-selection__placeholder {
+  margin-left: 0px !important;
 }
 
 .ant-select-selection--single {
