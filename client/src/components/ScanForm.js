@@ -356,7 +356,6 @@ class ScanForm extends Component {
             onSave={this.handleNewBarcode}
           />
         )}
-        <Spin spinning={!this.state.currentPrefix}>
           <Form className="scan-form" onSubmit={this.handleSubmit}>
             <Row gutter={24} style={{ minHeight: 90 }}>
               <Col s={24} md={8} lg={8}>
@@ -475,7 +474,14 @@ class ScanForm extends Component {
                       }
                     ]
                   })(
-                    <Input addonBefore={boxSelect} placeholder="Box Name" />
+                    <Input
+                      addonBefore={this.state.currentPrefix ? boxSelect :
+                        <div style={{marginTop: -7, width: 65}}>
+                          <Skeleton paragraph={false} loading={true} active />
+                        </div>
+                      }
+                      placeholder="Box Name"
+                    />
                   )}
                 </FormItem>
               </Col>
@@ -585,7 +591,6 @@ class ScanForm extends Component {
               )}
             </div>
           )}
-        </Spin>
       </div>
     );
   }

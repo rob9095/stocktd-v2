@@ -50,6 +50,22 @@ class AutoCompleteInputForm extends Component {
       this.handleDataFetch('')
       this.setFocus()
     }
+    //check if we are switching mode from multiple/tags to single/default, need to update select ui and handleChange
+    if (['tags','multiple'].includes(prevProps.mode) && [undefined,'default'].includes(this.props.mode)) {
+      let selected = this.props.form.getFieldValue('selected')
+      if (Array.isArray(selected) && selected[1]) {
+        let [update, ...rest] = selected
+        this.props.form.setFieldsValue({selected: update})
+        delete update.label
+        update = {
+          ...update,
+          props: {
+            data: this.state.data.find(item => item._id === update.key) || {}
+          }
+        }
+        this.handleChange(update,update)
+      }
+    }
   }
 
   handleType = (value) => {
