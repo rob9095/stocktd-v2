@@ -111,17 +111,20 @@ const scanToPO = (boxScan,scanQty) => {
       delete boxScan.quantity
       let locations = boxScan.locations
       delete boxScan.locations
+      let user = boxScan.user
+      delete boxScan.user
       await db.BoxScan.update({
-        skuCompany: { $regex: new RegExp(boxScan.skuCompany, "i") },
-        name: { $regex: new RegExp(boxScan.name, "i") },
-        po: poId,
-        poProduct: updatedPoProduct._id,
-        scanToPo: boxScan.scanToPo,
-      },
+          skuCompany: { $regex: new RegExp(boxScan.skuCompany, "i") },
+          name: { $regex: new RegExp(boxScan.name, "i") },
+          po: poId,
+          poProduct: updatedPoProduct._id,
+          scanToPo: boxScan.scanToPo,
+        },
         {
           lastScan: new Date(),
           lastScanQuantity: scanQty,
           ...locations && { locations },
+          user,
           $setOnInsert: {
             ...boxScan,
             ...!locations && {locations: []}
@@ -218,6 +221,8 @@ const scanFromPO = (scan, scanQty, product) => {
           delete boxScan.quantity
           let locations = boxScan.locations
           delete boxScan.locations
+          let user = boxScan.user
+          delete boxScan.user
           await db.BoxScan.update({
               skuCompany: { $regex: new RegExp(boxScan.skuCompany, "i") },
               name: { $regex: new RegExp(boxScan.name, "i") },
@@ -228,6 +233,7 @@ const scanFromPO = (scan, scanQty, product) => {
               lastScan: new Date(),
               lastScanQuantity: scanQty,
               ...locations && { locations },
+              user,
               $setOnInsert: {
                 ...boxScan,
                 ...!locations && { locations: [] }
@@ -505,6 +511,7 @@ exports.upsertBoxScan = async (req, res, next) => {
       sku: product.sku,
       company: req.body.company,
       product: product._id,
+      user: req.body.user,
     }
     const scanQty = parseInt(req.body.scan.quantity);
     // add the scanned product to PO instead of scan from PO

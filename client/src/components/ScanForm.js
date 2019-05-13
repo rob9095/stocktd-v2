@@ -551,41 +551,41 @@ class ScanForm extends Component {
                   itemDescription={'po.name'}
                   itemContent={'lastScan'}
                   renderItem={(item, itemLoading) =>
-                      <List.Item key={item._id}
-                        style={{
-                          borderBottom: '0px',
-                          background: '#fff',
-                          ...itemLoading ? {padding: 10, height: 47, paddingTop: 25} : {padding: 0},
-                          margin: '10px 0px',
-                          
-                          }}
-                      >
+                    <List.Item
+                      key={item._id}
+                      style={{
+                        borderBottom: '0px',
+                        background: '#fff',
+                        ...itemLoading ? { padding: 10, height: 47, paddingTop: 25 } : { padding: 0 },
+                        margin: '10px 0px',
+                      }}
+                    >
                       <Skeleton paragraph={{ rows: 1, width: '100%' }} title={false} loading={itemLoading} active>
                         <List.Item.Meta
                           style={{ alignItems: 'center' }}
                           // avatar={<Avatar>{this.props.currentUser.user.email[0]}</Avatar>}
                           // title={item.name}
-                          description={(
+                          description={
                             <Collapse bordered={false} defaultActiveKey={['1']}>
                               <Collapse.Panel header={(
                                 <div className="flex align-items-center space-between">
                                   <div>
                                     {item.sku}
-                                    <i style={{fontSize: 'small'}}> scanned {item.scanToPo ? 'to' : 'from'}</i> {item.po && item.po.name}
+                                    <i style={{ fontSize: 'small' }}> scanned {item.scanToPo ? 'to' : 'from'}</i> {item.po && item.po.name}
                                   </div>
                                   <div>
                                     {new Date(item.lastScan).toLocaleString()}
                                   </div>
                                 </div>
-                                )} key={item._id} style={{border: 0}}>
+                              )} key={item._id} style={{ border: 0 }}>
                                 {item.po && item.po.name}
                                 {new Date(item.lastScan).toLocaleString()}
                               </Collapse.Panel>
                             </Collapse>
-                          )}
+                          }
                         />
                       </Skeleton>
-                      </List.Item>
+                    </List.Item>
                   }
                 />
               )}

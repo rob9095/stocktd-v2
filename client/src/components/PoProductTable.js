@@ -337,7 +337,7 @@ class PoProductTable extends Component {
           this.setState({
             data,
           })
-          if (res.completedPoProducts.nMatched) {
+          if (res.completedPoProducts && res.completedPoProducts.nMatched) {
             this.handlePoComplete(res.updatedPoProduct)
           }
           resolve(res)
