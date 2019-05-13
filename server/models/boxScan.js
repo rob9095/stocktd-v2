@@ -28,6 +28,9 @@ const boxScanSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  lastScanQuantity: {
+    type: Number,
+  },
   skuCompany: {
     type: String,
     required: true

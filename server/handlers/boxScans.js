@@ -120,6 +120,7 @@ const scanToPO = (boxScan,scanQty) => {
       },
         {
           lastScan: new Date(),
+          lastScanQuantity: scanQty,
           ...locations && { locations },
           $setOnInsert: {
             ...boxScan,
@@ -225,6 +226,7 @@ const scanFromPO = (scan, scanQty, product) => {
             },
             {
               lastScan: new Date(),
+              lastScanQuantity: scanQty,
               ...locations && { locations },
               $setOnInsert: {
                 ...boxScan,
@@ -596,6 +598,7 @@ const bulkUpsertBoxScans = (config) => {
             update: {
               ...foundLocations.length > 0 && { locations: foundLocations.map(l=>l._id) },
               lastScan: new Date(),
+              lastScanQuantity: parseInt(box.quantity),
               $inc: {quantity: parseInt(box.quantity)},
               $setOnInsert: {
                 name: box.name,
