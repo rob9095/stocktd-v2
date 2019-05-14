@@ -25,24 +25,22 @@ exports.updatePoProducts = async (req, res, next) => {
       let update = req.body.updates.find(u=>u.id == doc._id)
       return({
         ...doc,
-        quantity: parseInt(update.quantity) - parseInt(doc.quantity),
-        ...update.scannedQuantity && {scannedQuantity: parseInt(update.scannedQuantity) - parseInt(doc.scannedQuantity)}
+        ...update.quantity && {quantity: parseInt(update.quantity) - parseInt(doc.quantity)},
+        ...update.scannedQuantity && {scannedQuantity: parseInt(update.scannedQuantity) - parseInt(doc.scannedQuantity)},
+        name: doc.name,
+        name: doc.name,
+        type: doc.type,
+        poRef: doc.poRef,
+        sku: doc.sku,        
       })
     })
 
     //upsert the pos, also upserts poProducts & products
     let poResult = await upsertPurchaseOrders({
       company: req.body.company,
-      data: data.map(doc => ({
-        name: doc.name,
-        type: doc.type,
-        poRef: doc.poRef,
-        sku: doc.sku,
-        quantity: doc.quantity,
-        ...doc.scannedQuantity && { scannedQuantity: doc.scannedQuantity }
-      }))
+      data,
     })
-    
+
     //old update approach
     // let poProductUpdates = req.body.updates.map(p=>{
     //   let quantity
