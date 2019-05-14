@@ -308,8 +308,8 @@ class PoProductTable extends Component {
     }
 
     handleCurrentPOUpdate = async (currentPOs) => {
-      console.log(currentPOs)
-      await this.setState({currentPOs: Array.isArray(currentPOs) ? currentPOs : []})
+      console.log({currentPOs})
+      await this.setState({ currentPOs: Array.isArray(currentPOs) ? currentPOs : currentPOs._id ? [currentPOs] : []})
       this.handleDataFetch();
     }
 

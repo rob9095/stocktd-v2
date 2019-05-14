@@ -108,7 +108,6 @@ class AutoCompleteInputForm extends Component {
   }
 
   handleChange = (id,e) => {
-    console.log({id,e})
     if (!id) {
       this.props.onUpdate({ id: '', data: {} })
       return

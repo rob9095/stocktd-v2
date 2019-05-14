@@ -1,4 +1,5 @@
 const db = require('../models');
+const { upsertPurchaseOrders } = require('./purchaseOrders')
 
 /*
 * UPDATE PoProducts and associated Purchase Order and Products
@@ -7,62 +8,96 @@ const db = require('../models');
 */
 exports.updatePoProducts = async (req, res, next) => {
   try {
-    if (!Array.isArray(req.body.updates) || req.body.updates.filter(p=> !p.id || !p.sku || !p.quantity || !p.oldQty).length > 0) {
+    if (req.body.updates.length > 7000) {
       return next({
         status: 404,
-        message: ['Please provide update array with id, sku, quantity, and oldQty']
+        message: ['Request to large'],
+      })      
+    }
+    if (!Array.isArray(req.body.updates) || req.body.updates.filter(p=>!p.id || !p.quantity).length > 0) {
+      return next({
+        status: 404,
+        message: ['Please provide update array with id and quantity']
       })
     }
-    let poProductUpdates = req.body.updates.map(p=>{
-      return ({
-        updateOne: {
-          filter: {_id: p.id},
-          update: {
-            ...p,
-          },
-        }
-        })
-    })
-    let productUpdates = req.body.updates.map(p => {
-      let qty = parseInt(p.quantity) - parseInt(p.oldQty)
+    let data = await db.PoProduct.find({ company: req.body.company, $and: [{ $or: req.body.updates.map(p => ({ _id: p.id })) }]})
+    data = data.map(doc=>{
+      let update = req.body.updates.find(u=>u.id == doc._id)
       return({
-        updateOne: {
-          filter: {skuCompany: p.sku+"-"+req.body.company},
-          update: {
-            $inc: { quantity: parseInt(qty) },
-          }
-        }
+        ...doc,
+        quantity: parseInt(update.quantity) - parseInt(doc.quantity),
+        ...update.scannedQuantity && {scannedQuantity: parseInt(update.scannedQuantity) - parseInt(doc.scannedQuantity)}
       })
     })
-    let poUpdates = req.body.updates.map(p => {
-      let qty = parseInt(p.quantity) - parseInt(p.oldQty)
-      return ({
-        updateOne: {
-          filter: {poRef: p.poRef, company: req.body.company},
-          update: {
-            $inc: { quantity: parseInt(qty) },
-          }
-        }
-      })
+
+    //upsert the pos, also upserts poProducts & products
+    let poResult = await upsertPurchaseOrders({
+      company: req.body.company,
+      data: data.map(doc => ({
+        name: doc.name,
+        type: doc.type,
+        poRef: doc.poRef,
+        sku: doc.sku,
+        quantity: doc.quantity,
+        ...doc.scannedQuantity && { scannedQuantity: doc.scannedQuantity }
+      }))
     })
-    let updatedPos = await db.PurchaseOrder.bulkWrite(poUpdates)
-    let updatedPoProducts = await db.PoProduct.bulkWrite(poProductUpdates)
-    let updatedProducts = await db.Product.bulkWrite(productUpdates)
-    let emptyPOs = await db.PurchaseOrder.find({company: req.body.company, quantity: 0})
-    let poRemovals = emptyPOs.map(po=>({
-      deleteOne: {
-        filter: {_id: po.id}
-      }
-    }))
-    let removedPos = []
-    if (poRemovals.length > 0) {
-      removedPos = await db.PurchaseOrder.bulkWrite(poRemovals)
-    }
+    
+    //old update approach
+    // let poProductUpdates = req.body.updates.map(p=>{
+    //   let quantity
+    //   return ({
+    //     updateOne: {
+    //       filter: {_id: p.id},
+    //       update: {
+    //         quantity:,
+    //       },
+    //     }
+    //     })
+    // })
+    // let productUpdates = req.body.updates.map(p => {
+    //   let qty = parseInt(p.quantity) - parseInt(p.oldQty)
+    //   return({
+    //     updateOne: {
+    //       filter: {skuCompany: p.sku+"-"+req.body.company},
+    //       update: {
+    //         $inc: { quantity: parseInt(qty) },
+    //       }
+    //     }
+    //   })
+    // })
+    // let poUpdates = req.body.updates.map(p => {
+    //   let qty = parseInt(p.quantity) - parseInt(p.oldQty)
+    //   return ({
+    //     updateOne: {
+    //       filter: {poRef: p.poRef, company: req.body.company},
+    //       update: {
+    //         $inc: { quantity: parseInt(qty) },
+    //       }
+    //     }
+    //   })
+    // })
+    // let updatedPos = await db.PurchaseOrder.bulkWrite(poUpdates)
+    // let updatedPoProducts = await db.PoProduct.bulkWrite(poProductUpdates)
+    // let updatedProducts = await db.Product.bulkWrite(productUpdates)
+    // let emptyPOs = await db.PurchaseOrder.find({company: req.body.company, quantity: 0})
+    // let poRemovals = emptyPOs.map(po=>({
+    //   deleteOne: {
+    //     filter: {_id: po.id}
+    //   }
+    // }))
+    // let removedPos = []
+    // if (poRemovals.length > 0) {
+    //   removedPos = await db.PurchaseOrder.bulkWrite(poRemovals)
+    // }
+    // return res.status(200).json({
+    //   poRemovals,
+    //   updatedPos,
+    //   updatedProducts,
+    //   updatedPoProducts,
+    // })
     return res.status(200).json({
-      poRemovals,
-      updatedPos,
-      updatedProducts,
-      updatedPoProducts,
+      poResult,
     })
   } catch(err) {
     return next(err);
