@@ -30,3 +30,19 @@ export function resendUserVerificationEmail(email){
 		});
 	}
 }
+
+export function resetPassword(data) {
+	return dispatch => {
+		return new Promise((resolve, reject) => {
+			const { email } = data
+			return apiCall('post', `/api/account/reset-password`, { email })
+				.then((res) => {
+					resolve(res);
+				})
+				.catch(err => {
+					dispatch(addError(err.message));
+					reject(err);
+				})
+		});
+	}
+}
