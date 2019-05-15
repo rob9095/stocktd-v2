@@ -158,6 +158,7 @@ class FilterForm extends Component {
                  }],
                })(
                  <Input
+                   size="small"
                    placeholder={i.text}
                  />
                )}

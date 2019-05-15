@@ -9,10 +9,10 @@ exports.verifySignUpToken = async function(req, res, next) {
         message: 'Unable to verify user'
       })
     }
-    let token = await db.SignUpToken.findOne({_id: req.params.token_id})
+    let token = await db.UserToken.findOne({_id: req.params.token_id})
     if (token) {
       // update user and remove token
-      let user = await db.User.findOne({email: token.email})
+      let user = await db.User.findOne({_id: token.user})
       if (user) {
         user.emailVerified = true;
         await user.save();
@@ -34,8 +34,8 @@ exports.verifySignUpToken = async function(req, res, next) {
 
 exports.resendVerificationEmail = async (req, res, next) => {
 	try {
-		let token = await db.SignUpToken.findOne({email: req.body.email})
-		if (token) {
+		let token = await upsertUserToken({userId: req.body.user.id, tokenType: 'verify-email'})
+		if (token._id) {
 			let emailRes = await sendEmail({
 						from: 'noreply@stocktd.com',
 						subject: 'Please confirm your email',
@@ -61,6 +61,39 @@ exports.resendVerificationEmail = async (req, res, next) => {
 	}
 }
 
+const upsertUserToken = (config) => {
+	return new Promise(async (resolve,reject) => {
+		try {
+			const { userId, tokenType, update } = config
+			if(!tokenType || !userId) {
+				reject({
+					message: ['Please provide a tokenType and id'],
+				})
+			}
+			let user = await db.User.findById(userId)
+			if (!user) {
+				reject({
+					message: ['Unable to create token'],
+				})
+			}
+			let foundToken = await db.UserToken.findOne({user: user._id, tokenType})
+			if (!foundToken) {
+				//create it
+				let token = await db.UserToken.create({user: user._id, tokenType})
+				resolve(token)
+			}
+			if (update) {
+				foundToken.createdOn = new Date()
+				foundToken.save()
+				resolve(foundToken)
+			}
+			resolve(foundToken)
+		} catch(err) {
+			reject(err)
+		}
+	})
+}
+
 const sendResetPasswordEmail = (email) => {
 	return new Promise(async(resolve,reject) => {
 		try {
@@ -71,7 +104,15 @@ const sendResetPasswordEmail = (email) => {
 				})
 			}
 			let user = await db.User.findOne({ email })
-			if (user) {
+			if (!user) {
+				//silently resolve
+				resolve({
+					message: ['Email sent successfully']
+				})
+			}
+			let token = await upsertUserToken({userId: user._id, tokenType: 'reset-pw', update: true,})
+			//send the reset email if we have a token
+			if (token._id) {
 				let emailRes = await sendEmail({
 					from: 'noreply@stocktd.com',
 					subject: 'Reset Password',
@@ -80,7 +121,7 @@ const sendResetPasswordEmail = (email) => {
 					<div class="emailContainer">
 						<h2>Need a new password?</h2>
 						<p>To get a new password for your stocktd account, just click the button below.</p>
-						<a href="https://stocktd.com/reset-password/${user._id}"><button class="btn">Reset Password</button></a>
+						<a href="https://stocktd.com/reset-password/${token._id}"><button class="btn">Reset Password</button></a>
 						<p>If you didn’t ask to reset your password, you can ignore this email. Your current password will still work.</p>
 						<p>Have some questions? <a href="#">Contact Us</a></p>
 					</div>

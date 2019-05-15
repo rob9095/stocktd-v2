@@ -111,7 +111,7 @@ exports.signup = async function(req, res, next) {
 		process.env.SECRET_KEY
 		);
 		// create the signup token
-		let signUpToken = await db.SignUpToken.create({email: req.body.email})
+		let signUpToken = await db.UserToken.create({tokenType: 'verify-email', user: user._id})
 		//send the verification email
 		let emailRes = await sendEmail({
 			from: 'noreply@stocktd.com',
