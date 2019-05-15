@@ -64,7 +64,7 @@ class AuthForm extends Component {
                 message={errors.message}
                 type="error"
                 closable
-                afterClose={this.handleClose}
+                afterClose={()=>removeError()}
               />
             )}
             <FormItem>

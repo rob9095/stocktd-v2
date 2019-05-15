@@ -69,8 +69,8 @@ exports.signup = async function(req, res, next) {
 			})
 		}
 		// check the email and company name are open
-		let foundUser = await db.User.findOne({email: req.body.email})
-		let foundCompany = await db.Company.findOne({name: req.body.company})
+		let foundUser = await db.User.findOne({ email: { $regex: `^${req.body.email}$`, '$options': 'i' }})
+		let foundCompany = await db.Company.findOne({ name: { $regex: `^${req.body.company}$`, '$options': 'i' }})
 		if (foundUser) {
 			return next({
 				status: 400,
