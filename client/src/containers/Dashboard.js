@@ -16,6 +16,7 @@ const { Sider } = Layout;
 const SubMenu = Menu.SubMenu;
 
 class Dashboard extends Component {
+  _isMounted = false
   constructor(props) {
     super(props)
     this.state = {
@@ -41,6 +42,7 @@ class Dashboard extends Component {
   }
 
   componentDidMount() {
+    this._isMounted = true
     if(!this.props.currentUser.isAuthenticated) {
       this.setState({
         loginRedirect: true,
@@ -50,26 +52,30 @@ class Dashboard extends Component {
     this.setState({
       clientWidth: document.documentElement.clientWidth,
     })
-    if (this.props.history.location.pathname){
-      this.setActiveMenuItem(this.props.location.pathname)
+    // if (this.props.history.location.pathname){
+    //   this.setActiveMenuItem(this.props.location.pathname)
+    // }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (!Object.is(prevProps.location, this.props.location)) {
+      this._isMounted && this.setActiveMenuItem(this.props.location.pathname)
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.location !== this.props.location) {
-      this.setActiveMenuItem(nextProps.location.pathname)
-    }
+  componentWillUnmount() {
+    this._isMounted = false;
   }
 
   toggle = () => {
-    this.setState({
+    this._isMounted && this.setState({
       collapsed: !this.state.collapsed,
     });
   }
 
   handleWindowResize = () => {
     const clientWidth = document.documentElement.clientWidth;
-    this.setState({
+    this._isMounted && this.setState({
       clientWidth,
       collapsed: clientWidth <= 600 ? true : this.state.collapsed,
     })
