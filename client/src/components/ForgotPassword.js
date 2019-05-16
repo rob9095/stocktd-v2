@@ -67,7 +67,8 @@ class ForgotPassword extends Component {
           {!this.state.emailSent && (
             <FormItem style={{ textAlign: 'left' }}>
               {getFieldDecorator('email', {
-                rules: [{ type: 'email', required: true, message: 'Please fill out this field' }],
+                rules: [{ type: 'email', required: true, message: this.props.form.getFieldValue('email') ? 'The email address is invalid' : 'Please fill out this field' }],
+                validateTrigger: 'onBlur',
               })(
                 <Input prefix={<Icon type="mail" theme="twoTone" twoToneColor={this.props.form.getFieldError('email') ? "#f5222d" : "#716aca"} />} placeholder="Email" />
               )}

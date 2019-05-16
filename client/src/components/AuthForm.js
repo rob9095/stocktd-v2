@@ -69,25 +69,28 @@ class AuthForm extends Component {
             )}
             <FormItem>
               {getFieldDecorator('email', {
-                rules: [{ type: 'email', required: true, message: 'Email is required' }],
+                rules: [{ type: 'email', required: true, message: this.props.form.getFieldValue('email') ? 'The email address is invalid' : 'This field is required' }],
+                validateTrigger: 'onBlur',
               })(
-                <Input prefix={<Icon type="mail" theme="twoTone" twoToneColor="#716aca"/>} placeholder="Email" />
+                <Input prefix={<Icon type="mail" theme="twoTone" twoToneColor={this.props.form.getFieldError('email') ? "#f5222d" : "#716aca"}/>} placeholder="Email" />
               )}
             </FormItem>
             {signUp && (
               <FormItem>
                 {getFieldDecorator('company', {
-                  rules: [{ required: true, message: 'Company is required' }],
+                  rules: [{ required: true, message: 'This field is required' }],
+                  validateTrigger: 'onBlur',
                 })(
-                  <Input prefix={<Icon type="shop" theme="twoTone" twoToneColor="#716aca" />} placeholder="Company" />
+                  <Input prefix={<Icon type="shop" theme="twoTone" twoToneColor={this.props.form.getFieldError('company') ? "#f5222d" : "#716aca"} />} placeholder="Company" />
                 )}
               </FormItem>
             )}
             <FormItem>
               {getFieldDecorator('password', {
-                rules: [{ min: signUp ? 6 : 0, required: true, message: signUp ? 'Please choose a password longer than 6 characters' : 'Password is required' }],
+                rules: [{ min: signUp ? 6 : 0, required: true, message: signUp ? 'Password must be longer than 6 characters' : 'This field is required' }],
+                validateTrigger: 'onBlur',
               })(
-                <Input prefix={<Icon type="lock" theme="twoTone" twoToneColor="#716aca" />} type="password" placeholder="Password" />
+                <Input prefix={<Icon type="lock" theme="twoTone" twoToneColor={this.props.form.getFieldError('password') ? "#f5222d" : "#716aca"} />} type="password" placeholder="Password" />
               )}
             </FormItem>
             <FormItem className="form-actions">

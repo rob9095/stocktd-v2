@@ -5,13 +5,12 @@ const { sendEmail } = require('../services/sendEmail');
 exports.signin = async function(req, res, next) {
 	try {
 		let user = await db.User.findOne({
-			email: req.body.email
+			email: { $regex: `^${req.body.email}$`, '$options': 'i' }
 		});
-		let { id, email, company } = user;
+		let { id, email, company, emailVerified } = user;
 		let isMatch = await user.comparePassword(req.body.password);
 		if(isMatch){
-			let token = jwt.sign(
-			{
+			let token = jwt.sign({
 				id,
 				email,
 				company
@@ -22,6 +21,7 @@ exports.signin = async function(req, res, next) {
 				id,
 				email,
 				company,
+				emailVerified,
 				token
 			});
 		} else {
@@ -33,7 +33,7 @@ exports.signin = async function(req, res, next) {
 	} catch(err) {
 		return next({
 			status: 400,
-			message: 'Invalid email or password'
+			message: err.toSring(),
 		})
 	}
 };
@@ -102,7 +102,7 @@ exports.signup = async function(req, res, next) {
 			company: req.body.company,
 			user: user._id,
 		})
-		let { id, email, company } = user;
+		let { id, email, company, emailVerified } = user;
 		let token = jwt.sign(
 		{
 			id,
@@ -132,6 +132,7 @@ exports.signup = async function(req, res, next) {
 			id,
 			email,
 			company,
+			emailVerified,
 			token
 		});
 	} catch(err) {
@@ -141,7 +142,7 @@ exports.signup = async function(req, res, next) {
 		}
 		return next({
 			status:400,
-			message: err.message
+			message: err.toSring(),
 		});
 
 	}
