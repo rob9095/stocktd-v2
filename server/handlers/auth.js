@@ -99,6 +99,7 @@ exports.signup = async function(req, res, next) {
 		//create default box prefix for user
 		await db.BoxPrefix.create({
 			name: req.body.email.split('@')[0],
+			company: req.body.company,
 			user: user._id,
 		})
 		let { id, email, company } = user;
@@ -118,10 +119,10 @@ exports.signup = async function(req, res, next) {
 			subject: 'Please confirm your email',
 			to: req.body.email,
 			html: `
-				<div class="emailVerifyContainer">
+				<div class="emailContainer">
 					<h2>Welcome to stocktd</h2>
 					<p>Please click the link below to confirm your email address</p>
-					<a href="https://stocktd.com/verify-email/${signUpToken._id}"><button class="ui teal button">Confirm my email</button></a>
+					<a href="https://stocktd.com/verify-email/${signUpToken._id}"><button class="btn">Confirm my email</button></a>
 					<p>Have some questions? <a href="#">Contact Us</a></p>
 				</div>
 			`,
