@@ -13,7 +13,8 @@ exports.signin = async function(req, res, next) {
 			let token = jwt.sign({
 				id,
 				email,
-				company
+				company,
+				emailVerified,
 			},
 				process.env.SECRET_KEY
 			);
@@ -107,7 +108,8 @@ exports.signup = async function(req, res, next) {
 		{
 			id,
 			email,
-			company
+			company,
+			emailVerified,
 		},
 		process.env.SECRET_KEY
 		);
