@@ -43,6 +43,21 @@ userSchema.path('email').validate(function (email) {
 	return emailRegex.test(email);
 }, 'Invalid Email')
 
+userSchema.pre('update', async function (next) {
+	try {
+		let update = this.getUpdate()
+		if (!update.password) {
+			return next();
+		}
+		let salt = bcrypt.genSaltSync(10);
+		let hashedPassword = await bcrypt.hashSync(update.password, salt);
+		this.update({},{...update, password: hashedPassword})
+		return next();
+	} catch (err) {
+		return next(err);
+	}
+});
+
 userSchema.pre('save', async function(next) {
 	try {
 		if(!this.isModified('password')){

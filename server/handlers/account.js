@@ -103,7 +103,7 @@ const sendResetPasswordEmail = (email) => {
 					message: ['Invalid Email']
 				})
 			}
-			let user = await db.User.findOne({ email })
+			let user = await db.User.findOne({ email: { $regex: `^${email}$`, '$options': 'i' } })
 			if (!user) {
 				//silently resolve
 				resolve({
@@ -137,9 +137,43 @@ const sendResetPasswordEmail = (email) => {
 	})
 }
 
+//allow for update of email, password, firstName, lastName
+updateAccount = (config) => {
+	return new Promise(async (resolve,reject) => {
+		try {
+			let { user, update } = config
+			let { email, password, firstName, lastName } = update || {}
+			let { _id } = user || {}
+			let foundUser = await db.User.findById(_id)
+			if (!foundUser) {
+				reject({ message: 'Unable to update user' })
+			}
+			if (email) {
+				//check if email is available
+				let emailCheck = await db.User.findOne({ email: { $regex: `^${email}$`, '$options': 'i' } })
+				emailCheck._id && reject({
+					message: 'Email Already Exists',
+				})
+			}
+			let userUpdate = {
+				...email && { email },
+				...password && { password },
+				...firstName && { firstName },
+				...lastName && { lastName },
+			}
+			user = await db.User.update({_id},userUpdate)
+			resolve({
+				user,
+			})
+		} catch(err) {
+			reject(err)
+		}
+	})
+}
+
 exports.resetPassword = async (req, res, next) => {
 	try {
-		let result = await sendResetPasswordEmail(req.body.email)
+		let result = req.body.token ? await updateAccount({user: req.body.token.user,update: req.body.update}) : await sendResetPasswordEmail(req.body.email)
 		return res.status(200).json({
 			...result,
 		})

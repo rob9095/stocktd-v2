@@ -52,7 +52,10 @@ class ForgotPassword extends Component {
       this.setState({
         loading: true
       })
-      await this.props.resetPassword({...values, ...this.state.token && {token: this.state.token}})
+      await this.props.resetPassword({
+        ...values,
+        ...this.state.token && {token: this.state.token, update: {password: values.password}}
+      })
       .then(res=>{
         this.setState({
           email: values.email,
