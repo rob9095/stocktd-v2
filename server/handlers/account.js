@@ -174,6 +174,10 @@ updateAccount = (config) => {
 exports.resetPassword = async (req, res, next) => {
 	try {
 		let result = req.body.token ? await updateAccount({user: req.body.token.user,update: req.body.update}) : await sendResetPasswordEmail(req.body.email)
+		if (req.body.token) {
+			//delete the token
+			await db.UserToken.deleteOne({_id: req.body.token._id})
+		}
 		return res.status(200).json({
 			...result,
 		})

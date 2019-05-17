@@ -127,14 +127,14 @@ class ForgotPassword extends Component {
                 )}  
               </div>
             )}
-            <FormItem className="form-actions" style={{ minWidth: 300 }}>
+            <div className="form-actions" style={{ minWidth: 300 }}>
               <Button loading={this.state.loading} type="primary" htmlType="submit" block>
-                {this.state.loading ? btnLoadingText || 'loading...' : this.state.actionComplete ? btnCompleteText || 'Close' : btnText || 'Submit'}
+                {this.state.loading ? btnLoadingText || 'loading...' : this.state.actionComplete || this.state.tokenError ? btnCompleteText || 'Close' : btnText || 'Submit'}
               </Button>
-              {!this.state.actionComplete && (
+              {!this.state.actionComplete || this.state.tokenError && (
                 <Link to="/signin">Back to Log in</Link>
               )}
-            </FormItem>
+            </div>
           </Form>
         </Spin>
       </div>
