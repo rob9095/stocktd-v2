@@ -54,6 +54,9 @@ const Main = props => {
 							<WrappedForgotPassword
 								removeError={removeError}
 								errors={errors}
+								btnText={'Send Email'}
+								btnLoadingText={'Sending...'}
+								btnCompleteText={'Back to login'}
 								{...props}
 							/>
 						}
@@ -67,6 +70,9 @@ const Main = props => {
 							removeError={removeError}
 							addError={addError}
 							errors={errors}
+							btnText={'Reset Password'}
+							btnLoadingText={'Resetting...'}
+							btnCompleteText={'Back to login'}
 							{...props}
 						/>
 					}
