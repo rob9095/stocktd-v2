@@ -248,7 +248,7 @@ exports.getAllModelDocuments = async (req,res,next) => {
 				}
 			}
 		}
-		let data = await db[req.body.model].find(query).limit(limit)
+		let data = await db[req.body.model].find(query).limit(limit).populate(req.body.populateArray)
 		return res.status(200).json({data})
 	} catch(err) {
 		return next(err)

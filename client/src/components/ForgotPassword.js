@@ -3,6 +3,7 @@ import { Alert, Form, Button, Icon, Input, Spin } from 'antd';
 import { Link } from 'react-router-dom';
 import { connect } from "react-redux";
 import { resetPassword } from '../store/actions/account';
+import { getAllModelDocuments } from '../store/actions/models';
 
 const FormItem = Form.Item;
 
@@ -12,10 +13,35 @@ class ForgotPassword extends Component {
     this.state = {}
   }
 
+  fetchToken = () => {
+    this.setState({
+      fetching: true
+    })
+    //get the token id from url param
+    const _id = this.props.match.params.token
+    getAllModelDocuments({ model: 'UserToken', documentRef: { _id, tokenType: 'reset-pw' }, populateArray: [{path: 'user'}] })
+    .then(res => {
+      const [token,...rest] = res.data
+      if (!token._id) throw new Error
+      this.setState({token, fetching: false})
+    })
+    .catch(err => {
+      this.props.addError('Unable to update password becuase request expired or is invalid')
+      this.setState({ fetching: false, tokenError: true })
+    })
+  }
+
+  componentDidMount() {
+    if (this.props.reset) {
+      this.fetchToken()
+    }
+  }
+
   handleSubmit = (e) => {
     e.preventDefault();
     this.props.removeError()
-    if (this.state.emailSent) {
+    // we have a saved email address in state and continue button was clicked
+    if (this.state.email) {
       this.props.history.push('/signin');
       return
     }
@@ -26,10 +52,10 @@ class ForgotPassword extends Component {
       this.setState({
         loading: true
       })
-      await this.props.resetPassword(values)
+      await this.props.resetPassword({...values, ...this.state.token && {token: this.state.token}})
       .then(res=>{
         this.setState({
-          emailSent: true,
+          email: values.email,
         })
       }).catch(err=>{
         console.log(err)
@@ -48,39 +74,55 @@ class ForgotPassword extends Component {
     });
     return(
       <div className="centered-container">
-        <Form onSubmit={this.handleSubmit} style={{textAlign: 'center',maxWidth: 320}}>
-          <h1>Forgot Password?</h1>
-          {errors.message && (
-            <Alert
-              style={{margin: '10px 0px'}}
-              message={errors.message}
-              type="error"
-              closable
-              afterClose={()=>removeError()}
-            />
-          )}
-          {this.state.emailSent ?
-            <p>Great, we have emailed you instructions to reset your password.</p>
-          :
-            <p>Please enter the email you signed up with and we will send a link to reset your password.</p>
-          }
-          {!this.state.emailSent && (
-            <FormItem style={{ textAlign: 'left' }}>
-              {getFieldDecorator('email', {
-                rules: [{ type: 'email', required: true, message: this.props.form.getFieldValue('email') ? 'The email address is invalid' : 'Please fill out this field' }],
-                validateTrigger: 'onBlur',
-              })(
-                <Input prefix={<Icon type="mail" theme="twoTone" twoToneColor={this.props.form.getFieldError('email') ? "#f5222d" : "#716aca"} />} placeholder="Email" />
-              )}
+        <Spin spinning={this.state.fetching ? true : false}>
+          <Form onSubmit={this.handleSubmit} style={{ textAlign: 'center', maxWidth: 320 }}>
+            <h1>{this.props.reset ? 'Reset Password' : 'Forgot Password?'}</h1>
+            {errors.message && (
+              <Alert
+                style={{ margin: '10px 0px' }}
+                message={errors.message}
+                type="error"
+                closable
+                afterClose={() => removeError()}
+              />
+            )}
+            {this.state.email ?
+              <p>Great, we just emailed <code>{this.state.email}</code> instructions to reset your password.</p>
+              :
+              this.props.reset ?
+                <p>Please enter a new password</p>
+                :
+                <p>Please enter the email you signed up with and we will send a link to reset your password.</p>
+            }
+            {!this.state.email && (
+              <FormItem style={{ textAlign: 'left' }}>
+                {getFieldDecorator('email', {
+                  rules: [{ type: 'email', required: true, message: this.props.form.getFieldValue('email') ? 'The email address is invalid' : 'Please fill out this field' }],
+                  validateTrigger: 'onBlur',
+                  ...this.props.reset && this.state.token && { initialValue: this.state.token.user.email }
+                })(
+                  <Input disabled={this.props.reset} prefix={<Icon type="mail" theme="twoTone" twoToneColor={this.props.form.getFieldError('email') ? "#f5222d" : "#716aca"} />} placeholder="Email" />
+                )}
+              </FormItem>
+            )}
+            {this.props.reset && (
+              <FormItem style={{ textAlign: 'left' }}>
+                {getFieldDecorator('password', {
+                  rules: [{ min: 6, required: true, message: this.props.form.getFieldValue('password') ? 'Password must be longer than 6 characters' : 'This field is required' }],
+                  validateTrigger: 'onBlur',
+                })(
+                  <Input prefix={<Icon type="lock" theme="twoTone" twoToneColor={this.props.form.getFieldError('password') ? "#f5222d" : "#716aca"} />} type="password" placeholder="Password" disabled={this.state.token ? false : true} />
+                )}
+              </FormItem>
+            )}
+            <FormItem className="form-actions" style={{ minWidth: 300 }}>
+              <Button loading={this.state.loading} type="primary" htmlType="submit" block>
+                {this.state.email ? 'Close' : this.state.loading ? 'Sending...' : this.props.reset ? 'Reset Password' : 'Send Email'}
+              </Button>
+              <Link to="/signin">Back to Log in</Link>
             </FormItem>
-          )}
-          <FormItem className="form-actions">
-            <Button loading={this.state.loading} type="primary" htmlType="submit" block>
-              {this.state.emailSent ? 'Close' : this.state.loading ? 'Sending...' : 'Send Email'}
-            </Button>
-            <Link to="/signin">Back to Log in</Link>
-          </FormItem>
-        </Form>
+          </Form>
+        </Spin>
       </div>
     )
   }

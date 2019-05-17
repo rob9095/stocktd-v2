@@ -100,7 +100,7 @@ class AuthForm extends Component {
               })(
                 <Checkbox>Remember me</Checkbox>
               )}
-              <Link className="auth-form-forgot" to="/reset-password">Forgot password</Link>
+              <Link className="auth-form-forgot" to="/forgot-password">Forgot password</Link>
               <Button type="primary" htmlType="submit" className="auth-form-button">
                 {buttonText}
               </Button>

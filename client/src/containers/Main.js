@@ -2,7 +2,7 @@ import React from 'react';
 import { Switch, Route, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { authUser } from '../store/actions/auth';
-import { removeError } from '../store/actions/errors';
+import { removeError, addError } from '../store/actions/errors';
 import Dashboard from './Dashboard';
 import DashboardLegacy from './DashboardLegacy';
 import WrappedAuthForm from '../components/AuthForm';
@@ -10,7 +10,7 @@ import WrappedForgotPassword from '../components/ForgotPassword';
 import NotFound from '../components/NotFound';
 
 const Main = props => {
-	const { authUser, errors, removeError, currentUser } = props;
+	const { authUser, errors, removeError, addError, currentUser } = props;
 	return(
 			<Switch>
 				<Route path="/app" render={props => <Dashboard currentUser={currentUser} {...props} />} />
@@ -49,15 +49,28 @@ const Main = props => {
 					}}
 				/>
 				<Route
-					exact path="/reset-password"
+					exact path="/forgot-password"
 					render={props =>
 							<WrappedForgotPassword
-								currentUser={currentUser}
 								removeError={removeError}
-								errors={errors} {...props}
+								errors={errors}
+								{...props}
 							/>
 						}
 					/>
+				<Route
+					exact path="/reset-password/:token"
+					render={props =>
+						<WrappedForgotPassword
+							reset={true}
+							currentUser={currentUser}
+							removeError={removeError}
+							addError={addError}
+							errors={errors}
+							{...props}
+						/>
+					}
+				/>
 				<Route render={props => <NotFound currentUser={currentUser} {...props} />} />
 			</Switch>
 	);
@@ -70,4 +83,4 @@ function mapStateToProps(state) {
 	};
 }
 
-export default withRouter(connect(mapStateToProps, { authUser, removeError })(Main));
+export default withRouter(connect(mapStateToProps, { authUser, removeError, addError })(Main));

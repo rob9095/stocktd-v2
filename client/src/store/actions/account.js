@@ -34,8 +34,8 @@ export function resendUserVerificationEmail(email){
 export function resetPassword(data) {
 	return dispatch => {
 		return new Promise((resolve, reject) => {
-			const { email } = data
-			return apiCall('post', `/api/account/reset-password`, { email })
+			const { email, token } = data
+			return apiCall('post', `/api/account/reset-password`, { email, token })
 				.then((res) => {
 					resolve(res);
 				})

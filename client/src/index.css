@@ -22,6 +22,11 @@ body #root {
 
 /* Global Styles */
 
+code {
+  background: #716aca2e;
+  padding: 2px;
+}
+
 .ant-layout {
   height: 100%;
   position: relative;
@@ -162,6 +167,10 @@ a:focus {
 
 .ant-input::placeholder {
   font-family: 'Work Sans', sans-serif !important;
+}
+
+h1 {
+  font-weight: 600 !important;
 }
 
 button, a, p, h1, h2, h3, h4, h5 {
@@ -607,6 +616,11 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
     display: flex;
     justify-content: space-evenly;
   }
+}
+
+/* Ant Spinner */
+.ant-spin-container::after {
+  background: transparent !important;
 }
 
 /* Form Validation/Helpers */
