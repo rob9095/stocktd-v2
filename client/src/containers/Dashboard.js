@@ -180,7 +180,7 @@ class Dashboard extends Component {
                 />
               }
             </div>
-            <div className="app-body" className="full-pad">
+            <div className="app-body" className="full-pad" style={{height: '100%'}}>
               <Switch>
                 <Route exact path="/app/po-products" render={props => (
                   <PoProductTable showHeader {...props} />
