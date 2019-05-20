@@ -1,8 +1,14 @@
 import React, { Component } from 'react'
 import BasicNavigation from './BasicNavigation'
 import BasicWidget from './BasicWidget';
+import { connect } from "react-redux";
+import { getAllModelDocuments } from '../store/actions/models';
+import { resetPassword } from '../store/actions/account';
+import InsertDataModal from './AccountPage';
+import UserCard from '../components/UserCard';
 
 class AccountPage extends Component {
+  _isMounted = false
   constructor(props) {
     super(props)
     this.state = {
@@ -12,6 +18,35 @@ class AccountPage extends Component {
       },
     }
   }
+
+  fetchData = () => {
+    this.setState({
+      loading: true,
+    })
+    const { id, company } = this.props.currentUser.user || {}
+    if (!id || !company) {
+      console.log('error!')
+      return
+    }
+    getAllModelDocuments({ model: 'User', documentRef: { _id: id, }, company, populateArray: [{ path: 'companyId', populate: [{path: 'users'}] }], })
+    .then(res=>{
+      const [account, ...rest] = res.data
+      this._isMounted && this.setState({account, loading: false})
+    }).catch(error=>{
+      console.log(error)
+      this._isMounted && this.setState({error, loading: false})
+    })
+  }
+
+  componentDidMount() {
+    this._isMounted = true
+    this.fetchData()
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false
+  }
+
   render() {
     return (
       <div style={{height: '100%', background: '#fff', flexDirection: 'column'}} className="flex">
@@ -34,7 +69,15 @@ class AccountPage extends Component {
           <div className="flex full-pad" style={{ height: '100%', width: '100%', borderLeft: '1px solid #dad2e0', marginLeft: 1}}>
             <div style={{width: '100%'}}>
               <h2>{this.state.selected.key}</h2>
-              <BasicWidget />
+              <BasicWidget
+                title="Account Details"
+                contentLoading={this.state.loading}
+                renderContent={()=>
+                  <div>
+                  hi
+                  </div>
+                }
+              />
             </div>
           </div>
         </div>
@@ -43,4 +86,11 @@ class AccountPage extends Component {
   }
 }
 
-export default AccountPage
+function mapStateToProps(state) {
+  return {
+    currentUser: state.currentUser,
+    errors: state.errors
+  };
+}
+
+export default connect(mapStateToProps, {})(AccountPage);
