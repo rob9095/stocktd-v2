@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import { Menu, Icon, Switch } from 'antd';
-
-const { SubMenu } = Menu;
+import { Menu, Icon, } from 'antd';
 
 class BasicNavigation extends Component {
   constructor(props) {
@@ -39,9 +37,10 @@ class BasicNavigation extends Component {
       }
     })
     return (
-      <div>
+      <div className="basic-menu">
         <Menu
-          style={{ border: 'none',  }}
+          onSelect={(selected) => this.props.onSelect(selected)}
+          style={{ border: 'none',}}
           defaultSelectedKeys={this.props.defaultSelectedKeys}
           defaultOpenKeys={this.props.defaultSelectedKeys}
           mode={this.props.mode || 'inline'}

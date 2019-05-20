@@ -243,14 +243,36 @@ i.xl svg {
   cursor: pointer;
 }
 
+.basic-menu .ant-menu-item-group-title {
+  color: rgb(94, 78, 112);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.basic-menu .ant-menu-vertical .ant-menu-item-selected::before, .ant-menu-vertical-left .ant-menu-item-selected::before, .ant-menu-vertical-right .ant-menu-item-selected::before, .ant-menu-inline .ant-menu-item-selected::before {
+    border-right: 5px solid #716aca;
+    content: ' ';
+    position: absolute;
+    top: 10px;
+    left: 0px;
+    height: 22px;
+    background: transparent;
+    border-radius: 0px 2px 2px 0px;
+}
+.basic-menu .ant-menu-vertical .ant-menu-item-selected::after, .ant-menu-vertical-left .ant-menu-item-selected::after, .ant-menu-vertical-right .ant-menu-item-selected::after, .ant-menu-inline .ant-menu-item-selected::after {
+    border-right: 0px !important;
+    display: none;
+}
+
 /* Default Widget Styles */
 .stkd-widget {
-  margin: 10px;
-  border-radius: 5px;
+  box-shadow: rgba(53, 15, 78, 0.04) 0px 2px 0px;
+  border-radius: 3px;
+  border: 1px solid #dad2e0;
 }
 
 .stkd-content {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
   background: #fff;
   padding: 24px;
 }
