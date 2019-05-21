@@ -653,11 +653,14 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
 /* Basic Form */
 .basic-form .ant-form-item-label label {
   display: flex;
+  font-size: 16px;
 }
 
 .basic-form .ant-form-item {
   margin-bottom: 0px !important;
-  padding: 14px;
+  padding: 15px 30px;
+  display: flex;
+  align-items: center;
 }
 
 .basic-form .ant-select-lg .ant-select-selection__rendered {

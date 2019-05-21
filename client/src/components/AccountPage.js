@@ -88,7 +88,7 @@ class AccountPage extends Component {
                   <BasicForm
                     onBlur={this.handleInputUpdate}
                     inputs={[
-                      { id: 'email', text: 'Email', span: 24, labelCol: {span: 12}, wrapperCol: {span: 12}, required: true, initialValue: account.email },
+                      { id: 'email', text: 'Email', span: 24, validType: 'email', labelCol: {span: 12}, wrapperCol: {span: 12}, required: true, initialValue: account.email },
                       { id: 'firstName', confirm: true, text: 'First Name', span: 24, labelCol: {span: 12}, wrapperCol: {span: 12}, initialValue: account.firstName },
                       { id: 'lastName', text: 'Last Name', span: 24, labelCol: {span: 12}, wrapperCol: {span: 12}, initialValue: account.lastName },
                     ]}
