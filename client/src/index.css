@@ -640,6 +640,11 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
   }
 }
 
+/* Basic Form */
+.basic-form .ant-form-item-label label {
+  display: flex;
+}
+
 /* Ant Spinner */
 .ant-spin-container::after {
   background: transparent !important;

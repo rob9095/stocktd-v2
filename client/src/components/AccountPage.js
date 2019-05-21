@@ -4,18 +4,19 @@ import BasicWidget from './BasicWidget';
 import { connect } from "react-redux";
 import { getAllModelDocuments } from '../store/actions/models';
 import { resetPassword } from '../store/actions/account';
-import InsertDataModal from './AccountPage';
-import UserCard from '../components/UserCard';
+import BasicForm from './BasicForm';
 
 class AccountPage extends Component {
   _isMounted = false
   constructor(props) {
     super(props)
     this.state = {
+      loading: true,
       selected: {
         selectedKeys: ['Account Details'],
         key: 'Account Details'
       },
+      account: {},
     }
   }
 
@@ -48,6 +49,7 @@ class AccountPage extends Component {
   }
 
   render() {
+    const account = this.state.account || {}
     return (
       <div style={{height: '100%', background: '#fff', flexDirection: 'column'}} className="flex">
         <div className="flex space-between" style={{height: '100%'}}>
@@ -74,7 +76,11 @@ class AccountPage extends Component {
                 contentLoading={this.state.loading}
                 renderContent={()=>
                   <div>
-                  hi
+                  <BasicForm
+                    inputs={[
+                      { id: 'email', text: 'Email', span: 24, labelCol: {span: 12}, wrapperCol: {span: 12}, required: true, initialValue: account.email },
+                    ]}
+                  />
                   </div>
                 }
               />
