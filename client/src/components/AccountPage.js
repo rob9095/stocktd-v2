@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import { getAllModelDocuments } from '../store/actions/models';
 import { resetPassword } from '../store/actions/account';
 import BasicForm from './BasicForm';
+import { Row, Col, } from 'antd';
 
 class AccountPage extends Component {
   _isMounted = false
@@ -48,6 +49,14 @@ class AccountPage extends Component {
     this._isMounted = false
   }
 
+  handleInputUpdate = (data) => {
+    return new Promise((resolve,reject) => {
+      setTimeout(()=>{
+        resolve()
+      },2000)
+    })
+  }
+
   render() {
     const account = this.state.account || {}
     return (
@@ -69,7 +78,7 @@ class AccountPage extends Component {
             />
           </div>
           <div className="flex full-pad" style={{ height: '100%', width: '100%', borderLeft: '1px solid #dad2e0', marginLeft: 1}}>
-            <div style={{width: '100%'}}>
+            <div style={{width: '100%', maxWidth: 1200}}>
               <h2>{this.state.selected.key}</h2>
               <BasicWidget
                 title="Account Details"
@@ -77,10 +86,27 @@ class AccountPage extends Component {
                 renderContent={()=>
                   <div>
                   <BasicForm
+                    onBlur={this.handleInputUpdate}
                     inputs={[
                       { id: 'email', text: 'Email', span: 24, labelCol: {span: 12}, wrapperCol: {span: 12}, required: true, initialValue: account.email },
+                      { id: 'firstName', confirm: true, text: 'First Name', span: 24, labelCol: {span: 12}, wrapperCol: {span: 12}, initialValue: account.firstName },
+                      { id: 'lastName', text: 'Last Name', span: 24, labelCol: {span: 12}, wrapperCol: {span: 12}, initialValue: account.lastName },
                     ]}
                   />
+                  </div>
+                }
+              />
+              <BasicWidget
+                title="Preferences"
+                contentLoading={this.state.loading}
+                renderContent={() =>
+                  <div>
+                    <BasicForm
+                      inputs={[
+                        { id: 'language', text: 'Language', showSearch: true, type: 'select', values: [{id: 'english', text: 'English'}], span: 24, labelCol: { span: 12 }, wrapperCol: { span: 12 }, initialValue: 'english' },
+                        { id: 'timezone', text: 'Timezone', showSearch: true, type: 'select', values: [{ id: 'test', text: 'test' }], span: 24, labelCol: { span: 12 }, wrapperCol: { span: 12 }, initialValue: 'test' },
+                      ]}
+                    />
                   </div>
                 }
               />

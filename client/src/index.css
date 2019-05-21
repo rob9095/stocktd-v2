@@ -1,18 +1,18 @@
-@import url('https://fonts.googleapis.com/css?family=Work+Sans:400,700');
+@import url('https://fonts.googleapis.com/css?family=Ubuntu:400,700');
 
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Work Sans', sans-serif !important;
+  font-family: 'Ubuntu', sans-serif !important;
   background: #f0f2f5 !important;
 }
 
 button {
-  font-family: 'Work Sans', sans-serif !important;
+  font-family: 'Ubuntu', sans-serif !important;
 }
 
 ul {
-  font-family: 'Work Sans', sans-serif !important;
+  font-family: 'Ubuntu', sans-serif !important;
 }
 
 body #root {
@@ -156,17 +156,17 @@ a:focus {
 }
 
 .ant-form-item {
-  font-family: 'Work Sans', sans-serif !important;
+  font-family: 'Ubuntu', sans-serif !important;
   margin-bottom: 1em !important;
 }
 
 .ant-input {
-  font-family: 'Work Sans', sans-serif !important;
+  font-family: 'Ubuntu', sans-serif !important;
   min-height: 40px !important;
 }
 
 .ant-input::placeholder {
-  font-family: 'Work Sans', sans-serif !important;
+  font-family: 'Ubuntu', sans-serif !important;
 }
 
 h1 {
@@ -174,7 +174,7 @@ h1 {
 }
 
 button, a, p, h1, h2, h3, h4, h5 {
-  font-family: 'Work Sans', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
 }
 
 .no-pad {
@@ -222,7 +222,7 @@ i.xl svg {
 }
 
 .ant-menu {
-  font-family: 'Work Sans', sans-serif !important;
+  font-family: 'Ubuntu', sans-serif !important;
   font-weight: 500;
 }
 
@@ -242,6 +242,8 @@ i.xl svg {
   color: #716aca;
   cursor: pointer;
 }
+
+/* Basic Menu */
 
 .basic-menu .ant-menu-item-group-title {
   color: rgb(94, 78, 112);
@@ -263,6 +265,14 @@ i.xl svg {
 .basic-menu .ant-menu-vertical .ant-menu-item-selected::after, .ant-menu-vertical-left .ant-menu-item-selected::after, .ant-menu-vertical-right .ant-menu-item-selected::after, .ant-menu-inline .ant-menu-item-selected::after {
     border-right: 0px !important;
     display: none;
+}
+
+.basic-menu .ant-menu-vertical .ant-menu-item-selected, .ant-menu-vertical-left .ant-menu-item-selected, .ant-menu-vertical-right .ant-menu-item-selected, .ant-menu-inline .ant-menu-item-selected {
+    font-weight: 600;
+}
+
+.basic-menu .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
+    background-color: rgba(112, 106, 202, 0.04);
 }
 
 /* Default Widget Styles */
@@ -415,12 +425,12 @@ i.xl svg {
   align-items: center;
 }
 .ant-avatar {
-  font-family: 'Work Sans', sans-serif !important;
+  font-family: 'Ubuntu', sans-serif !important;
   text-transform: uppercase;
 }
 
 .user-card-menu {
-  font-family: 'Work Sans', sans-serif !important;
+  font-family: 'Ubuntu', sans-serif !important;
 }
 
 .user-card-menu .ant-menu-item {
@@ -474,7 +484,7 @@ i.xl svg {
 }
 
 .ant-select-selection__placeholder {
-  font-family: 'Work Sans', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   top: 14px;
 }
 
@@ -645,6 +655,16 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
   display: flex;
 }
 
+.basic-form .ant-form-item {
+  margin-bottom: 0px !important;
+  padding: 14px;
+}
+
+.basic-form .ant-select-lg .ant-select-selection__rendered {
+  line-height: 40px;
+  top: -5px;
+}
+
 /* Ant Spinner */
 .ant-spin-container::after {
   background: transparent !important;
@@ -666,15 +686,15 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
 }
 .auth-form-forgot {
   float: right;
-  font-family: 'Work Sans', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
 }
 .auth-form-button {
   width: 100%;
-  font-family: 'Work Sans', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
 }
 .auth-form-or {
   text-align: center;
-  font-family: 'Work Sans', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
 }
 
 
