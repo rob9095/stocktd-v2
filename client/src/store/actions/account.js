@@ -62,14 +62,20 @@ export function sendVerficationEmail(config) {
 }
 
 export function updateAccount(config) {
-	return new Promise((resolve, reject) => {
-		const { user, update } = config
-		return apiCall('post', `/api/account/update-account`, { user, update })
-			.then((res) => {
-				resolve(res);
-			})
-			.catch(err => {
-				reject(err);
-			})
-	});
+	return dispatch => {
+		return new Promise((resolve, reject) => {
+			const { user, update } = config
+			return apiCall('post', `/api/account/update-account`, { user, update })
+				.then((res) => {
+					update.email && dispatch(setCurrentUser({
+						...user,
+						email: update.email,
+					}))
+					resolve(res);
+				})
+				.catch(err => {
+					reject(err);
+				})
+		});
+	}
 }
