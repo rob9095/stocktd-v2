@@ -24,7 +24,7 @@ class BForm extends Component {
     })
   }
 
-  handleBlur = async (input, id) => {
+  handleBlur = async (input, id, skipConfirm) => {
     //validate
     let validation = await this.validate([id],input,id)
     if (validation.errors) {
@@ -32,7 +32,7 @@ class BForm extends Component {
     }
     
     //if input uses special confirm step, setState and return
-    if (input.confirm) {
+    if (input.confirm && !skipConfirm) {
       this.setState({
         [id]: true,
       })
@@ -52,7 +52,9 @@ class BForm extends Component {
     //use custom onBlur for input if avaiable otherwise use onBlur handler in props
     let onBlur = typeof input.onBlur === 'function' ? input.onBlur : this.props.onBlur
     await onBlur(validation.values, input.handler)
-    .then(res=>this.setState({[id]: {status: 'done'}}))
+    .then(res=>{
+      this.setState({[id]: {status: 'done'}})
+    })
     .catch(err=>{
       this.setState({ [id]: { status: 'error' }, customFeedback: { ...this.state.customFeedback, [id]: { help: err.message.toString(), validateStatus: 'error' }}})
     })
@@ -174,14 +176,14 @@ class BForm extends Component {
                 />
               )}
             </FormItem>
-            {i.confirm && this.state[id] && (
-              <div className="flex space-between align-items-center half-pad" style={{borderTop: '1px solid rgb(218, 210, 224)', background: '#f9f9fd', marginTop: -5}}>
+            {i.confirm && this.state[id] === true && (
+              <div className="flex space-between align-items-center" style={{padding: '15px 30px', borderTop: '1px solid rgb(218, 210, 224)', background: '#f9f9fd', marginTop: -5}}>
                 <div className="flex" style={{fontSize: 16}}>
                   {i.confirmMessage || <div className="flex align-items-center"><Icon type="info-circle" style={{fontSize: 24, marginRight: 5}} /> Please confirm the changes</div>}
                 </div>
                 <div className="flex">
                   <Button style={{marginRight: 5}} size="large" onClick={()=>this.handleConfirmCancel(i,id)}>Cancel</Button>
-                  <Button style={{ marginRight: 5 }} size="large" type="primary">Save</Button>
+                  <Button size="large" type="primary" onClick={()=>this.handleBlur(i,id,true)}>Save</Button>
                 </div>
               </div>
             )}
