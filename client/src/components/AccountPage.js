@@ -20,7 +20,7 @@ class AccountPage extends Component {
     }
   }
 
-  fetchData = () => {
+  fetchData = async () => {
     this.setState({
       loading: true,
     })
@@ -29,7 +29,7 @@ class AccountPage extends Component {
       console.log('error!')
       return
     }
-    getAllModelDocuments({ model: 'User', documentRef: { _id: id, }, company, populateArray: [{ path: 'companyId', populate: [{path: 'users'}] }], })
+    await getAllModelDocuments({ model: 'User', documentRef: { _id: id, }, company, populateArray: [{ path: 'companyId', populate: [{path: 'users'}] }], })
     .then(res=>{
       const [account, ...rest] = res.data
       this._isMounted && this.setState({account, loading: false})
@@ -74,9 +74,9 @@ class AccountPage extends Component {
   render() {
     const account = this.state.account || {}
     return (
-      <div style={{height: '100%', background: '#fff', flexDirection: 'column'}} className="flex">
-        <div className="flex space-between" style={{height: '100%'}}>
-          <div style={{ minWidth: 220, height: '100%', padding: '24px 0px'}}>
+      <div style={{ background: '#fff', flexDirection: 'column'}} className="flex">
+        <div className="flex space-between">
+          <div style={{ minWidth: 220, padding: '24px 0px'}}>
             <BasicNavigation
               defaultSelectedKeys={this.state.selected.selectedKeys}
               onSelect={(selected)=>this.setState({selected})}
@@ -91,7 +91,7 @@ class AccountPage extends Component {
               ]}
             />
           </div>
-          <div className="flex full-pad" style={{ height: '100%', width: '100%', borderLeft: '1px solid #dad2e0', marginLeft: 1}}>
+          <div className="flex full-pad" style={{ width: '100%', borderLeft: '1px solid #dad2e0', marginLeft: 1}}>
             <div style={{width: '100%', maxWidth: 1200}}>
               <h2>{this.state.selected.key}</h2>
               <BasicWidget

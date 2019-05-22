@@ -177,7 +177,7 @@ class BForm extends Component {
               )}
             </FormItem>
             {i.confirm && this.state[id] === true && (
-              <div className="flex space-between align-items-center" style={{padding: '15px 30px', borderTop: '1px solid rgb(218, 210, 224)', background: '#f9f9fd', marginTop: -5}}>
+              <div className="flex space-between align-items-center flex-wrap" style={{padding: '15px 30px', borderTop: '1px solid rgb(218, 210, 224)', background: '#f9f9fd', marginTop: -5}}>
                 <div className="flex" style={{fontSize: 16}}>
                   {i.confirmMessage || <div className="flex align-items-center"><Icon type="info-circle" style={{fontSize: 24, marginRight: 5}} /> Please confirm the changes</div>}
                 </div>

@@ -18,6 +18,7 @@ class BasicWidget extends Component {
   }
 
   render() {
+    let contentRows = this.props.contentRows || 3
     let content = this.props.renderContent ? this.props.renderContent() : this.props.content || <Empty description={'Nothing to see here'} />
     return(
       <div className="stkd-widget" style={{margin: '14px 0px'}}>
@@ -27,9 +28,15 @@ class BasicWidget extends Component {
           </Skeleton>
         </div>
         <div style={{background: '#fff'}}>
-          <Skeleton loading={this.props.loading} title={false} paragraph={{ rows: this.props.skelRows || 3, width: this.props.skelWidth || ['50%'] }} active>
-            {content}
-          </Skeleton>
+          {this.props.contentLoading ? 
+          Array(contentRows).fill({}).map((s,i)=>(
+            <div key={i} className="flex align-items-center" style={{ padding: '30px 30px 15px', height: 70, width: '100%', ...contentRows !== i+1 && { borderBottom: '1px solid #dad2e0' }}}>
+              <Skeleton paragraph={{ rows: 1, width: '100%' }} title={false} loading={true} active />
+            </div>
+          ))
+          :
+          content
+          }
         </div>
       </div>
     )

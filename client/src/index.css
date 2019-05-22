@@ -89,6 +89,16 @@ code {
   padding: 12px;
 }
 
+@media screen and (max-width: 900px) {
+  .full-pad {
+  padding: 12px;
+  }
+
+  .half-pad {
+    padding: 6px;
+  }
+}
+
 .no-margin {
   margin: 0px;
 }
@@ -661,6 +671,7 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
   padding: 15px 30px;
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .basic-form .ant-select-lg .ant-select-selection__rendered {
