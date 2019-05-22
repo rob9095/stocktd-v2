@@ -3,9 +3,8 @@ import BasicNavigation from './BasicNavigation'
 import BasicWidget from './BasicWidget';
 import { connect } from "react-redux";
 import { getAllModelDocuments } from '../store/actions/models';
-import { resetPassword } from '../store/actions/account';
+import { resetPassword, updateAccount } from '../store/actions/account';
 import BasicForm from './BasicForm';
-import { Row, Col, } from 'antd';
 
 class AccountPage extends Component {
   _isMounted = false
@@ -49,11 +48,26 @@ class AccountPage extends Component {
     this._isMounted = false
   }
 
-  handleInputUpdate = (data) => {
-    return new Promise((resolve,reject) => {
-      setTimeout(()=>{
-        resolve()
-      },2000)
+  handleInputUpdate = (update,handler) => {
+    return new Promise(async (resolve,reject) => {
+      if (handler) {
+        handler({ user: this.props.currentUser.user, update})
+        .then(res=>{
+          this.setState({
+            account: {
+              ...this.state.account,
+              ...update,
+            }
+          })
+          resolve(res)
+        })
+        .catch(err=>{
+          reject(err)
+        })
+      } else {
+        console.log('onBlur triggered without handler for change!')
+        reject({message: 'Unable to save update'})
+      }
     })
   }
 
@@ -88,9 +102,9 @@ class AccountPage extends Component {
                   <BasicForm
                     onBlur={this.handleInputUpdate}
                     inputs={[
-                      { id: 'email', text: 'Email', span: 24, validType: 'email', labelCol: {span: 12}, wrapperCol: {span: 12}, required: true, initialValue: account.email },
+                      { id: 'email', text: 'Email', span: 24, validType: 'email', labelCol: {span: 12}, wrapperCol: {span: 12}, required: true, initialValue: account.email, handler: updateAccount },
                       { id: 'firstName', confirm: true, text: 'First Name', span: 24, labelCol: {span: 12}, wrapperCol: {span: 12}, initialValue: account.firstName },
-                      { id: 'lastName', text: 'Last Name', span: 24, labelCol: {span: 12}, wrapperCol: {span: 12}, initialValue: account.lastName },
+                      { id: 'lastName', text: 'Last Name', span: 24, labelCol: { span: 12 }, wrapperCol: { span: 12 }, initialValue: account.lastName, handler: updateAccount },
                     ]}
                   />
                   </div>

@@ -46,3 +46,16 @@ export function resetPassword(data) {
 		});
 	}
 }
+
+export function updateAccount(config) {
+	return new Promise((resolve, reject) => {
+		const { user, update } = config
+		return apiCall('post', `/api/account/update-account`, { user, update })
+			.then((res) => {
+				resolve(res);
+			})
+			.catch(err => {
+				reject(err);
+			})
+	});
+}

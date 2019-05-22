@@ -150,7 +150,7 @@ updateAccount = (config) => {
 			}
 			if (email) {
 				//check if email is available
-				let emailCheck = await db.User.findOne({ email: { $regex: `^${email}$`, '$options': 'i' } })
+				let emailCheck = await db.User.findOne({ email: { $regex: `^${email}$`, '$options': 'i' } }) || {}
 				emailCheck._id && reject({
 					message: 'Email Already Exists',
 				})
@@ -178,6 +178,17 @@ exports.resetPassword = async (req, res, next) => {
 			//delete the token
 			await db.UserToken.deleteOne({_id: req.body.token._id})
 		}
+		return res.status(200).json({
+			...result,
+		})
+	} catch(err) {
+		return next(err)
+	}
+}
+
+exports.updateAccount = async (req, res, next) => {
+	try {
+		let result = await updateAccount({user: {_id: req.body.user.id}, update: req.body.update})
 		return res.status(200).json({
 			...result,
 		})

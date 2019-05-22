@@ -11,6 +11,7 @@ class BForm extends Component {
     super(props);
     this.state = {
       loadingInputs: [],
+      customFeedback: {},
     };
   }
 
@@ -50,14 +51,22 @@ class BForm extends Component {
 
     //use custom onBlur for input if avaiable otherwise use onBlur handler in props
     let onBlur = typeof input.onBlur === 'function' ? input.onBlur : this.props.onBlur
-    await onBlur()
+    await onBlur(validation.values, input.handler)
     .then(res=>this.setState({[id]: {status: 'done'}}))
-    .catch(err=>this.setState({[id]: {status: 'error'}}))
-    reset state after timeout to show success/exception
+    .catch(err=>{
+      this.setState({ [id]: { status: 'error' }, customFeedback: { ...this.state.customFeedback, [id]: { help: err.message.toString(), validateStatus: 'error' }}})
+    })
+    //reset state after timeout to show success/exception
     setTimeout(()=>{
+      //reset value if we errored out onBlur
+      this.state[id].status === 'error' && this.props.form.setFieldsValue({ [id]: input.initialValue })
       this.setState({
         loadingInputs: this.state.loadingInputs.filter(fid => fid !== id),
         [id]: null,
+        customFeedback: {
+          ...this.state.customFeedback,
+          [id]: null,
+        }
       })
     },input.timeout || 3000)
   }
@@ -147,7 +156,7 @@ class BForm extends Component {
             {this.state.loadingInputs.includes(id) && (
               <CircularProgress style={{position: 'absolute', top: 25, right: 7}} {...this.state[id] ? { ...this.state[id] } : {}} />
             )}
-            <FormItem key={id} label={`${i.text}`} labelCol={i.labelCol} wrapperCol={i.wrapperCol}>
+            <FormItem key={id} {...this.state.customFeedback[id] && {...this.state.customFeedback[id]}} label={`${i.text}`} labelCol={i.labelCol} wrapperCol={i.wrapperCol}>
               {getFieldDecorator(id, {
                 initialValue: i.initialValue,
                 validateTrigger: 'onBlur',
@@ -158,7 +167,7 @@ class BForm extends Component {
                 }],
               })(
                 <Input
-                  autoComplete={this.props.form.getFieldValue(id) || i.initialValue ? "off" : !!window.chrome ? "disabled" : "off"}
+                  autoComplete={i.initialValue ? "off" : !!window.chrome ? "disabled" : "off"}
                   size="small"
                   placeholder={i.text}
                   onBlur={() => this.handleBlur(i, id)}
@@ -182,8 +191,8 @@ class BForm extends Component {
     })
     return (
       <div>
-        <Form autoComplete="disabled" layout={this.props.formLayout} className="basic-form">
-          <input type="hidden" autoComplete="disabled" />
+        <Form autoComplete="off" layout={this.props.formLayout} className="basic-form">
+          <input type="hidden" autoComplete="false" />
           <Row gutter={2}>{inputs}</Row>
         </Form>
       </div>
