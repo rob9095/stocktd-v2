@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Form, Input, Button, DatePicker, Icon, Row, Col, Select, } from 'antd';
+import { Form, Input, Button, DatePicker, Icon, Row, Col, Select } from 'antd';
 import CircularProgress from './CircularProgress';
 
 const { RangePicker } = DatePicker;
@@ -174,6 +174,11 @@ class BForm extends Component {
                   placeholder={i.text}
                   onBlur={() => this.handleBlur(i, id)}
                 />
+              )}
+              {i.extra && (
+                <div>
+                  {i.extra}
+                </div>
               )}
             </FormItem>
             {i.confirm && this.state[id] === true && (

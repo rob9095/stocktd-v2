@@ -32,15 +32,22 @@ exports.verifySignUpToken = async function(req, res, next) {
 	}
 };
 
-exports.resendVerificationEmail = async (req, res, next) => {
-	try {
-		let token = await upsertUserToken({userId: req.body.user.id, tokenType: 'verify-email'})
-		if (token._id) {
-			let emailRes = await sendEmail({
-						from: 'noreply@stocktd.com',
-						subject: 'Please confirm your email',
-						to: req.body.email,
-						html: `
+const sendUserEmailVerification = (user) => {
+	return new Promise( async (resolve,reject) => {
+		try {
+			let { id } = user || {}
+			let foundUser = await db.User.findOne({_id: id})
+			if (!foundUser) {
+				reject({
+					message: 'Unable to send verification email'
+				})
+			}
+			let token = await upsertUserToken({userId: id, tokenType: 'verify-email', update: true})
+			await sendEmail({
+				from: 'noreply@stocktd.com',
+				subject: 'Please confirm your email',
+				to: foundUser.email,
+				html: `
 							<div class="emailContainer">
 								<h2>Welcome to stocktd</h2>
 								<p>Please click the link below to confirm your email address</p>
@@ -48,14 +55,22 @@ exports.resendVerificationEmail = async (req, res, next) => {
 								<p>Have some questions? <a href="#">Contact Us</a></p>
 							</div>
 						`,
-					})
-				return res.status(200).json({status: 'Email sent succesfully'})
-		} else {
-			return next({
-				status: 400,
-				message: 'Unable to resend email'
 			})
+			resolve({
+				status: 'Email sent succesfully',
+			})
+		} catch(err) {
+			reject(err)
 		}
+	})
+}
+
+exports.sendEmailVerification = async (req, res, next) => {
+	try {
+		let result = await sendUserEmailVerification({id: req.body.user.id})
+		return res.status(200).json({
+			...result,
+		})
 	} catch(err) {
 		return next(err)
 	}
@@ -138,7 +153,7 @@ const sendResetPasswordEmail = (email) => {
 }
 
 //allow for update of email, password, firstName, lastName
-updateAccount = (config) => {
+const updateUserAccount = (config) => {
 	return new Promise(async (resolve,reject) => {
 		try {
 			let { user, update } = config
@@ -173,7 +188,7 @@ updateAccount = (config) => {
 
 exports.resetPassword = async (req, res, next) => {
 	try {
-		let result = req.body.token ? await updateAccount({user: req.body.token.user,update: req.body.update}) : await sendResetPasswordEmail(req.body.email)
+		let result = req.body.token ? await updateUserAccount({user: req.body.token.user,update: req.body.update}) : await sendResetPasswordEmail(req.body.email)
 		if (req.body.token) {
 			//delete the token
 			await db.UserToken.deleteOne({_id: req.body.token._id})
@@ -188,7 +203,7 @@ exports.resetPassword = async (req, res, next) => {
 
 exports.updateAccount = async (req, res, next) => {
 	try {
-		let result = await updateAccount({user: {_id: req.body.user.id}, update: req.body.update})
+		let result = await updateUserAccount({user: {_id: req.body.user.id}, update: req.body.update})
 		return res.status(200).json({
 			...result,
 		})
@@ -196,3 +211,6 @@ exports.updateAccount = async (req, res, next) => {
 		return next(err)
 	}
 }
+
+
+exports.sendUserEmailVerification = sendUserEmailVerification

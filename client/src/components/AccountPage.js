@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import { getAllModelDocuments } from '../store/actions/models';
 import { resetPassword, updateAccount } from '../store/actions/account';
 import BasicForm from './BasicForm';
+import { Tag, Button } from 'antd';
 
 class AccountPage extends Component {
   _isMounted = false
@@ -102,7 +103,7 @@ class AccountPage extends Component {
                   <BasicForm
                     onBlur={this.handleInputUpdate}
                     inputs={[
-                      { id: 'email', text: 'Email', span: 24, validType: 'email', labelCol: {span: 12}, wrapperCol: {span: 12}, required: true, initialValue: account.email, handler: updateAccount },
+                      { id: 'email', text: 'Email', span: 24, validType: 'email', labelCol: {span: 12}, wrapperCol: {span: 12}, required: true, initialValue: account.email, handler: updateAccount, ...!this.props.currentUser.user.emailVerified && {extra: (<div style={{fontSize: 'small'}}><Tag style={{opacity: 1, marginRight: 5}} color="volcano">Unverified</Tag><a>Resend verification</a></div>)} },
                       { id: 'firstName', confirm: true, text: 'First Name', span: 24, labelCol: { span: 12 }, wrapperCol: { span: 12 }, initialValue: account.firstName, handler: updateAccount },
                       { id: 'lastName', text: 'Last Name', span: 24, labelCol: { span: 12 }, wrapperCol: { span: 12 }, initialValue: account.lastName, handler: updateAccount },
                     ]}

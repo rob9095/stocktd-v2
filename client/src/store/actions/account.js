@@ -47,6 +47,19 @@ export function resetPassword(data) {
 	}
 }
 
+export function sendVerficationEmail(config) {
+	return new Promise((resolve, reject) => {
+		const { user } = config
+		return apiCall('post', `/api/account/email-verification`, { user })
+			.then((res) => {
+				resolve(res);
+			})
+			.catch(err => {
+				reject(err);
+			})
+	});
+}
+
 export function updateAccount(config) {
 	return new Promise((resolve, reject) => {
 		const { user, update } = config

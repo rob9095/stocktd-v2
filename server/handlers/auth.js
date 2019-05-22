@@ -1,6 +1,6 @@
 const db = require('../models');
 const jwt = require('jsonwebtoken');
-const { sendEmail } = require('../services/sendEmail');
+const { sendUserEmailVerification } = require('./account')
 
 exports.signin = async function(req, res, next) {
 	try {
@@ -113,22 +113,27 @@ exports.signup = async function(req, res, next) {
 		},
 		process.env.SECRET_KEY
 		);
+
+		//send email verification
+		await sendUserEmailVerification({id: user._id})
+
+		// legacy code for sending email verification
 		// create the signup token
-		let signUpToken = await db.UserToken.create({tokenType: 'verify-email', user: user._id})
+		// let signUpToken = await db.UserToken.create({tokenType: 'verify-email', user: user._id})
 		//send the verification email
-		let emailRes = await sendEmail({
-			from: 'noreply@stocktd.com',
-			subject: 'Please confirm your email',
-			to: req.body.email,
-			html: `
-				<div class="emailContainer">
-					<h2>Welcome to stocktd</h2>
-					<p>Please click the link below to confirm your email address</p>
-					<a href="https://stocktd.com/verify-email/${signUpToken._id}"><button class="btn">Confirm my email</button></a>
-					<p>Have some questions? <a href="#">Contact Us</a></p>
-				</div>
-			`,
-		})
+		// let emailRes = await sendEmail({
+		// 	from: 'noreply@stocktd.com',
+		// 	subject: 'Please confirm your email',
+		// 	to: req.body.email,
+		// 	html: `
+		// 		<div class="emailContainer">
+		// 			<h2>Welcome to stocktd</h2>
+		// 			<p>Please click the link below to confirm your email address</p>
+		// 			<a href="https://stocktd.com/verify-email/${signUpToken._id}"><button class="btn">Confirm my email</button></a>
+		// 			<p>Have some questions? <a href="#">Contact Us</a></p>
+		// 		</div>
+		// 	`,
+		// })
 
 		return res.status(200).json({
 			id,

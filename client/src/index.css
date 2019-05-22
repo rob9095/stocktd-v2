@@ -670,8 +670,13 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
   margin-bottom: 0px !important;
   padding: 15px 30px;
   display: flex;
-  align-items: center;
   flex-wrap: wrap;
+}
+
+@media screen and (max-width:400px) {
+ .basic-form .ant-form-item {
+    padding: 7px 15px;
+  } 
 }
 
 .basic-form .ant-select-lg .ant-select-selection__rendered {
