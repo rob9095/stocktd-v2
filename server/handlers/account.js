@@ -171,12 +171,14 @@ const updateUserAccount = (config) => {
 				})
 			}
 			let userUpdate = {
-				...email && { email },
+				...email && { email, emailVerified: false },
 				...password && { password },
 				...firstName && { firstName },
 				...lastName && { lastName },
 			}
 			user = await db.User.update({_id},userUpdate)
+			//send new verification email if neccesary
+			email && await sendUserEmailVerification({id: _id})
 			resolve({
 				user,
 			})

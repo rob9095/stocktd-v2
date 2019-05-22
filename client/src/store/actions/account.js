@@ -70,6 +70,7 @@ export function updateAccount(config) {
 					update.email && dispatch(setCurrentUser({
 						...user,
 						email: update.email,
+						emailVerified: res.user.emailVerified,
 					}))
 					resolve(res);
 				})
