@@ -1,5 +1,6 @@
 import { apiCall } from '../../services/api';
 import { addError } from './errors';
+import { setCurrentUser } from './auth';
 
 export function verifyUserEmail(token_id){
   return dispatch => {

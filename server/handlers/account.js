@@ -39,7 +39,7 @@ const sendUserEmailVerification = (user) => {
 			let foundUser = await db.User.findOne({_id: id})
 			if (!foundUser) {
 				reject({
-					message: 'Unable to send verification email'
+					message: 'Email failed'
 				})
 			}
 			let token = await upsertUserToken({userId: id, tokenType: 'verify-email', update: true})

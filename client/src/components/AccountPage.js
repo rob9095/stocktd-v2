@@ -3,8 +3,9 @@ import BasicNavigation from './BasicNavigation'
 import BasicWidget from './BasicWidget';
 import { connect } from "react-redux";
 import { getAllModelDocuments } from '../store/actions/models';
-import { resetPassword, updateAccount } from '../store/actions/account';
+import { resetPassword, updateAccount, sendVerficationEmail } from '../store/actions/account';
 import BasicForm from './BasicForm';
+import CircularProgress from './CircularProgress';
 import { Tag, Button } from 'antd';
 
 class AccountPage extends Component {
@@ -72,6 +73,36 @@ class AccountPage extends Component {
     })
   }
 
+  handleEmailVerification = async () => {
+    this.setState({
+      sendEmail: true
+    })
+    await sendVerficationEmail({user: this.props.currentUser.user})
+    .then(res=>{
+      console.log({res})
+      this.setState({
+        sendEmail: {
+          status: 'done',
+          message: 'Email Sent',
+        }
+      })
+    })
+    .catch(err => {
+      console.log({err})
+      this.setState({
+        sendEmail: {
+          status: 'error',
+          message: err.message.toString(),
+        }
+      })
+    })
+    setTimeout(()=>{
+      this.setState({
+        sendEmail: null,
+      })
+    },3000)
+  }
+
   render() {
     const account = this.state.account || {}
     return (
@@ -103,7 +134,7 @@ class AccountPage extends Component {
                   <BasicForm
                     onBlur={this.handleInputUpdate}
                     inputs={[
-                      { id: 'email', text: 'Email', span: 24, validType: 'email', labelCol: {span: 12}, wrapperCol: {span: 12}, required: true, initialValue: account.email, handler: updateAccount, ...!this.props.currentUser.user.emailVerified && {extra: (<div style={{fontSize: 'small'}}><Tag style={{opacity: 1, marginRight: 5}} color="volcano">Unverified</Tag><a>Resend verification</a></div>)} },
+                      { id: 'email', text: 'Email', span: 24, validType: 'email', labelCol: {span: 12}, wrapperCol: {span: 12}, required: true, initialValue: account.email, handler: updateAccount, ...!this.props.currentUser.user.emailVerified && {extra: (<div className="flex align-items-center flex-wrap" style={{fontSize: 'small'}}><Tag style={{opacity: 1}} color="volcano">unverified</Tag><a onClick={this.handleEmailVerification}>Resend verification</a>{this.state.sendEmail && (<span><CircularProgress style={{marginRight: 5}} {...this.state.sendEmail} /></span>)}</div>)} },
                       { id: 'firstName', confirm: true, text: 'First Name', span: 24, labelCol: { span: 12 }, wrapperCol: { span: 12 }, initialValue: account.firstName, handler: updateAccount },
                       { id: 'lastName', text: 'Last Name', span: 24, labelCol: { span: 12 }, wrapperCol: { span: 12 }, initialValue: account.lastName, handler: updateAccount },
                     ]}
@@ -140,4 +171,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, {})(AccountPage);
+export default connect(mapStateToProps, { })(AccountPage);
