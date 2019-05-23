@@ -62,7 +62,7 @@ class AuthForm extends Component {
               <Alert
                 style={{marginBottom: '1em'}}
                 message={errors.message}
-                type="error"
+                type={errors.status}
                 closable
                 afterClose={()=>removeError()}
               />

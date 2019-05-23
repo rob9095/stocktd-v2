@@ -85,7 +85,7 @@ class ForgotPassword extends Component {
               <Alert
                 style={{ margin: '10px 0px' }}
                 message={errors.message}
-                type="error"
+                type={errors.status}
                 closable
                 afterClose={() => removeError()}
               />

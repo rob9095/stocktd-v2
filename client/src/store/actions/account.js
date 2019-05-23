@@ -9,7 +9,7 @@ export function verifyUserEmail(token_id, user){
 			return apiCall('post', `/api/account/verify/${token_id}`)
 			.then((res) => {
 				resolve(res);
-				user && dispatch(authUser('signin',{...user, silentAuth: true}))
+				user.id ? dispatch(authUser('signin',{...user, silentAuth: true})) : dispatch(addError({message: 'Email Verified', status: 'success'}))
 				dispatch(removeNotification({id: 'verify-email'}))
 				dispatch(addNotification({ closable: true, onClose: ()=> removeNotification({ id:'verify-email-confirm'}), banner: true, type: 'success', message: 'Thanks for confirming your email.', id: 'verify-email-confirm' }));
 			})
