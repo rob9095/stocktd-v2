@@ -8,6 +8,7 @@ import DashboardLegacy from './DashboardLegacy';
 import WrappedAuthForm from '../components/AuthForm';
 import WrappedForgotPassword from '../components/ForgotPassword';
 import NotFound from '../components/NotFound';
+import VerifyEmail from '../components/VerifyEmail';
 
 const Main = props => {
 	const { authUser, errors, removeError, addError, currentUser } = props;
@@ -73,6 +74,14 @@ const Main = props => {
 							btnText={'Reset Password'}
 							btnLoadingText={'Resetting...'}
 							btnCompleteText={'Back to login'}
+							{...props}
+						/>
+					}
+				/>
+				<Route
+					exact path="/verify-email/:token"
+					render={props =>
+						<VerifyEmail
 							{...props}
 						/>
 					}
