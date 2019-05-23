@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Switch, Route, withRouter, Redirect, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Layout, Menu, Icon, Breadcrumb, Row, Col } from 'antd';
+import { Layout, Menu, Icon, Breadcrumb, Row, Col, Alert } from 'antd';
 import Navbar from './Navbar';
 import NavbarMobile from './NavbarMobile';
 import NotFound from '../components/NotFound';
@@ -13,6 +13,7 @@ import ProductTableLegacy from '../components/ProductTableLegacy';
 import ReceiveInventory from '../components/ReceiveInventory';
 import ScanTable from '../components/ScanTable';
 import AccountPage from '../components/AccountPage';
+import StkdNotification from '../components/StkdNotification';
 const { Sider } = Layout;
 const SubMenu = Menu.SubMenu;
 
@@ -146,7 +147,7 @@ class Dashboard extends Component {
             </Sider>
           </div>
           <div id="app-content" className="app-column">
-            <div className="flex align-items-center" style={{
+            {/* <div className="flex align-items-center" style={{
               borderBottom: '1px solid #ffe58f',
               background: '#fffbe6',
               padding: 10,
@@ -162,7 +163,12 @@ class Dashboard extends Component {
                   You're almost there! Verify your email to unlock all the features.
               </Link>
               </div>
-            </div>
+            </div> */}
+            {this.props.notifications.length > 0 && (
+              this.props.notifications.map((n,i)=>(
+                <StkdNotification key={n.id+i} config={n} nType={'alert'} />
+              ))
+            )}
             <div className="top">
               {this.state.clientWidth >= 1000 ?
                 <Navbar
@@ -242,7 +248,8 @@ class Dashboard extends Component {
 function mapStateToProps(state) {
 	return {
 		currentUser: state.currentUser,
-		errors: state.errors
+    errors: state.errors,
+    notifications: state.notifications,
 	};
 }
 

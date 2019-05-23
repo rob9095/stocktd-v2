@@ -3,7 +3,6 @@ const router = express.Router();
 const { verifySignUpToken, resetPassword, updateAccount, sendEmailVerification } = require('../handlers/account');
 
 router.post('/verify/:token_id', verifySignUpToken);
-// router.post('/resend-emailver', resendVerificationEmail);
 router.post('/email-verification', sendEmailVerification);
 router.post('/reset-password', resetPassword);
 router.post('/update-account', updateAccount);

@@ -134,7 +134,7 @@ class AccountPage extends Component {
                   <BasicForm
                     onBlur={this.handleInputUpdate}
                     inputs={[
-                      { id: 'email', text: 'Email', span: 24, validType: 'email', labelCol: {span: 12}, wrapperCol: {span: 12}, required: true, initialValue: account.email, handler: this.props.updateAccount, ...!this.props.currentUser.user.emailVerified && {extra: (<div className="flex align-items-center flex-wrap" style={{fontSize: 'small'}}><Tag style={{opacity: 1}} color="volcano">unverified</Tag><a onClick={this.handleEmailVerification}>Resend verification</a>{this.state.sendEmail && (<span><CircularProgress style={{marginRight: 5}} {...this.state.sendEmail} /></span>)}</div>)} },
+                      { id: 'email', text: 'Email', span: 24, validType: 'email', labelCol: {span: 12}, wrapperCol: {span: 12}, required: true, initialValue: account.email, handler: this.props.updateAccount, ...!this.props.currentUser.user.emailVerified && {extra: (<div className="flex align-items-center flex-wrap" style={{fontSize: 'small'}}><Tag style={{opacity: 1}} color="volcano">unverified</Tag><a onClick={this.handleEmailVerification}>Resend Email</a>{this.state.sendEmail && (<span><CircularProgress style={{marginRight: 5}} {...this.state.sendEmail} /></span>)}</div>)} },
                       { id: 'firstName', confirm: true, text: 'First Name', span: 24, labelCol: { span: 12 }, wrapperCol: { span: 12 }, initialValue: account.firstName, handler: this.props.updateAccount },
                       { id: 'lastName', text: 'Last Name', span: 24, labelCol: { span: 12 }, wrapperCol: { span: 12 }, initialValue: account.lastName, handler: this.props.updateAccount },
                     ]}

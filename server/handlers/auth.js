@@ -7,6 +7,12 @@ exports.signin = async function(req, res, next) {
 		let user = await db.User.findOne({
 			email: { $regex: `^${req.body.email}$`, '$options': 'i' }
 		});
+		if (!user) {
+			return next({
+				status: 400,
+				message: 'Invalid email or password'
+			})			
+		}
 		let { id, email, company, emailVerified } = user;
 		let isMatch = await user.comparePassword(req.body.password);
 		if(isMatch){
@@ -34,7 +40,7 @@ exports.signin = async function(req, res, next) {
 	} catch(err) {
 		return next({
 			status: 400,
-			message: err.toSring(),
+			message: 'Login Failed',
 		})
 	}
 };
@@ -149,7 +155,7 @@ exports.signup = async function(req, res, next) {
 		}
 		return next({
 			status:400,
-			message: err.toSring(),
+			message: 'Signup Failed',
 		});
 
 	}
