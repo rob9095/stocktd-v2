@@ -85,7 +85,7 @@ class BForm extends Component {
     let formItems = this.props.inputs || []
     let inputs = formItems.map((i,index) => {
       const id = i.nestedKey ? i.id + i.nestedKey : i.id
-      let message = i.validationRender ? i.validationRender(i) : i.validationMessage || this.props.form.getFieldValue(id) ? 'Please enter a valid ' + i.text : i.text + ' is required.'
+      let message = i.validationRender ? i.validationRender(this.props.form.getFieldValue(id)) : i.validationMessage || this.props.form.getFieldValue(id) ? 'Please enter a valid ' + i.text : i.text + ' is required.'
       const selectBefore = (
         <Select key={`${id}Select`} defaultValue={'='} onChange={this.handleSelect} showArrow={false} className="number-input pre-select">
           <Option id={`${id}Select`} value="=">=</Option>
@@ -98,58 +98,131 @@ class BForm extends Component {
       if (i.type === 'number') {
         return (
           <Col xs={i.span * 3} md={i.span} key={id} style={index !== this.props.inputs.length - 1 && { borderBottom: '1px solid #dad2e0' }}>
-            <FormItem key={id} label={`${i.text}`} labelCol={i.labelCol} wrapperCol={i.wrapperCol}>
+            {this.state.loadingInputs.includes(id) && (
+              <CircularProgress style={{ position: 'absolute', top: 25, right: 7 }} {...this.state[id] ? { ...this.state[id] } : {}} />
+            )}
+            <FormItem key={id} {...this.state.customFeedback[id] && { ...this.state.customFeedback[id] }} label={`${i.text}`} labelCol={i.labelCol} wrapperCol={i.wrapperCol}>
               {getFieldDecorator(id, {
                 initialValue: i.initialValue,
+                validateTrigger: 'onBlur',
                 rules: [{
                   required: i.required,
                   message,
+                  type: i.validType,
+                  ...i.rules && {
+                    ...i.rules,
+                  }
                 }],
               })(
                 <Input
-                  autoComplete={i.autoComplete || "off"}
+                  autoComplete={i.initialValue ? "off" : !!window.chrome ? "disabled" : "off"}
                   type="number"
                   addonBefore={selectBefore}
                   placeholder={i.text}
+                  onBlur={() => this.handleBlur(i, id)}
                 />
               )}
+              {i.extra && (
+                <div>
+                  {i.extra}
+                </div>
+              )}
             </FormItem>
+            {i.confirm && this.state[id] === true && (
+              <div className="flex space-between align-items-center flex-wrap" style={{ padding: '15px 30px', borderTop: '1px solid rgb(218, 210, 224)', background: '#f9f9fd', marginTop: -5 }}>
+                <div className="flex" style={{ fontSize: 16 }}>
+                  {i.confirmMessage || <div className="flex align-items-center"><Icon type="info-circle" style={{ fontSize: 24, marginRight: 5 }} /> Please confirm the changes</div>}
+                </div>
+                <div className="flex">
+                  <Button style={{ marginRight: 5 }} size="large" onClick={() => this.handleConfirmCancel(i, id)}>Cancel</Button>
+                  <Button size="large" type="primary" onClick={() => this.handleBlur(i, id, true)}>Save</Button>
+                </div>
+              </div>
+            )}
           </Col>
         )
       } if (i.type === 'date') {
         return (
           <Col xs={i.span * 3} md={i.span} key={id} style={index !== this.props.inputs.length - 1 && { borderBottom: '1px solid #dad2e0' }}>
-            <FormItem key={id} label={`${i.text}`} labelCol={i.labelCol} wrapperCol={i.wrapperCol}>
+            {this.state.loadingInputs.includes(id) && (
+              <CircularProgress style={{ position: 'absolute', top: 25, right: 7 }} {...this.state[id] ? { ...this.state[id] } : {}} />
+            )}
+            <FormItem key={id} {...this.state.customFeedback[id] && { ...this.state.customFeedback[id] }} label={`${i.text}`} labelCol={i.labelCol} wrapperCol={i.wrapperCol}>
               {getFieldDecorator(id, {
                 initialValue: i.initialValue,
+                validateTrigger: 'onBlur',
                 rules: [{
                   required: i.required,
                   message,
+                  type: i.validType,
+                  ...i.rules && {
+                    ...i.rules,
+                  }
                 }],
               })(
-                <RangePicker key={id} onChange={this.handleDateSelect} />
+                <RangePicker key={id} onChange={() => this.handleBlur(i, id)} />
+              )}
+              {i.extra && (
+                <div>
+                  {i.extra}
+                </div>
               )}
             </FormItem>
+            {i.confirm && this.state[id] === true && (
+              <div className="flex space-between align-items-center flex-wrap" style={{ padding: '15px 30px', borderTop: '1px solid rgb(218, 210, 224)', background: '#f9f9fd', marginTop: -5 }}>
+                <div className="flex" style={{ fontSize: 16 }}>
+                  {i.confirmMessage || <div className="flex align-items-center"><Icon type="info-circle" style={{ fontSize: 24, marginRight: 5 }} /> Please confirm the changes</div>}
+                </div>
+                <div className="flex">
+                  <Button style={{ marginRight: 5 }} size="large" onClick={() => this.handleConfirmCancel(i, id)}>Cancel</Button>
+                  <Button size="large" type="primary" onClick={() => this.handleBlur(i, id, true)}>Save</Button>
+                </div>
+              </div>
+            )}
           </Col>
         )
       } else if (i.type === 'select') {
         return (
           <Col xs={i.span * 3} md={i.span} key={id} style={index !== this.props.inputs.length - 1 && { borderBottom: '1px solid #dad2e0' }}>
-            <FormItem label={`${i.text}`} labelCol={i.labelCol} wrapperCol={i.wrapperCol}>
+            {this.state.loadingInputs.includes(id) && (
+              <CircularProgress style={{ position: 'absolute', top: 25, right: 7 }} {...this.state[id] ? { ...this.state[id] } : {}} />
+            )}
+            <FormItem key={id} {...this.state.customFeedback[id] && { ...this.state.customFeedback[id] }} label={`${i.text}`} labelCol={i.labelCol} wrapperCol={i.wrapperCol}>
               {getFieldDecorator(id, {
                 initialValue: i.initialValue,
+                validateTrigger: 'onBlur',
                 rules: [{
                   required: i.required,
                   message,
+                  type: i.validType,
+                  ...i.rules && {
+                    ...i.rules,
+                  }
                 }],
               })(
-                <Select key={`${id}Select`} size="large" showSearch={i.showSearch}>
+                <Select key={`${id}Select`} size="large" showSearch={i.showSearch} onChange={() => this.handleBlur(i, id)}>
                   {i.values.map(val => (
                     <Option key={id + val.id + "Select"} value={val.id}>{val.text}</Option>
                   ))}
                 </Select>
               )}
+              {i.extra && (
+                <div>
+                  {i.extra}
+                </div>
+              )}
             </FormItem>
+            {i.confirm && this.state[id] === true && (
+              <div className="flex space-between align-items-center flex-wrap" style={{ padding: '15px 30px', borderTop: '1px solid rgb(218, 210, 224)', background: '#f9f9fd', marginTop: -5 }}>
+                <div className="flex" style={{ fontSize: 16 }}>
+                  {i.confirmMessage || <div className="flex align-items-center"><Icon type="info-circle" style={{ fontSize: 24, marginRight: 5 }} /> Please confirm the changes</div>}
+                </div>
+                <div className="flex">
+                  <Button style={{ marginRight: 5 }} size="large" onClick={() => this.handleConfirmCancel(i, id)}>Cancel</Button>
+                  <Button size="large" type="primary" onClick={() => this.handleBlur(i, id, true)}>Save</Button>
+                </div>
+              </div>
+            )}
           </Col>
         )
       } else {
@@ -166,12 +239,16 @@ class BForm extends Component {
                   required: i.required,
                   message,
                   type: i.validType,
+                  ...i.rules && {
+                    ...i.rules,
+                  }
                 }],
               })(
                 <Input
                   autoComplete={i.initialValue ? "off" : !!window.chrome ? "disabled" : "off"}
                   size="small"
                   placeholder={i.text}
+                  type={i.inputType || 'text'}
                   onBlur={() => this.handleBlur(i, id)}
                 />
               )}

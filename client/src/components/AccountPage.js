@@ -6,7 +6,8 @@ import { getAllModelDocuments } from '../store/actions/models';
 import { resetPassword, updateAccount, sendVerficationEmail } from '../store/actions/account';
 import BasicForm from './BasicForm';
 import CircularProgress from './CircularProgress';
-import { Tag, Button } from 'antd';
+import { Tag, Button, Tabs} from 'antd';
+const TabPane = Tabs.TabPane;
 
 class AccountPage extends Component {
   _isMounted = false
@@ -103,15 +104,23 @@ class AccountPage extends Component {
     },3000)
   }
 
+  handleNavigationUpdate = (selected) => {
+    //maybe fetch new data here for now just suedo loading effect
+    this.setState({ selected, loading: true })
+    setTimeout(()=>{
+      this.setState({loading: false})
+    },500)
+  }
+
   render() {
     const account = this.state.account || {}
     return (
-      <div style={{ background: '#fff', flexDirection: 'column'}} className="flex">
-        <div className="flex space-between">
+      <div style={{ background: '#fff', flexDirection: 'column', height: '100%'}} className="flex">
+        <div className="flex space-between" style={{height: '100%'}}>
           <div style={{ minWidth: 220, padding: '24px 0px'}}>
             <BasicNavigation
               defaultSelectedKeys={this.state.selected.selectedKeys}
-              onSelect={(selected)=>this.setState({selected})}
+              onSelect={this.handleNavigationUpdate}
               data={[
                 {id: 'account-group', title: 'Account', type: 'itemGroup', children: [
                   {title: 'Account Details'},
@@ -126,36 +135,58 @@ class AccountPage extends Component {
           <div className="flex full-pad" style={{ width: '100%', borderLeft: '1px solid #dad2e0', marginLeft: 1}}>
             <div style={{width: '100%', maxWidth: 1200}}>
               <h2>{this.state.selected.key}</h2>
-              <BasicWidget
-                title="Account Details"
-                contentLoading={this.state.loading}
-                renderContent={()=>
-                  <div>
-                  <BasicForm
-                    onBlur={this.handleInputUpdate}
-                    inputs={[
-                      { id: 'email', text: 'Email', span: 24, validType: 'email', labelCol: {span: 12}, wrapperCol: {span: 12}, required: true, initialValue: account.email, handler: this.props.updateAccount, ...!this.props.currentUser.user.emailVerified && {extra: (<div className="flex align-items-center flex-wrap" style={{fontSize: 'small'}}><Tag style={{opacity: 1}} color="volcano">unverified</Tag><a onClick={this.handleEmailVerification}>Resend Email</a>{this.state.sendEmail && (<span><CircularProgress style={{marginRight: 5}} {...this.state.sendEmail} /></span>)}</div>)} },
-                      { id: 'firstName', confirm: true, text: 'First Name', span: 24, labelCol: { span: 12 }, wrapperCol: { span: 12 }, initialValue: account.firstName, handler: this.props.updateAccount },
-                      { id: 'lastName', text: 'Last Name', span: 24, labelCol: { span: 12 }, wrapperCol: { span: 12 }, initialValue: account.lastName, handler: this.props.updateAccount },
-                    ]}
+              <Tabs animated={false} renderTabBar={()=><div />} activeKey={this.state.selected.key} tabPosition={'top'}>
+                <TabPane tab="Account Details" key="Account Details">
+                  <BasicWidget
+                    title="Account Details"
+                    contentLoading={this.state.loading}
+                    renderContent={() =>
+                      <div>
+                        <BasicForm
+                          onBlur={this.handleInputUpdate}
+                          inputs={[
+                            { id: 'email', text: 'Email', span: 24, validType: 'email', labelCol: { span: 12 }, wrapperCol: { span: 12 }, required: true, initialValue: account.email, handler: this.props.updateAccount, ...!this.props.currentUser.user.emailVerified && { extra: (<div className="flex align-items-center flex-wrap" style={{ fontSize: 'small' }}><Tag style={{ opacity: 1 }} color="volcano">unverified</Tag><a onClick={this.handleEmailVerification}>Resend Email</a>{this.state.sendEmail && (<span><CircularProgress style={{ marginRight: 5 }} {...this.state.sendEmail} /></span>)}</div>) } },
+                            { id: 'firstName', confirm: true, text: 'First Name', span: 24, labelCol: { span: 12 }, wrapperCol: { span: 12 }, initialValue: account.firstName, handler: this.props.updateAccount },
+                            { id: 'lastName', text: 'Last Name', span: 24, labelCol: { span: 12 }, wrapperCol: { span: 12 }, initialValue: account.lastName, handler: this.props.updateAccount },
+                          ]}
+                        />
+                      </div>
+                    }
                   />
-                  </div>
-                }
-              />
-              <BasicWidget
-                title="Preferences"
-                contentLoading={this.state.loading}
-                renderContent={() =>
-                  <div>
-                    <BasicForm
-                      inputs={[
-                        { id: 'language', text: 'Language', showSearch: true, type: 'select', values: [{id: 'english', text: 'English'}], span: 24, labelCol: { span: 12 }, wrapperCol: { span: 12 }, initialValue: 'english' },
-                        { id: 'timezone', text: 'Timezone', showSearch: true, type: 'select', values: [{ id: 'test', text: 'test' }], span: 24, labelCol: { span: 12 }, wrapperCol: { span: 12 }, initialValue: 'test' },
-                      ]}
-                    />
-                  </div>
-                }
-              />
+                  <BasicWidget
+                    title="Preferences"
+                    contentLoading={this.state.loading}
+                    renderContent={() =>
+                      <div>
+                        <BasicForm
+                          inputs={[
+                            { id: 'language', text: 'Language', showSearch: true, type: 'select', values: [{ id: 'english', text: 'English' }], span: 24, labelCol: { span: 12 }, wrapperCol: { span: 12 }, initialValue: 'english' },
+                            { id: 'timezone', text: 'Timezone', showSearch: true, type: 'select', values: [{ id: 'test', text: 'test' }], span: 24, labelCol: { span: 12 }, wrapperCol: { span: 12 }, initialValue: 'test' },
+                          ]}
+                        />
+                      </div>
+                    }
+                  />
+                </TabPane>
+                <TabPane tab="Security" key="Security">
+                  <BasicWidget
+                    title="Password"
+                    contentLoading={this.state.loading}
+                    renderContent={() =>
+                      <div>
+                        <BasicForm
+                          inputs={[
+                            { id: 'currentPassword', text: 'Current Password', span: 24, inputType: 'password', labelCol: { span: 12 }, wrapperCol: { span: 12 }, required: true, },
+                            { id: 'password', text: 'New Password', span: 24, rules: { min: 6 }, validationRender: (i) => i ? 'Password must be longer than 6 characters' : 'This field is required', inputType: 'password', labelCol: { span: 12 }, wrapperCol: { span: 12 }, required: true, },
+                            { id: 'passwordConfirm', text: 'Confirm Password', rules: { min: 6 }, validationRender: (i) => i ? 'Password must be longer than 6 characters' : 'This field is required', span: 24, inputType: 'password', labelCol: { span: 12 }, wrapperCol: { span: 12 }, required: true, },
+
+                          ]}
+                        />
+                      </div>
+                    }
+                  />
+                </TabPane>
+              </Tabs>
             </div>
           </div>
         </div>
