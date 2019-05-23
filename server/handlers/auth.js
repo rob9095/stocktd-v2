@@ -1,7 +1,8 @@
+require('dotenv').load();
 const db = require('../models');
 const jwt = require('jsonwebtoken');
 const { sendUserEmailVerification } = require('./account');
-require('dotenv').load();
+
 
 const createUserToken = (signature) => {
 	return new Promise((resolve,reject)=>{
@@ -18,23 +19,28 @@ const createUserToken = (signature) => {
 	})
 }
 
-const refreshUserToken = (authorization, user, create) => {
+const refreshUserToken = (config) => {
 	return new Promise(async (resolve, reject) => {
 		try {
+			let { auth, user, create } = config
+			let signature = (({ id, email, company, emailVerified }) => ({ id, email, company, emailVerified }))(user)
 			if (create) {
-				let nt = await createUserToken(user)
-				resolve(nt)
+				let token = await createUserToken(signature)
+				resolve({token, signature})
 			}
-			const auth = authorization || ''
-			let token = auth.split(' ')[1];
-			jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
-				if (decoded && decoded.id === user.id) {
-					let nt = await createUserToken(user)
-					resolve(nt)
+			jwt.verify(auth, process.env.SECRET_KEY, async (err, decoded) => {
+				console.log({
+					auth,
+					decoded,
+					err
+				})
+				if (decoded && decoded.id === signature.id) {
+					let token = await createUserToken(signature)
+					resolve({token,signature})
 				} else {
 					reject({
 						status: 401,
-						message: 'Unauthorized'
+						message: 'Unauthorized',
 					});
 				}
 			});
@@ -58,21 +64,20 @@ exports.signin = async function(req, res, next) {
 				message: 'Invalid email or password'
 			})			
 		}
-		let signature = (({ id, email, company, emailVerified }) => ({ id, email, company, emailVerified }))(user)
 		if (req.body.silentAuth === true) {
-			let auth = req.headers.authorization
-			let token = await refreshUserToken(auth, signature)
+			let auth = req.headers.authorization.split(' ')[1]
+			let {token, ...signature} = await refreshUserToken({auth, user})
 			return res.status(200).json({
+				token,
 				...signature,
-				token
 			})
 		}
 		let isMatch = await user.comparePassword(req.body.password);
 		if(isMatch){
-			let token = createUserToken(signature)
+			let { token, ...signature } = await refreshUserToken({user,create: true})
 			return res.status(200).json({
+				token,
 				...signature,
-				token
 			});
 		} else {
 			return next({
@@ -81,7 +86,9 @@ exports.signin = async function(req, res, next) {
 			})
 		}
 	} catch(err) {
+		console.log({err})
 		return next({
+			...err,
 			status: 400,
 			message: 'Login Failed',
 		})
@@ -152,19 +159,15 @@ exports.signup = async function(req, res, next) {
 			company: req.body.company,
 			user: user._id,
 		})
-		let { id, email, company, emailVerified } = user;
-		let token = jwt.sign(
-		{
-			id,
-			email,
-			company,
-			emailVerified,
-		},
-		process.env.SECRET_KEY
-		);
+		let { token, signature } = await refreshUserToken({user,create:true})
 
 		//send email verification
 		await sendUserEmailVerification({id: user._id})
+
+		return res.status(200).json({
+			token,
+			...signature,
+		});
 
 		// legacy code for sending email verification
 		// create the signup token
@@ -183,14 +186,6 @@ exports.signup = async function(req, res, next) {
 		// 		</div>
 		// 	`,
 		// })
-
-		return res.status(200).json({
-			id,
-			email,
-			company,
-			emailVerified,
-			token
-		});
 	} catch(err) {
 		if(err.code === 11000) {
 			console.log(err)

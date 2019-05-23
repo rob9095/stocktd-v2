@@ -6,7 +6,7 @@ exports.verifySignUpToken = async function(req, res, next) {
     if (!req.params.token_id.match(/^[0-9a-fA-F]{24}$/)) {
       return next({
         status: 400,
-				message: 'Verification Failed'
+				message: 'Invalid request'
       })
     }
     let token = await db.UserToken.findOne({_id: req.params.token_id})
@@ -16,7 +16,7 @@ exports.verifySignUpToken = async function(req, res, next) {
       if (user) {
         user.emailVerified = true;
         await user.save();
-        //await token.remove();
+        await token.remove();
         return res.status(200).json({
           message: `Email Verified`
         });
@@ -24,7 +24,7 @@ exports.verifySignUpToken = async function(req, res, next) {
     } else {
       return next({
         status: 400,
-        message: 'Verification Failed'
+        message: 'Invalid request',
       })
     }
 	} catch(err) {

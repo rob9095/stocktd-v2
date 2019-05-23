@@ -10,10 +10,7 @@ class UserCard extends Component {
     this.state = {}
   }
   logout = () => {
-    this.props.logout();
-    setTimeout(()=>{
-      this.props.history.push("/signin");
-    }, 250)
+    this.props.logout()
   }
   render() {
     return (

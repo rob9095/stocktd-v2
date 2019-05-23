@@ -51,7 +51,7 @@ class AuthForm extends Component {
     const { getFieldDecorator } = this.props.form;
     const { signUp, heading, buttonText, errors, history, removeError } = this.props;
     history.listen(() => {
-      removeError();
+      errors.message && removeError();
     });
     return (
       <div className="centered-container">

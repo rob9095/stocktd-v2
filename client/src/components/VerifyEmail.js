@@ -3,7 +3,6 @@ import { Spin, Icon } from 'antd';
 import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { verifyUserEmail } from '../store/actions/account';
-import { addError } from '../store/actions/errors';
 import NotFound from './NotFound';
 
 class VerifyEmail extends Component {
@@ -64,4 +63,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, { verifyUserEmail, addError })(VerifyEmail);
+export default connect(mapStateToProps, { verifyUserEmail })(VerifyEmail);

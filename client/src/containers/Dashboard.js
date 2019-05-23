@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Switch, Route, withRouter, Redirect, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Layout, Menu, Icon, Breadcrumb, Row, Col, Alert } from 'antd';
+import { logout } from '../store/actions/auth';
 import Navbar from './Navbar';
 import NavbarMobile from './NavbarMobile';
 import NotFound from '../components/NotFound';
@@ -43,25 +44,37 @@ class Dashboard extends Component {
     })
   }
 
-  componentDidMount() {
-    this._isMounted = true
-    if(!this.props.currentUser.isAuthenticated) {
-      this.setState({
+  checkAuth = () => {
+    if (!this.props.currentUser.isAuthenticated) {
+      this._isMounted && this.setState({
         loginRedirect: true,
         redirectPath: '/signin',
       })
+      return
     }
+    //isAuthenticated is true but we don't have user id or company, can add authCheck check here. just logout for now
+    const { id, company } = this.props.currentUser.user || {}
+    if (!id || !company) {
+      console.log('logging out')
+      this.props.logout()
+    }
+  }
+
+  componentDidMount() {
+    this._isMounted = true
+    this.checkAuth()
     this.setState({
       clientWidth: document.documentElement.clientWidth,
     })
-    // if (this.props.history.location.pathname){
-    //   this.setActiveMenuItem(this.props.location.pathname)
-    // }
   }
 
   componentDidUpdate(prevProps) {
     if (!Object.is(prevProps.location, this.props.location)) {
       this._isMounted && this.setActiveMenuItem(this.props.location.pathname)
+    }
+    //if current user has changed, check the auth
+    if (!Object.is(prevProps.currentUser, this.props.currentUser)) {
+      this.checkAuth()
     }
   }
 
@@ -253,4 +266,4 @@ function mapStateToProps(state) {
 	};
 }
 
-export default withRouter(connect(mapStateToProps, {})(Dashboard));
+export default withRouter(connect(mapStateToProps, {logout,})(Dashboard));
