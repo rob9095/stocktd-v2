@@ -16,7 +16,7 @@ exports.verifySignUpToken = async function(req, res, next) {
       if (user) {
         user.emailVerified = true;
         await user.save();
-        await token.remove();
+        //await token.remove();
         return res.status(200).json({
           message: `Email Verified`
         });

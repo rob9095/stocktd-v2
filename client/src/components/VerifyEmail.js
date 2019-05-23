@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { Spin, Icon } from 'antd';
 import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { verifyUserEmail } from '../store/actions/account';
+import NotFound from './NotFound';
 
 class VerifyEmail extends Component {
   _isMounted = false
@@ -12,12 +14,23 @@ class VerifyEmail extends Component {
     }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this._isMounted = true
-    if (this.props.match.params.token.match(/^[0-9a-fA-F]{24}$/)) {
-      console.log('token good!')
+    let token = this.props.match.params.token
+    if (token.match(/^[0-9a-fA-F]{24}$/)) {
+      let user = this.props.currentUser.user
+      await this.props.verifyUserEmail(token, user)
+      .then(res=>{})
+      .catch(err=>{console.log(err)})
+      this.setState({
+        redirect: {
+          to: '/app/account'
+        }
+      })
     } else {
-      console.log('bad token!')
+      this.setState({
+        notFound: true,
+      })
     }
   }
 
@@ -26,6 +39,12 @@ class VerifyEmail extends Component {
   }
 
   render() {
+    if (this.state.redirect) {
+      return <Redirect {...this.state.redirect} />
+    }
+    if (this.state.notFound) {
+      return <NotFound />
+    }
     return(
       <div className="centered-container">
         <Spin indicator={<Icon type="loading" style={{ fontSize: 24 }} spin />} tip="Verifying Email..." />
@@ -44,4 +63,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, {})(VerifyEmail);
+export default connect(mapStateToProps, { verifyUserEmail })(VerifyEmail);

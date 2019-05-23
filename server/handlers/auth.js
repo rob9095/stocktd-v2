@@ -1,6 +1,51 @@
 const db = require('../models');
 const jwt = require('jsonwebtoken');
-const { sendUserEmailVerification } = require('./account')
+const { sendUserEmailVerification } = require('./account');
+require('dotenv').load();
+
+const createUserToken = (signature) => {
+	return new Promise((resolve,reject)=>{
+		try {
+			let token = jwt.sign({
+				...signature,
+			},
+				process.env.SECRET_KEY
+			);
+			resolve(token)
+		} catch(err) {
+			reject(err)
+		}
+	})
+}
+
+const refreshUserToken = (authorization, user, create) => {
+	return new Promise(async (resolve, reject) => {
+		try {
+			if (create) {
+				let nt = await createUserToken(user)
+				resolve(nt)
+			}
+			const auth = authorization || ''
+			let token = auth.split(' ')[1];
+			jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
+				if (decoded && decoded.id === user.id) {
+					let nt = await createUserToken(user)
+					resolve(nt)
+				} else {
+					reject({
+						status: 401,
+						message: 'Unauthorized'
+					});
+				}
+			});
+		} catch (err) {
+			reject({
+				status: 401,
+				message: 'Unauthorized'
+			});
+		}
+	})
+}
 
 exports.signin = async function(req, res, next) {
 	try {
@@ -13,22 +58,20 @@ exports.signin = async function(req, res, next) {
 				message: 'Invalid email or password'
 			})			
 		}
-		let { id, email, company, emailVerified } = user;
+		let signature = (({ id, email, company, emailVerified }) => ({ id, email, company, emailVerified }))(user)
+		if (req.body.silentAuth === true) {
+			let auth = req.headers.authorization
+			let token = await refreshUserToken(auth, signature)
+			return res.status(200).json({
+				...signature,
+				token
+			})
+		}
 		let isMatch = await user.comparePassword(req.body.password);
 		if(isMatch){
-			let token = jwt.sign({
-				id,
-				email,
-				company,
-				emailVerified,
-			},
-				process.env.SECRET_KEY
-			);
+			let token = createUserToken(signature)
 			return res.status(200).json({
-				id,
-				email,
-				company,
-				emailVerified,
+				...signature,
 				token
 			});
 		} else {

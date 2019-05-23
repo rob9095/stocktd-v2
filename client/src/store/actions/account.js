@@ -1,17 +1,21 @@
 import { apiCall } from '../../services/api';
 import { addError } from './errors';
-import { setCurrentUser } from './auth';
+import { addNotification, removeNotification } from './notifications';
+import { authUser } from './auth';
 
-export function verifyUserEmail(token_id){
+export function verifyUserEmail(token_id, user){
   return dispatch => {
 		return new Promise((resolve,reject) => {
 			return apiCall('post', `/api/account/verify/${token_id}`)
 			.then((res) => {
 				resolve(res);
+				user && dispatch(authUser('signin',{...user, silentAuth: true}))
+				dispatch(removeNotification({id: 'verify-email'}))
+				dispatch(addNotification({ closable: true, onClose: ()=> removeNotification({ id:'verify-email-confirm'}), banner: true, type: 'success', message: 'Thanks for confirming your email.', id: 'verify-email-confirm' }));
 			})
 			.catch(err => {
-				dispatch(addError(err.message));
-				reject();
+				dispatch(addNotification({ closable: true, onClose: removeNotification({ id: 'verify-email-failed' }), banner: true, type: 'error', message: 'Failed to confirm email.', id: 'verify-email-failed' }));
+				reject(err);
 			})
 		});
 	}
@@ -52,11 +56,7 @@ export function updateAccount(config) {
 			const { user, update } = config
 			return apiCall('post', `/api/account/update-account`, { user, update })
 				.then((res) => {
-					update.email && dispatch(setCurrentUser({
-						...user,
-						email: update.email,
-						emailVerified: res.user.emailVerified,
-					}))
+					update.email && dispatch(authUser('signin', { ...user, email: user.email, silentAuth: true }))
 					resolve(res);
 				})
 				.catch(err => {
