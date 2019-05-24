@@ -84,6 +84,7 @@ class BForm extends Component {
   handleSubmit = async () => {
     let validation = await this.validate()
     if (validation.errors) {
+      console.log({validation})
       return
     }
     this.setState({submitLoading: true})

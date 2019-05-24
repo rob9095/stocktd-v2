@@ -152,12 +152,12 @@ const sendResetPasswordEmail = (email) => {
 	})
 }
 
-//allow for update of email, password, firstName, lastName
+//allow for update of email, password(currentPassword needed), firstName, lastName
 const updateUserAccount = (config) => {
 	return new Promise(async (resolve,reject) => {
 		try {
 			let { user, update } = config
-			let { email, password, firstName, lastName } = update || {}
+			let { email, password, firstName, lastName, currentPassword } = update || {}
 			let { _id } = user || {}
 			let foundUser = await db.User.findById(_id)
 			if (!foundUser) {
@@ -168,6 +168,13 @@ const updateUserAccount = (config) => {
 				let emailCheck = await db.User.findOne({ email: { $regex: `^${email}$`, '$options': 'i' } }) || {}
 				emailCheck._id && reject({
 					message: 'Email Already Exists',
+				})
+			}
+			if (password) {
+				//check if current password is a match 
+				let isMatch = await user.comparePassword(currentPassword)
+				!isMatch && reject({
+					message: 'Incorrect current password.'
 				})
 			}
 			let userUpdate = {
@@ -205,7 +212,9 @@ exports.resetPassword = async (req, res, next) => {
 
 exports.updateAccount = async (req, res, next) => {
 	try {
-		let result = await updateUserAccount({user: {_id: req.body.user.id}, update: req.body.update})
+		let {id = '' } = req.body.user
+		let { update = {}} = req.body.update
+		let result = await updateUserAccount({user: {_id: id}, update})
 		return res.status(200).json({
 			...result,
 		})
