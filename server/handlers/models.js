@@ -225,30 +225,30 @@ exports.upsertModelDocuments = async (req,res,next) => {
 */
 exports.getAllModelDocuments = async (req,res,next) => {
 	try {
-		if (req.body.limit > 100) {
+		let { limit = 10, documentRef = {}, company, regex, populateArray = [], model } = req.body		
+		if (limit > 100) {
 			return next({
 				status: 404,
 				message: ['Request to large']
 			})
 		}
-		let limit = req.body.limit || 10
 		//remove empty strings from documentRef to allow for searchAll type query
-		for (let ref of Object.entries(req.body.documentRef)) {
+		for (let ref of Object.entries(documentRef)) {
 			if (!ref[1]) {
-				delete req.body.documentRef[ref[0]]
+				delete documentRef[ref[0]]
 			}
 		}
-		let query = {...req.body.documentRef, company: req.body.company}
-		if (req.body.regex === true) {
+		let query = {...documentRef, company}
+		if (regex === true) {
 			query = {}
-			for (let val of Object.entries(req.body.documentRef)) {
+			for (let val of Object.entries(documentRef)) {
 				query = {
 					...query,
 					[val[0]]: { $regex : new RegExp(val[1], "i") },
 				}
 			}
 		}
-		let data = await db[req.body.model].find(query).limit(limit).populate(req.body.populateArray)
+		let data = await db[model].find(query).limit(limit).populate(populateArray)
 		return res.status(200).json({data})
 	} catch(err) {
 		return next(err)
