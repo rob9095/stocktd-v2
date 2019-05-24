@@ -177,10 +177,11 @@ class AccountPage extends Component {
                         <BasicForm
                           inputs={[
                             { id: 'currentPassword', text: 'Current Password', span: 24, inputType: 'password', labelCol: { span: 12 }, wrapperCol: { span: 12 }, required: true, },
-                            { id: 'password', text: 'New Password', span: 24, rules: { min: 6 }, validationRender: (i) => i ? 'Password must be longer than 6 characters' : 'This field is required', inputType: 'password', labelCol: { span: 12 }, wrapperCol: { span: 12 }, required: true, },
-                            { id: 'passwordConfirm', text: 'Confirm Password', rules: { min: 6 }, validationRender: (i) => i ? 'Password must be longer than 6 characters' : 'This field is required', span: 24, inputType: 'password', labelCol: { span: 12 }, wrapperCol: { span: 12 }, required: true, },
-                            { id: 'submit', type: 'content', span: 24, labelCol: { span: 0 }, wrapperCol: { span: 24 }, submit: 'Change Password', submitProps: {style: {float: 'right'}, type: 'primary', size: 'large', } }
+                            { id: 'password', text: 'New Password', span: 24, rules: { min: 6 }, validationRender: (i) => i ? 'Password must be longer than 6 characters' : 'Password is required', inputType: 'password', labelCol: { span: 12 }, wrapperCol: { span: 12 }, required: true, },
+                            { id: 'passwordConfirm', text: 'Confirm Password', validationRender: (i) => i ? i.length > 6 ? 'Passwords must match' : 'Password must be longer than 6 characters' : 'Password Confirm is required', rules: { min: 6 }, span: 24, mustMatch: [{ input: 'password' }], inputType: 'password', labelCol: { span: 12 }, wrapperCol: { span: 12 }, required: true, },
+                            { id: 'submit', type: 'content', span: 24, labelCol: { span: 0 }, wrapperCol: { span: 24 }, submit: 'Change Password', submitProps: { style: { float: 'right' }, type: 'primary', size: 'large', } }
                           ]}
+                          validateOnChange
                           onSubmit={(update)=>this.handleInputUpdate(update,this.props.updateAccount)}
                         />
                       </div>

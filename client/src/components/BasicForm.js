@@ -16,10 +16,27 @@ class BForm extends Component {
   }
 
   validate = async (fieldNames,input,id) => {
-    input = !input && {}
     return new Promise((resolve,reject)=>{
       this.props.form.validateFields(fieldNames, (errors, values) => {
-        if (input.initialValue === values[id]) resolve({errors: true, values})
+        // if we provided an input, check the initialValue to avoid unneccesary saves
+        if (input) {
+          input.initialValue === values[id] && resolve({ errors: true, values })
+        }
+        //check mustMatch inputs
+        for (let item of this.props.inputs.filter(i=>i.mustMatch)) {
+          for (let check of item.mustMatch) {
+            let value = check.input ? this.props.form.getFieldValue(check.input) : check.value
+            let checkVal = this.props.form.getFieldValue(item.id)
+            if (checkVal !== value) {
+              let help = `${item.text} must match ${check.input || check.text}`
+              errors = Array.isArray(errors) ? [...errors, help] : [help]
+              this.setState({ customFeedback: { ...this.state.customFeedback, [item.id]: { help, validateStatus: 'error'}}})
+              resolve({errors,values})
+            } else {
+              this.setState({ customFeedback: { ...this.state.customFeedback, [item.id]: null } })
+            }
+          }
+        }
         resolve({errors,values})
       })
     })
@@ -99,7 +116,7 @@ class BForm extends Component {
     let formItems = this.props.inputs || []
     let inputs = formItems.map((i,index) => {
       const id = i.nestedKey ? i.id + i.nestedKey : i.id
-      let message = i.validationRender ? i.validationRender(this.props.form.getFieldValue(id)) : i.validationMessage || this.props.form.getFieldValue(id) ? 'Please enter a valid ' + i.text : i.text + ' is required.'
+      let message = i.validationRender ? i.validationRender(this.props.form.getFieldValue(id), this.props.form.getFieldError(id)) : i.validationMessage || this.props.form.getFieldValue(id) ? 'Please enter a valid ' + i.text : i.text + ' is required.'
       const selectBefore = (
         <Select key={`${id}Select`} defaultValue={'='} onChange={this.handleSelect} showArrow={false} className="number-input pre-select">
           <Option id={`${id}Select`} value="=">=</Option>
