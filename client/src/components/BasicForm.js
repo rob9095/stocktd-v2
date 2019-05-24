@@ -16,6 +16,7 @@ class BForm extends Component {
   }
 
   validate = async (fieldNames,input,id) => {
+    input = !input && {}
     return new Promise((resolve,reject)=>{
       this.props.form.validateFields(fieldNames, (errors, values) => {
         if (input.initialValue === values[id]) resolve({errors: true, values})
@@ -78,6 +79,18 @@ class BForm extends Component {
       [id]: null
     })
     this.props.form.setFieldsValue({[id]: input.initialValue})
+  }
+
+  handleSubmit = async () => {
+    let validation = await this.validate()
+    if (validation.errors) {
+      return
+    }
+    this.setState({submitLoading: true})
+    await this.props.onSubmit && this.props.onSubmit(validation.values)
+    .then(res=>{console.log(res)})
+    .catch(err=>{console.log(err)})
+    this.setState({submitLoading: false})
   }
 
   render() {
@@ -231,7 +244,7 @@ class BForm extends Component {
             <FormItem key={id} {...this.state.customFeedback[id] && { ...this.state.customFeedback[id] }} label={i.text || ''} colon={!i.text && false} labelCol={i.labelCol} wrapperCol={i.wrapperCol}>
               {i.content}
               {i.submit && (
-                <Button {...i.submitProps && {...i.submitProps}}>{i.submit}</Button>
+                <Button loading={this.state.submitLoading} {...i.submitProps && {...i.submitProps}} onClick={this.handleSubmit} >{i.submit}</Button>
               )}
             </FormItem>
           </Col>
