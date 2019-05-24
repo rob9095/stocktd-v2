@@ -122,7 +122,7 @@ exports.signup = async function(req, res, next) {
 		if (req.body.password.length < 6) {
 			return next({
 				status: 400,
-				message: 'Password must be at least 6 characters',
+				message: 'Password must contain at least 6 characters',
 			})
 		}
 		// check the email and company name are open

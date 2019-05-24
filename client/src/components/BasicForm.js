@@ -18,6 +18,8 @@ class BForm extends Component {
   validate = async (fieldNames,input,id) => {
     return new Promise((resolve,reject)=>{
       this.props.form.validateFields(fieldNames, (errors, values) => {
+        //clear existing customFeedbacks 
+        this.setState({ customFeedback: id ? { ...this.state.customFeedback, [id]: null } : {} })
         // if we provided an input, check the initialValue to avoid unneccesary saves
         if (input) {
           input.initialValue === values[id] && resolve({ errors: true, values })
@@ -32,8 +34,6 @@ class BForm extends Component {
               errors = Array.isArray(errors) ? [...errors, help] : [help]
               this.setState({ customFeedback: { ...this.state.customFeedback, [item.id]: { help, validateStatus: 'error'}}})
               resolve({errors,values})
-            } else {
-              this.setState({ customFeedback: { ...this.state.customFeedback, [item.id]: null } })
             }
           }
         }
@@ -104,11 +104,21 @@ class BForm extends Component {
       console.log({validation})
       return
     }
-    this.setState({submitLoading: true})
-    await this.props.onSubmit && this.props.onSubmit(validation.values)
-    .then(res=>{console.log(res)})
-    .catch(err=>{console.log(err)})
-    this.setState({submitLoading: false})
+    this.setState({ submitLoading: true, })
+    this.props.onSubmit && await this.props.onSubmit(validation.values)
+    .then(res=>{
+      //dispatch success notification from parent component
+    })
+    .catch(err=>{
+      let [help, ...rest] = err.message || []
+      help = !help ? '' : help
+      if (help.includes('current password')) {
+        this.setState({ customFeedback: { ...this.state.customFeedback, ['currentPassword']: { help, validateStatus: 'error' } } })
+      } else if (help.includes('Password must contain at least 6 characters')) {
+        this.setState({ customFeedback: { ...this.state.customFeedback, ['password']: { help, validateStatus: 'error' } } })
+      }
+    })
+    this.setState({submitLoading: false,})
   }
 
   render() {
@@ -262,7 +272,7 @@ class BForm extends Component {
             <FormItem key={id} {...this.state.customFeedback[id] && { ...this.state.customFeedback[id] }} label={i.text || ''} colon={!i.text && false} labelCol={i.labelCol} wrapperCol={i.wrapperCol}>
               {i.content}
               {i.submit && (
-                <Button loading={this.state.submitLoading} {...i.submitProps && {...i.submitProps}} onClick={this.handleSubmit} >{i.submit}</Button>
+                <Button loading={this.state.submitLoading} {...i.submitProps && {...i.submitProps}} onClick={()=>this.handleSubmit(i.loadInputs)} >{i.submit}</Button>
               )}
             </FormItem>
           </Col>

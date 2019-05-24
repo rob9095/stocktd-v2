@@ -172,10 +172,8 @@ const updateUserAccount = (config) => {
 			}
 			if (password) {
 				//check if current password is a match 
-				let isMatch = await user.comparePassword(currentPassword)
-				!isMatch && reject({
-					message: 'Incorrect current password.'
-				})
+				let isMatch = await foundUser.comparePassword(currentPassword)
+				!isMatch && reject({ message: 'Incorrect current password'})
 			}
 			let userUpdate = {
 				...email && { email, emailVerified: false },
@@ -183,6 +181,10 @@ const updateUserAccount = (config) => {
 				...firstName && { firstName },
 				...lastName && { lastName },
 			}
+
+			//reject if update is empty
+			!Object.keys(userUpdate) && reject({message: 'No update found'})
+
 			user = await db.User.update({_id},userUpdate)
 			//send new verification email if neccesary
 			email && await sendUserEmailVerification({id: _id})
@@ -213,7 +215,7 @@ exports.resetPassword = async (req, res, next) => {
 exports.updateAccount = async (req, res, next) => {
 	try {
 		let {id = '' } = req.body.user
-		let { update = {}} = req.body.update
+		let { update = {}} = req.body
 		let result = await updateUserAccount({user: {_id: id}, update})
 		return res.status(200).json({
 			...result,

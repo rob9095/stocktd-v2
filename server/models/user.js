@@ -39,15 +39,21 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.path('email').validate(function (email) {
-	let emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
-	return emailRegex.test(email);
+	return /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/.test(email);
 }, 'Invalid Email')
+
+userSchema.path('password').validate(function (pw) {
+	return pw.length > 6;
+}, 'Password must contain at least 6 characters')
 
 userSchema.pre('update', async function (next) {
 	try {
 		let update = this.getUpdate()
 		if (!update.password) {
 			return next();
+		}
+		if (update.password.length < 6) {
+			throw 'Password must contain at least 6 characters'
 		}
 		let salt = bcrypt.genSaltSync(10);
 		let hashedPassword = await bcrypt.hashSync(update.password, salt);
@@ -62,6 +68,9 @@ userSchema.pre('save', async function(next) {
 	try {
 		if(!this.isModified('password')){
 			return next();
+		}
+		if (this.password && this.password.length < 6) {
+			throw 'Password must contain at least 6 characters'
 		}
 		let salt = bcrypt.genSaltSync(10);
 		let hashedPassword = await bcrypt.hashSync(this.password, salt);

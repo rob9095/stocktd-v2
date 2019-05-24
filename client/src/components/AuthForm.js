@@ -87,7 +87,7 @@ class AuthForm extends Component {
             )}
             <FormItem>
               {getFieldDecorator('password', {
-                rules: [{ min: signUp ? 6 : 0, required: true, message: signUp ? 'Password must be longer than 6 characters' : 'This field is required' }],
+                rules: [{ min: signUp ? 6 : 0, required: true, message: signUp ? 'Password must contain at least 6 characters' : 'This field is required' }],
                 validateTrigger: 'onBlur',
               })(
                 <Input prefix={<Icon type="lock" theme="twoTone" twoToneColor={this.props.form.getFieldError('password') ? "#f5222d" : "#716aca"} />} type="password" placeholder="Password" />

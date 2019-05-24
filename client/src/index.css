@@ -548,13 +548,14 @@ input.ant-input.no-border {
 }
 
 /* Navbar */
-.nav-popover {
+/* .nav-popover {
   top: 70px !important;
 }
-
 .nav-popover.mobile {
-  top: 95px !important;
+  margin-top: -50px !important;
 }
+*/
+
 
 .stkd-navbar.ant-layout-header {
   background: #fff;

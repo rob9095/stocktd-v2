@@ -179,7 +179,7 @@ class Dashboard extends Component {
             </div> */}
             {this.props.notifications.length > 0 && (
               this.props.notifications.map((n,i)=>(
-                <StkdNotification key={n.id+i} config={n} nType={'alert'} />
+                <StkdNotification key={n.id+i} config={n} nType={n.nType} />
               ))
             )}
             <div className="top">

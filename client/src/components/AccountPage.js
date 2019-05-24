@@ -3,10 +3,11 @@ import BasicNavigation from './BasicNavigation'
 import BasicWidget from './BasicWidget';
 import { connect } from "react-redux";
 import { getAllModelDocuments } from '../store/actions/models';
-import { resetPassword, updateAccount, sendVerficationEmail } from '../store/actions/account';
+import { updateAccount, sendVerficationEmail } from '../store/actions/account';
+import { addNotification, removeNotification } from '../store/actions/notifications';
 import BasicForm from './BasicForm';
 import CircularProgress from './CircularProgress';
-import { Tag, Button, Tabs} from 'antd';
+import { Tag, Tabs} from 'antd';
 const TabPane = Tabs.TabPane;
 
 class AccountPage extends Component {
@@ -51,20 +52,36 @@ class AccountPage extends Component {
     this._isMounted = false
   }
 
-  handleInputUpdate = (update,handler) => {
+  handleInputUpdate = (update,handler,nConfig) => {
     return new Promise(async (resolve,reject) => {
       if (handler) {
         handler({ user: this.props.currentUser.user, update})
         .then(res=>{
+          nConfig && this.props.addNotification({
+            message: nConfig.message || 'Changes Saved',
+            id: nConfig.message,
+            banner: true,
+            closable: true,
+            type: 'success',
+            onClose: () => this.props.removeNotification({id: nConfig.message}),
+          })
           this.setState({
             account: {
               ...this.state.account,
-              ...update,
+              ...!update.password && {...update},
             }
           })
           resolve(res)
         })
         .catch(err=>{
+          nConfig && this.props.addNotification({
+            message: nConfig.errMessage || err.message.toString() || 'Changes Failed',
+            id: nConfig.errMessage,
+            banner: true,
+            closable: true,
+            type: 'error',
+            onClose: () => this.props.removeNotification({ id: nConfig.errMessage }),
+          })
           reject(err)
         })
       } else {
@@ -179,10 +196,9 @@ class AccountPage extends Component {
                             { id: 'currentPassword', text: 'Current Password', span: 24, inputType: 'password', labelCol: { span: 12 }, wrapperCol: { span: 12 }, required: true, },
                             { id: 'password', text: 'New Password', span: 24, rules: { min: 6 }, validationRender: (i) => i ? 'Password must be longer than 6 characters' : 'Password is required', inputType: 'password', labelCol: { span: 12 }, wrapperCol: { span: 12 }, required: true, },
                             { id: 'passwordConfirm', text: 'Confirm Password', validationRender: (i) => i ? i.length > 6 ? 'Passwords must match' : 'Password must be longer than 6 characters' : 'Password Confirm is required', rules: { min: 6 }, span: 24, mustMatch: [{ input: 'password' }], inputType: 'password', labelCol: { span: 12 }, wrapperCol: { span: 12 }, required: true, },
-                            { id: 'submit', type: 'content', span: 24, labelCol: { span: 0 }, wrapperCol: { span: 24 }, submit: 'Change Password', submitProps: { style: { float: 'right' }, type: 'primary', size: 'large', } }
+                            { id: 'submit', type: 'content', span: 24, labelCol: { span: 0 }, wrapperCol: { span: 24 }, submit: 'Change Password', config: {loadInputs: true}, submitProps: { style: { float: 'right' }, type: 'primary', size: 'large', } }
                           ]}
-                          validateOnChange
-                          onSubmit={(update)=>this.handleInputUpdate(update,this.props.updateAccount)}
+                          onSubmit={(update)=>this.handleInputUpdate(update,this.props.updateAccount,{ message: 'Password Updated', errMessage: 'Password Update Failed'})}
                         />
                       </div>
                     }
@@ -204,4 +220,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, { updateAccount })(AccountPage);
+export default connect(mapStateToProps, { updateAccount, addNotification, removeNotification })(AccountPage);

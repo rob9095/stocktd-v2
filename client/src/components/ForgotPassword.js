@@ -118,7 +118,7 @@ class ForgotPassword extends Component {
                 {this.props.reset && !this.state.actionComplete && (
                   <FormItem style={{ textAlign: 'left' }}>
                     {getFieldDecorator('password', {
-                      rules: [{ min: 6, required: true, message: this.props.form.getFieldValue('password') ? 'Password must be longer than 6 characters' : 'This field is required' }],
+                      rules: [{ min: 6, required: true, message: this.props.form.getFieldValue('password') ? 'Password must contain at least 6 characters' : 'This field is required' }],
                       validateTrigger: 'onBlur',
                     })(
                       <Input prefix={<Icon type="lock" theme="twoTone" twoToneColor={this.props.form.getFieldError('password') ? "#f5222d" : "#716aca"} />} type="password" placeholder="Password" disabled={this.state.token ? false : true} />
