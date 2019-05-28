@@ -178,6 +178,7 @@ class ScanForm extends Component {
         this.props.onScan({
           ...values,
           prefix: this.state.currentPrefix,
+          user: this.props.currentUser.user.id,
         })
         .then(res=>{
           console.log(res)
@@ -579,6 +580,7 @@ class ScanForm extends Component {
                               <div className="flex" style={{ flexDirection: 'column' }}>
                                 <span><strong>SKU: </strong>{item.sku}</span>
                                 <span><strong>Scanned Quantity: </strong>{item.lastScanQuantity}</span>
+                                <span><strong>Box Quantity: </strong>{item.quantity}</span>
                                 <span><strong>Purchase Order: </strong>{item.po && item.po.name}</span>
                                 <span><strong>Box: </strong>{item.name}</span>
                                 <span><strong>User: </strong>{item.user && item.user.email}</span>

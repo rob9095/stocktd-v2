@@ -147,7 +147,7 @@ class Dashboard extends Component {
                   key="products"
                   title={<span><Icon type="tags" theme="outlined" /><span>Inventory</span></span>}
                 >
-                  <Menu.Item className="stkd-dark sub-menu-item" key="products">Manage Products</Menu.Item>
+                  <Menu.Item className="stkd-dark sub-menu-item" key="products-new">Manage Products</Menu.Item>
                   <Menu.Item className="stkd-dark sub-menu-item" key="purchase-orders">Update Quantity</Menu.Item>
                   <Menu.Item className="stkd-dark sub-menu-item" key="receive-inventory">Receive Inventory</Menu.Item>
                   <Menu.Item className="stkd-dark sub-menu-item" key="scan-table">Scan Table</Menu.Item>
@@ -199,7 +199,7 @@ class Dashboard extends Component {
                 />
               }
             </div>
-            <div className="app-body" className="full-pad" style={{height: '100%'}}>
+            <div className="app-body" className="full-pad">
               <Switch>
                 <Route exact path="/app/po-products" render={props => (
                   <PoProductTable showHeader {...props} />

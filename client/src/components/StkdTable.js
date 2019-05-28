@@ -639,7 +639,7 @@ class ProductTable extends Component {
             <EditItemDrawer
               inputs={this.props.headers.filter(h => !h.noSort)}
               item={drawerItem}
-              title={`${drawerItem._id ? 'Edit '+ drawerItem.name || 'Item' : 'Create Item'} `}
+              title={`${drawerItem._id ? 'Edit '+this.props.editTitle || '' : 'Create Item'} `}
               onClose={() => this.setState({ drawerItem: null })}
               onSave={(data, id) => id ? this.handleRowEditSave(data, id) : this.handleImport(data)}
               create={drawerItem._id ? false : true}

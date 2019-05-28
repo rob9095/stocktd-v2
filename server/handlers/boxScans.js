@@ -72,8 +72,8 @@ const scanToPO = (boxScan,scanQty) => {
         let locations = await upsertScanLocation({ ...boxScan, filterRef: 'name' })
         boxScan.locations = locations.length > 0 ? locations.map(l=>l._id) : []
       }
-      //define the current po, first array item if array, otherwise set to generic inbound po
-      const currentPO = Array.isArray(boxScan.currentPOs) ? boxScan.currentPOs[0] : genericInboundPo
+      //define the current po, first array item if array, otherwise set to generic inbound po if currentPOs is falsy
+      const currentPO = Array.isArray(boxScan.currentPOs) ? boxScan.currentPOs[0] : boxScan.currentPOs || genericInboundPo
       // find the po, otherwise set it to generic inbound defaults above to upsert
       let foundPo = await db.PurchaseOrder.findOne({ poRef: currentPO.poRef }) || genericInboundPo
       //upsert poProduct, update Product, upsert Purchase Order, upsert boxScan
@@ -511,7 +511,6 @@ exports.upsertBoxScan = async (req, res, next) => {
       sku: product.sku,
       company: req.body.company,
       product: product._id,
-      user: req.body.user,
     }
     const scanQty = parseInt(req.body.scan.quantity);
     // add the scanned product to PO instead of scan from PO

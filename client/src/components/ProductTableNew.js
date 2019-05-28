@@ -68,15 +68,14 @@ class ProductTableNew extends Component {
   }
 
   handleCascaderUpdate = (data) => {
-    console.log({data})
     return new Promise((resolve,reject) => {
-      let [location,box, ...rest] = data.clicked.options
+      let [location={},box={}, ...rest] = data.clicked.options
       let update = [{
         id: data.rowId,
-        defaultLocation: location ? location.id : null,
-        defaultBox: box ? box.id : null,
+        defaultLocation: location.id || null,
+        defaultBox: box.id || null,
       }]
-      console.log(update)
+      console.log({update})
       this.handleImport(update).then(res=>resolve(res)).catch(err=>reject(err))
     })
   }
@@ -206,6 +205,7 @@ class ProductTableNew extends Component {
       <div>
         <StkdTable
           queryModel="Product"
+          editTitle="Product"
           populateArray={[{ path: 'boxscans', populate: [{path: 'locations'},{path: 'po'}] }]}
           filters={this.state.filters}
           additionalSearchInputs={[

@@ -83,6 +83,7 @@ class ScanTable extends Component {
         </div>
         <StkdTable
           queryModel="BoxScan"
+          editTitle={"Scan"}
           populateArray={[{ path: 'po' }, { path: 'product' }, { path: 'locations' }]}
           filters={this.state.filters}
           title={false}

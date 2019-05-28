@@ -138,7 +138,7 @@ class BForm extends Component {
       )
       if (i.type === 'number') {
         return (
-          <Col xs={i.span * 3} md={i.span} key={id} style={index !== this.props.inputs.length - 1 && { borderBottom: '1px solid #dad2e0' }}>
+          <Col xs={i.span * 3} md={i.span} key={id} className="form-section">
             {this.state.loadingInputs.includes(id) && (
               <CircularProgress style={{ position: 'absolute', top: 25, right: 7 }} {...this.state[id] ? { ...this.state[id] } : {}} />
             )}
@@ -184,7 +184,7 @@ class BForm extends Component {
         )
       } if (i.type === 'date') {
         return (
-          <Col xs={i.span * 3} md={i.span} key={id} style={index !== this.props.inputs.length - 1 && { borderBottom: '1px solid #dad2e0' }}>
+          <Col xs={i.span * 3} md={i.span} key={id} className="form-section">
             {this.state.loadingInputs.includes(id) && (
               <CircularProgress style={{ position: 'absolute', top: 25, right: 7 }} {...this.state[id] ? { ...this.state[id] } : {}} />
             )}
@@ -224,7 +224,7 @@ class BForm extends Component {
         )
       } else if (i.type === 'select') {
         return (
-          <Col xs={i.span * 3} md={i.span} key={id} style={index !== this.props.inputs.length - 1 && { borderBottom: '1px solid #dad2e0' }}>
+          <Col xs={i.span * 3} md={i.span} key={id} className="form-section">
             {this.state.loadingInputs.includes(id) && (
               <CircularProgress style={{ position: 'absolute', top: 25, right: 7 }} {...this.state[id] ? { ...this.state[id] } : {}} />
             )}
@@ -268,7 +268,7 @@ class BForm extends Component {
         )
       } else if (i.type === 'content') {
         return (
-          <Col xs={i.span * 3} md={i.span} key={id} style={index !== this.props.inputs.length - 1 && { borderBottom: '1px solid #dad2e0' }}>
+          <Col xs={i.span * 3} md={i.span} key={id} className="form-section">
             <FormItem key={id} {...this.state.customFeedback[id] && { ...this.state.customFeedback[id] }} label={i.text || ''} colon={!i.text && false} labelCol={i.labelCol} wrapperCol={i.wrapperCol}>
               {i.content}
               {i.submit && (
@@ -279,7 +279,7 @@ class BForm extends Component {
         )
       } else {
         return (
-          <Col xs={i.span * 3} md={i.span} key={id} style={index !== this.props.inputs.length - 1 && { borderBottom: '1px solid #dad2e0'}}>
+          <Col xs={i.span * 3} md={i.span} key={id} className="form-section">
             {this.state.loadingInputs.includes(id) && (
               <CircularProgress style={{position: 'absolute', top: 25, right: 7}} {...this.state[id] ? { ...this.state[id] } : {}} />
             )}

@@ -38,6 +38,10 @@ code {
   font-weight: 600 !important;
 }
 
+.center-a {
+  text-align: center;
+}
+
 .flex {
   display: flex;
 }
@@ -254,6 +258,10 @@ i.xl svg {
   cursor: pointer;
 }
 
+a.no-color {
+  color: rgba(0, 0, 0, 0.65);
+}
+
 /* Basic Menu */
 
 .basic-menu .ant-menu-item-group-title {
@@ -288,9 +296,9 @@ i.xl svg {
 
 /* Default Widget Styles */
 .stkd-widget {
-  box-shadow: rgba(53, 15, 78, 0.04) 0px 2px 0px;
+  box-shadow:#f1f3f4 0px 2px 0px;
   border-radius: 3px;
-  border: 1px solid #dad2e0;
+  border: 1px solid #c4c8d3;
 }
 
 .stkd-content {
@@ -686,6 +694,10 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
   top: -5px;
 }
 
+.basic-form .ant-col.form-section:not(:last-child) {
+  border-bottom: 1px solid #c4c8d3;
+}
+
 /* Ant Spinner */
 .ant-spin-container::after {
   background: transparent !important;
@@ -742,7 +754,7 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
 }
 
 
-/* Search Form */
+/* Search/Filter Form */
 .number-input.pre-select {
   width: 45px !important;
   display: flex;

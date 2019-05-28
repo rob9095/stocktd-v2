@@ -10,19 +10,21 @@ exports.processProductImport = async (req, res, next) => {
 				message: ['Request to large']
 			})
 		}
-		console.log(req.body.products[0])
+		//should add check inside map if no sku or id, throw error
 		let company = req.body.company;
 		let updates = req.body.products.map(p => {
+			let _id = p.id
+			delete p.id
 			if(p.action === 'delete') {
 				return {
 					deleteOne: {
-						filter: p.id ? { _id: p.id } : { skuCompany: `${p.sku}-${company}`},
+						filter: _id ? { _id } : { skuCompany: `${p.sku}-${company}`},
 					}
 				}
 			} else {
 				return {
 					updateOne: {
-						filter: p.id ? {_id: p.id} : { skuCompany: `${p.sku}-${company}`},
+						filter: _id ? {_id} : { skuCompany: `${p.sku}-${company}`},
 						update: {
 							...p,
 							...p.barcode && { barcodeCompany: p.barcode + "-" + company },
@@ -30,7 +32,7 @@ exports.processProductImport = async (req, res, next) => {
 							company
 						},
 						upsert: true,
-						$setOnInsert: { createdOn: new Date(), quantityToShip: 0, skuCompany: p.sku +"-"+company, barcodeCompany: p.barcode || p.sku + "-" + company  },
+						$setOnInsert: {createdOn: new Date(), quantityToShip: 0, ...p.sku && {skuCompany: p.sku +"-"+company, barcodeCompany: p.barcode || p.sku + "-" + company}},
 					}
 				}
 			}

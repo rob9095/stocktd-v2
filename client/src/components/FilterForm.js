@@ -92,11 +92,11 @@ class FilterForm extends Component {
       const id = i.nestedKey ? i.id + i.nestedKey : i.id
       const selectBefore = (
         <Select key={`${id}Select`} defaultValue={'='} onChange={this.handleSelect} showArrow={false} className="number-input pre-select">
-          <Option id={`${id}Select`} value="=">=</Option>
-          <Option id={`${id}Select`} value="gt">{'>'}</Option>
-          <Option id={`${id}Select`} value="gte">{'>='}</Option>
-          <Option id={`${id}Select`} value="lt">{'<'}</Option>
-          <Option id={`${id}Select`} value="lte">{'<='}</Option>
+          <Option id={`${id}Select`} className="center-a" value="=">=</Option>
+          <Option id={`${id}Select`} className="center-a" value="gt">{'>'}</Option>
+          <Option id={`${id}Select`} className="center-a" value="gte">{'≥'}</Option>
+          <Option id={`${id}Select`} className="center-a" value="lt">{'<'}</Option>
+          <Option id={`${id}Select`} className="center-a" value="lte">{'≤'}</Option>
         </Select>
       )
       if (i.type === 'number') {

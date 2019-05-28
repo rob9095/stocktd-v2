@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Button, Icon } from 'antd';
 import { logout } from '../store/actions/auth';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 
 class UserCard extends Component {
   constructor(props) {
@@ -18,8 +18,10 @@ class UserCard extends Component {
         <div className="user-card-menu">
           <div className="ant-menu-item">
             <span>
-              <Icon type="idcard" theme="twoTone" twoToneColor="#716aca" />
-              <span>My Account</span>
+              <Link className="no-color" to="/app/account">
+                <Icon type="idcard" theme="twoTone" twoToneColor="#716aca" />
+                <span>My Account</span>
+              </Link>
             </span>
           </div>
           <div className="ant-menu-item">

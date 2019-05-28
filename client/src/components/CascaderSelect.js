@@ -59,15 +59,17 @@ class CascaderSelect extends Component {
 
     //reverse the data
     if (this.props.reverseData) {
-      data = data.map(option => option.children.length === 0 ? [{ label: 'N/A', value:'N/A-stkd', key: 'N/A-stkd'}] : [...option.children]).flat().map(option => ({
-         ...option,
+      data = data.map(option => option.children.length === 0 ? [{ label: 'N/A', value:'N/A-stkd~', key: 'N/A-stkd~'}] : [...option.children]).flat().map(option => ({
+        ...option,
+        ...option.value === 'N/A-stkd~' && data.filter(parent => parent.children.length === 0 && parent.isDefault).length > 0 && {isDefault: true},
         children: 
-          option.value === 'N/A-stkd' ? data.filter(parent => parent.children.length === 0)
+          option.value === 'N/A-stkd~' ? data.filter(parent => parent.children.length === 0)
           .map(parent => ({ ...parent, children: null }))
           : data.filter(parent => parent.children.map(c => c.value).indexOf(option.value) !== -1)
           .map(parent => ({ ...parent, children: null })) }))
          .reduce((acc, cv) => acc.map(option => option.value).indexOf(cv.value) !== -1 ? [...acc] : [...acc, cv], [])
     }
+    console.log({data})
 
     //get defaults, use empty option if no data, otherwise check for default, otherwise use sortKey provided to parent
     let defaultParent = data.length === 0 ? { children: [] } : data.find(parent=>parent.isDefault) || data.sort((a,b)=>b[this.props.parent.sortKey] - a[this.props.parent.sortKey])[0]
