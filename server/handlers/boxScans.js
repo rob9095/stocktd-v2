@@ -114,7 +114,7 @@ const scanToPO = (boxScan,scanQty) => {
       let user = boxScan.user
       delete boxScan.user
       await db.BoxScan.update({
-          skuCompany: { $regex: new RegExp(boxScan.skuCompany, "i") },
+          product: boxScan.product,
           name: { $regex: new RegExp(boxScan.name, "i") },
           po: poId,
           poProduct: updatedPoProduct._id,
@@ -134,9 +134,11 @@ const scanToPO = (boxScan,scanQty) => {
         { upsert: true }
       );
       updatedBoxScan = await db.BoxScan.findOne({
-        skuCompany: { $regex: new RegExp(boxScan.skuCompany, "i") },
+        product: boxScan.product,
         name: { $regex: new RegExp(boxScan.name, "i") },
-        po: poId
+        po: poId,
+        poProduct: updatedPoProduct._id,
+        scanToPo: boxScan.scanToPo,
       })
       resolve({
         updatedPoProduct,
@@ -511,6 +513,7 @@ exports.upsertBoxScan = async (req, res, next) => {
       sku: product.sku,
       company: req.body.company,
       product: product._id,
+      currentPOs: Array.isArray(req.body.scan.currentPOs) ? req.body.scan.currentPOs : [req.body.scan.currentPOs]
     }
     const scanQty = parseInt(req.body.scan.quantity);
     // add the scanned product to PO instead of scan from PO

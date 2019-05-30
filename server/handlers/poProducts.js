@@ -109,17 +109,18 @@ exports.updatePoProducts = async (req, res, next) => {
 */
 exports.removePoProducts = async (req, res, next) => {
   try {
-    let poProductRemovals = req.body.data.map(p=>{
+    let { data, company } = req.body 
+    let poProductRemovals = data.map(p=>{
       return ({
         deleteOne: {
           filter: {_id: p._id},
         }
       })
     })
-    let productUpdates = req.body.data.map(p => {
+    let productUpdates = data.map(p => {
       return({
         updateOne: {
-          filter: {skuCompany: p.sku+"-"+req.body.company},
+          filter: {_id: p.product},
           update: {
             $inc: p.type === 'outbound' ?
               { quantity: parseInt(p.quantity) }
@@ -129,30 +130,43 @@ exports.removePoProducts = async (req, res, next) => {
         }
       })
     })
-    let poUpdates = req.body.data.map(p => {
+    let poUpdates = data.map(p => {
       return ({
         updateOne: {
-          filter: {poRef: p.poRef, company: req.body.company},
+          filter: {_id: p.po, company},
           update: {
             $inc: { quantity: parseInt(-p.quantity) }
           }
         }
       })
     })
+    // need to either delete boxes scannedTo and scannedFrom this po or move to generic pos
+    // just delete boxes for now..
+    let boxRemovals = data.map(p => {
+      return({
+        deleteOne: {
+          filter: {po: p.po, poProduct: p._id},
+        }
+      })
+    })
     let updatedPos = await db.PurchaseOrder.bulkWrite(poUpdates)
     let removedPoProducts = await db.PoProduct.bulkWrite(poProductRemovals)
     let updatedProducts = await db.Product.bulkWrite(productUpdates)
-    let emptyPOs = await db.PurchaseOrder.find({company: req.body.company, quantity: 0})
-    let poRemovals = emptyPOs.map(po=>({
+    let removedBoxes = await db.BoxScan.bulkWrite(boxRemovals)
+    //define the updated poIds
+    let poIds = data.map(p=>({_id: p.po})).reduce((acc,cv)=>acc.map(po => po._id).indexOf(cv._id) !== -1 ? [...acc] : [...acc, cv], [])
+    //find any remaining poProducts on po's
+    let foundPoProducts = await db.PoProduct.find({company, quantity: { $lte: 0 }, $and: [{$or: poIds}] })
+    let removedPos = []
+    //loop the poIds and check if there are any remaining poProducts, delete the po if there isn't any remaining poProducts
+    let poRemovals = poIds.filter(po => !foundPoProducts.map(p => p.po).includes(po._id)).map(po => ({
       deleteOne: {
-        filter: {_id: po.id}
+        filter: { _id: po._id }
       }
     }))
-    let removedPos = []
-    if (poRemovals.length > 0) {
-      removedPos = await db.PurchaseOrder.bulkWrite(poRemovals)
-    }
+    removedPos = poRemovals.length > 0 && await db.PurchaseOrder.bulkWrite(poRemovals)
     return res.status(200).json({
+      removedBoxes,
       removedPos,
       updatedPos,
       removedPoProducts,
