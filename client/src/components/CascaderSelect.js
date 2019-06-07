@@ -24,38 +24,43 @@ class CascaderSelect extends Component {
   componentDidMount() {
     this._isMounted = true;
     //loop through provided data and configure options
-    let data = this.props.data.map((option,i) => ({
-      label: (
-        <div style={{ maxHeight: 40, overflow: "hidden" }}>
-          <div style={{ fontSize: "small" }}>
-            {option[this.props.parent.label] || option._id || i}
+    let data = this.props.data.map((option,i) => {
+      let nestedObj = option[this.props.parent.subChild.key] || {}
+      return ({
+        label: (
+          <div style={{ maxHeight: 40, overflow: "hidden" }}>
+            <div style={{ fontSize: "small" }}>
+              {option[this.props.parent.label] || option._id || i}
+            </div>
+            <div style={{ fontSize: 10, color: "grey" }}>
+              {nestedObj[this.props.parent.subChild.label]}
+            </div>
           </div>
-          <div style={{ fontSize: 10, color: "grey" }}>
-            {option[this.props.parent.subChild.key][this.props.parent.subChild.label]}
-          </div>
-        </div>
-      ),
-      value: option[this.props.parent.value] + option[this.props.parent.subChild.key]._id || option._id || i,
-      key: option._id || i,
-      id: option._id,
-      isDefault: option._id === option[this.props.parent.defaultKey],
-      ...this.props.parent.sortKey && {[this.props.parent.sortKey]: option[this.props.parent.sortKey]},
-      ...this.props.parent.subChild.key && {[this.props.parent.subChild.key]: {
-        label: option[this.props.parent.subChild.key][this.props.parent.subChild.label],
-        value: option[this.props.parent.subChild.key][this.props.parent.subChild.value],
-        key: option[this.props.parent.subChild.key]._id,
-        id: option[this.props.parent.subChild.key]._id,
-        childrenValues: option[this.props.child.arrayKey].map(child=>child[this.props.child.value]),
-        parentId: option._id,
-      }},
-      children: option[this.props.child.arrayKey].map((child,ci) => ({
-        label: child[this.props.child.label] || child[this.props.parent.label] || child._id || ci,
-        value: child[this.props.child.value] || child[this.props.parent.value] || child._id || ci,
-        key: child._id || ci,
-        id: child._id,
-        isDefault: child._id === option[this.props.child.defaultKey],
-      }))
-    })).reduce((acc, cv) => acc.map(option => option.value).indexOf(cv.value) !== -1 ? [...acc] : [...acc, cv], [])
+        ),
+        value: option[this.props.parent.value] + nestedObj._id || option._id || i,
+        key: option._id || i,
+        id: option._id,
+        isDefault: option._id === option[this.props.parent.defaultKey],
+        ...this.props.parent.sortKey && { [this.props.parent.sortKey]: option[this.props.parent.sortKey] },
+        ...this.props.parent.subChild.key && {
+          [this.props.parent.subChild.key]: {
+            label: nestedObj[this.props.parent.subChild.label],
+            value: nestedObj[this.props.parent.subChild.value],
+            key: nestedObj._id,
+            id: nestedObj._id,
+            childrenValues: option[this.props.child.arrayKey].map(child => child[this.props.child.value]),
+            parentId: option._id,
+          }
+        },
+        children: option[this.props.child.arrayKey].map((child, ci) => ({
+          label: child[this.props.child.label] || child[this.props.parent.label] || child._id || ci,
+          value: child[this.props.child.value] || child[this.props.parent.value] || child._id || ci,
+          key: child._id || ci,
+          id: child._id,
+          isDefault: child._id === option[this.props.child.defaultKey],
+        }))
+      })
+    }).reduce((acc, cv) => acc.map(option => option.value).indexOf(cv.value) !== -1 ? [...acc] : [...acc, cv], [])
 
     //reverse the data
     if (this.props.reverseData) {
