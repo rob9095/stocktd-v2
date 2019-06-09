@@ -23,7 +23,7 @@ class Dashboard extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      collapsed: true,
+      collapsed: false,
       clientWidth: 0,
       loginRedirect: false,
       activeMenuItems: [],
@@ -114,7 +114,15 @@ class Dashboard extends Component {
       )
     }
     return (
-      <div style={{height: '100%'}}>
+      <div style={{height: '100%', overflow: 'hidden'}}>
+        <div className="flex space-between align-items-center" style={{ color: "#fff", background: '#7933e1', height: 60, padding: '0px 15px'}}>
+          <div className="logo">
+            <img style={{ height: 30 }} src={require("../images/logo-clear-white.png")}></img>
+          </div>
+          <div>
+            options
+          </div>
+        </div>
         <div className="app-dashboard">
           <div id="app-sidebar" className="app-column">
             <Sider
@@ -128,20 +136,20 @@ class Dashboard extends Component {
               <div className="logo">
                 {/* {this.state.collapsed ? <img src={check} width='30px' /> : <img src={logo} width='130px' /> } */}
               </div>
-              <Menu onClick={this.handleMenuClick} theme="dark" mode="inline" selectedKeys={this.state.activeMenuItems}>
-                <Menu.Item className="stkd-dark menu-item" key="appHome">
-                  <Icon type="appstore" theme="outlined" />
-                  <span>Dashboard</span>
+              <Menu onClick={this.handleMenuClick} theme="light" mode="inline" selectedKeys={this.state.activeMenuItems}>
+                <Menu.Item className="stkd-menu-item" key="appHome">
+                  {/* <Icon type="dashboard" theme="twoTone" twoToneColor={this.state.activeMenuItems.includes("appHome") ? "#7933e1" : "#5a6195"} /> */}
+                  <div className="flex align-items-center">
+                    <img src={require(`../images/${this.state.activeMenuItems.includes('appHome')?'dashboard-active':'dashboard'}.png`)} width="16px" height="18px" style={{ marginRight: 10 }} />
+                    <span>Dashboard</span>
+                  </div>
                 </Menu.Item>
-                <SubMenu
-                  className="stkd-dark menu-item"
-                  key="orders"
-                  title={<span><Icon type="shopping-cart" theme="outlined" /><span>Orders</span></span>}
-                >
-                  <Menu.Item className="stkd-dark sub-menu-item" key="orders">Open Orders</Menu.Item>
-                  <Menu.Item className="stkd-dark sub-menu-item" key="order-history">Order History</Menu.Item>
-                  <Menu.Item className="stkd-dark sub-menu-item" key="add-order">Add Order</Menu.Item>
-                </SubMenu>
+                <Menu.Item className="stkd-menu-item" key="orders">
+                  <div className="flex align-items-center">
+                    <img src={require(`../images/${this.state.activeMenuItems.includes('orders') ? 'shopping-basket-active' : 'shopping-basket'}.png`)} width="22px" height="24px" style={{ marginRight: 10 }} />
+                    <span>Orders</span>
+                  </div>
+                </Menu.Item>
                 <SubMenu
                   className="stkd-dark menu-item"
                   key="products"
@@ -160,29 +168,12 @@ class Dashboard extends Component {
             </Sider>
           </div>
           <div id="app-content" className="app-column">
-            {/* <div className="flex align-items-center" style={{
-              borderBottom: '1px solid #ffe58f',
-              background: '#fffbe6',
-              padding: 10,
-              width: '100%',
-            }}
-            >
-              <Icon type="exclamation-circle" style={{marginRight: 5, fontSize: 20}} />
-              <div>
-                <Link to="/app/account" style={{
-                  color: 'rgb(47, 41, 54)',
-                  borderBottom: '1px dotted black'
-                }}>
-                  You're almost there! Verify your email to unlock all the features.
-              </Link>
-              </div>
-            </div> */}
             {this.props.notifications.length > 0 && (
               this.props.notifications.map((n,i)=>(
                 <StkdNotification key={n.id+i} config={n} nType={n.nType} />
               ))
             )}
-            <div className="top">
+            <div className="top" style={{display: 'none'}}>
               {this.state.clientWidth >= 1000 ?
                 <Navbar
                   onSiderToggle={this.toggle}
@@ -228,6 +219,44 @@ class Dashboard extends Component {
                       <Breadcrumb.Item>User</Breadcrumb.Item>
                       <Breadcrumb.Item>Bill</Breadcrumb.Item>
                     </Breadcrumb>
+                    <Row gutter={16} >
+                      <Col lg={24} xl={8}>
+                        <div className="stkd-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+                          Bill is a cat.
+                      </div>
+                      </Col>
+                      <Col lg={24} xl={8}>
+                        <div className="stkd-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+                          Bill is a cat.
+                      </div>
+                      </Col>
+                      <Col lg={24} xl={8}>
+                        <div className="stkd-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+                          Bill is a cat.
+                      </div>
+                      </Col>
+                    </Row>
+                    <Row gutter={16}>
+                      <Col lg={24} xl={8}>
+                        <div className="stkd-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+                          Bill is a cat.
+                          <Icon style={{fontSize: 35}} type="appstore" theme="twoTone" twoToneColor="#7933e1" />
+                          <Icon style={{ fontSize: 35 }} type="appstore" theme="twoTone" twoToneColor="#a6aed8" />
+                          <Icon style={{ fontSize: 35 }} type="dashboard" theme="twoTone" twoToneColor="#7933e1" />
+                          <Icon style={{ fontSize: 35 }} type="dashboard" theme="twoTone" twoToneColor="#5a6195" />
+                      </div>
+                      </Col>
+                      <Col lg={24} xl={8}>
+                        <div className="stkd-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+                          Bill is a cat.
+                      </div>
+                      </Col>
+                      <Col lg={24} xl={8}>
+                        <div className="stkd-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+                          Bill is a cat.
+                      </div>
+                      </Col>
+                    </Row>
                     <Row gutter={16}>
                       <Col lg={24} xl={8}>
                         <div className="stkd-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
