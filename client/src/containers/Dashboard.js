@@ -15,8 +15,11 @@ import ReceiveInventory from '../components/ReceiveInventory';
 import ScanTable from '../components/ScanTable';
 import AccountPage from '../components/AccountPage';
 import StkdNotification from '../components/StkdNotification';
+import Svg from '../svg/svgs';
+const { homeSvg, basketSvg, tags, sliders, logoWhite } = Svg
 const { Sider } = Layout;
 const SubMenu = Menu.SubMenu;
+
 
 class Dashboard extends Component {
   _isMounted = false
@@ -117,7 +120,8 @@ class Dashboard extends Component {
       <div style={{height: '100%', overflow: 'hidden'}}>
         <div className="flex space-between align-items-center" style={{ color: "#fff", background: '#7933e1', height: 60, padding: '0px 15px'}}>
           <div className="logo">
-            <img style={{ height: 30 }} src={require("../images/logo-clear-white.png")}></img>
+            {/* <img style={{ height: 30 }} src={require("../images/logo-clear-white.png")}></img> */}
+            {/* <Icon style={{height: 30, width: 140}} component={logoWhite} /> */}
           </div>
           <div>
             options
@@ -139,31 +143,30 @@ class Dashboard extends Component {
               <Menu onClick={this.handleMenuClick} theme="light" mode="inline" selectedKeys={this.state.activeMenuItems}>
                 <Menu.Item className="stkd-menu-item" key="appHome">
                   {/* <Icon type="dashboard" theme="twoTone" twoToneColor={this.state.activeMenuItems.includes("appHome") ? "#7933e1" : "#5a6195"} /> */}
-                  <div className="flex align-items-center">
-                    <img src={require(`../images/${this.state.activeMenuItems.includes('appHome')?'dashboard-active':'dashboard'}.png`)} width="16px" height="18px" style={{ marginRight: 10 }} />
-                    <span>Dashboard</span>
-                  </div>
+                  <Icon component={homeSvg} />
+                  <span>Home</span>
                 </Menu.Item>
                 <Menu.Item className="stkd-menu-item" key="orders">
-                  <div className="flex align-items-center">
-                    <img src={require(`../images/${this.state.activeMenuItems.includes('orders') ? 'shopping-basket-active' : 'shopping-basket'}.png`)} width="22px" height="24px" style={{ marginRight: 10 }} />
-                    <span>Orders</span>
-                  </div>
+                  <Icon component={basketSvg} />
+                  <span>Orders</span>
                 </Menu.Item>
                 <SubMenu
                   className="stkd-dark menu-item"
                   key="products"
-                  title={<span><Icon type="tags" theme="outlined" /><span>Inventory</span></span>}
+                  title={<span><Icon component={tags} /><span>Inventory</span></span>}
                 >
-                  <Menu.Item className="stkd-dark sub-menu-item" key="products-new">Manage Products</Menu.Item>
-                  <Menu.Item className="stkd-dark sub-menu-item" key="purchase-orders">Update Quantity</Menu.Item>
-                  <Menu.Item className="stkd-dark sub-menu-item" key="receive-inventory">Receive Inventory</Menu.Item>
-                  <Menu.Item className="stkd-dark sub-menu-item" key="scan-table">Scan Table</Menu.Item>
+                  <Menu.Item key="products-new">Products</Menu.Item>
+                  <Menu.Item key="scan-table">Scans</Menu.Item>
+                  <Menu.Item key="purchase-orders">Purchase Orders</Menu.Item>
+                  <Menu.Item key="receive-inventory">Receive Inventory</Menu.Item>
                 </SubMenu>
-                <Menu.Item className="stkd-dark menu-item" key="purchase-orders">
-                  <Icon type="file-done" theme="outlined" />
-                  <span>Purchase Orders</span>
-                </Menu.Item>
+                <SubMenu
+                  className="stkd-dark menu-item"
+                  key="settings"
+                  title={<span><Icon component={sliders} /><span>Settings</span></span>}
+                >
+                  <Menu.Item className="stkd-dark sub-menu-item" key="account">Account</Menu.Item>
+                </SubMenu>
               </Menu>
             </Sider>
           </div>
@@ -173,7 +176,7 @@ class Dashboard extends Component {
                 <StkdNotification key={n.id+i} config={n} nType={n.nType} />
               ))
             )}
-            <div className="top" style={{display: 'none'}}>
+            <div className="top" style={{}}>
               {this.state.clientWidth >= 1000 ?
                 <Navbar
                   onSiderToggle={this.toggle}
