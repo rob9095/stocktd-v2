@@ -16,7 +16,7 @@ import ScanTable from '../components/ScanTable';
 import AccountPage from '../components/AccountPage';
 import StkdNotification from '../components/StkdNotification';
 import Svg from '../svg/svgs';
-const { homeSvg, basketSvg, tags, sliders, logoWhite } = Svg
+const { homeSvg, basketSvg, tags, sliders, logoWhite, stocktdLogoWhite } = Svg
 const { Sider } = Layout;
 const SubMenu = Menu.SubMenu;
 
@@ -119,10 +119,9 @@ class Dashboard extends Component {
     return (
       <div style={{height: '100%', overflow: 'hidden'}}>
         <div className="flex space-between align-items-center" style={{ color: "#fff", background: '#7933e1', height: 60, padding: '0px 15px'}}>
-          <div className="logo">
-            {/* <img style={{ height: 30 }} src={require("../images/logo-clear-white.png")}></img> */}
-            {/* <Icon style={{height: 30, width: 140}} component={logoWhite} /> */}
-          </div>
+          {/* <img style={{ height: 30 }} src={require("../images/logo-clear-white.png")}></img> */}
+          {/* <Icon component={stocktdLogoWhite} /> */}
+          <div />
           <div>
             options
           </div>
@@ -222,59 +221,55 @@ class Dashboard extends Component {
                       <Breadcrumb.Item>User</Breadcrumb.Item>
                       <Breadcrumb.Item>Bill</Breadcrumb.Item>
                     </Breadcrumb>
-                    <Row gutter={16} >
+                    <Row gutter={16}>
                       <Col lg={24} xl={8}>
-                        <div className="stkd-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+                        <div className="stkd-content stkd-widget" style={{ minHeight: 360 }}>
                           Bill is a cat.
-                      </div>
+                        </div>
                       </Col>
                       <Col lg={24} xl={8}>
-                        <div className="stkd-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+                        <div className="stkd-content stkd-widget" style={{ minHeight: 360 }}>
                           Bill is a cat.
-                      </div>
+                        </div>
                       </Col>
                       <Col lg={24} xl={8}>
-                        <div className="stkd-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+                        <div className="stkd-content stkd-widget" style={{ minHeight: 360 }}>
                           Bill is a cat.
-                      </div>
+                        </div>
                       </Col>
                     </Row>
                     <Row gutter={16}>
                       <Col lg={24} xl={8}>
-                        <div className="stkd-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+                        <div className="stkd-content stkd-widget" style={{ minHeight: 360 }}>
                           Bill is a cat.
-                          <Icon style={{fontSize: 35}} type="appstore" theme="twoTone" twoToneColor="#7933e1" />
-                          <Icon style={{ fontSize: 35 }} type="appstore" theme="twoTone" twoToneColor="#a6aed8" />
-                          <Icon style={{ fontSize: 35 }} type="dashboard" theme="twoTone" twoToneColor="#7933e1" />
-                          <Icon style={{ fontSize: 35 }} type="dashboard" theme="twoTone" twoToneColor="#5a6195" />
-                      </div>
+                        </div>
                       </Col>
                       <Col lg={24} xl={8}>
-                        <div className="stkd-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+                        <div className="stkd-content stkd-widget" style={{ minHeight: 360 }}>
                           Bill is a cat.
-                      </div>
+                        </div>
                       </Col>
                       <Col lg={24} xl={8}>
-                        <div className="stkd-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+                        <div className="stkd-content stkd-widget" style={{ minHeight: 360 }}>
                           Bill is a cat.
-                      </div>
+                        </div>
                       </Col>
                     </Row>
                     <Row gutter={16}>
                       <Col lg={24} xl={8}>
-                        <div className="stkd-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+                        <div className="stkd-content stkd-widget" style={{ minHeight: 360 }}>
                           Bill is a cat.
-                      </div>
+                        </div>
                       </Col>
                       <Col lg={24} xl={8}>
-                        <div className="stkd-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+                        <div className="stkd-content stkd-widget" style={{ minHeight: 360 }}>
                           Bill is a cat.
-                      </div>
+                        </div>
                       </Col>
                       <Col lg={24} xl={8}>
-                        <div className="stkd-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+                        <div className="stkd-content stkd-widget" style={{ minHeight: 360 }}>
                           Bill is a cat.
-                      </div>
+                        </div>
                       </Col>
                     </Row>
                   </div>
