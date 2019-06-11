@@ -4,7 +4,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Lato', sans-serif !important;
-  /* background: #f0f2f5 !important; */
+  background: #fefefe !important;
 }
 
 button {
@@ -298,7 +298,8 @@ a.no-color {
 .stkd-widget {
   box-shadow:#f1f3f4 0px 2px 0px;
   border-radius: 3px;
-  border: 1px solid #c4c8d3;
+  border: 1px solid rgb(222, 226, 242);;
+  margin: 16px;
 }
 
 .stkd-content {

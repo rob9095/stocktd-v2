@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { authUser } from '../store/actions/auth';
 import { removeError, addError } from '../store/actions/errors';
 import Dashboard from './Dashboard';
+import DashboardNew from './DashboardNew';
 import DashboardLegacy from './DashboardLegacy';
 import WrappedAuthForm from '../components/AuthForm';
 import WrappedForgotPassword from '../components/ForgotPassword';
@@ -14,8 +15,9 @@ const Main = props => {
 	const { authUser, errors, removeError, addError, currentUser } = props;
 	return(
 			<Switch>
-				<Route path="/app" render={props => <Dashboard currentUser={currentUser} {...props} />} />
-				<Route path="/app-old" render={props => <DashboardLegacy currentUser={currentUser} {...props} />} />
+				<Route path="/app-old" render={props => <Dashboard currentUser={currentUser} {...props} />} />
+				<Route path="/app" render={props => <DashboardNew currentUser={currentUser} {...props} />} />
+				<Route path="/app-legacy" render={props => <DashboardLegacy currentUser={currentUser} {...props} />} />
 				<Route
 					exact
 					path="/(signin|login)/"

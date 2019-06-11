@@ -1,10 +1,8 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react' ;
 import { Switch, Route, withRouter, Redirect, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Layout, Menu, Icon, Breadcrumb, Row, Col, Alert } from 'antd';
 import { logout } from '../store/actions/auth';
-import Navbar from './Navbar';
-import NavbarMobile from './NavbarMobile';
+import { Layout, Menu, Breadcrumb, Icon, Row, Col } from 'antd'
 import NotFound from '../components/NotFound';
 import ProductTable from '../components/ProductTable';
 import ProductTableNew from '../components/ProductTableNew';
@@ -16,13 +14,13 @@ import ScanTable from '../components/ScanTable';
 import AccountPage from '../components/AccountPage';
 import StkdNotification from '../components/StkdNotification';
 import Svg from '../svg/svgs';
-const { homeSvg, basketSvg, tags, sliders, logoWhite, stocktdLogoWhite } = Svg
-const { Sider } = Layout;
-const SubMenu = Menu.SubMenu;
 
 
-class Dashboard extends Component {
-  _isMounted = false
+const { homeSvg, basketSvg, tags, sliders, logoWhite, stocktdLogoWhite, arrowCircle } = Svg
+const { SubMenu } = Menu;
+const { Header, Content, Sider } = Layout;
+
+class DashboardNew extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -35,7 +33,7 @@ class Dashboard extends Component {
 
   setActiveMenuItem = async (pathname) => {
     let pathArr = pathname.split('/');
-    let activeMenuItems = pathArr.map(arg=>{
+    let activeMenuItems = pathArr.map(arg => {
       if (arg === 'app' && pathArr.length === 2) {
         return arg + 'Home';
       } else {
@@ -111,37 +109,38 @@ class Dashboard extends Component {
     window.onresize = (e) => {
       this.handleWindowResize();
     }
-    if (this.state.loginRedirect){
+    if (this.state.loginRedirect) {
       return (
         <Redirect to={this.state.redirectPath} />
       )
     }
-    return (
-      <div style={{height: '100%', overflow: 'hidden'}}>
+    return(
+      <Layout style={{overflow: 'hidden'}}>
+        {this.props.notifications.length > 0 && (
+          this.props.notifications.map((n, i) => (
+            <StkdNotification key={n.id + i} config={n} nType={n.nType} />
+          ))
+        )}
         <div className="flex space-between align-items-center" style={{ color: "#fff", background: '#7933e1', height: 60, padding: '0px 15px' }}>
           {/* <img style={{ height: 30 }} src={require("../images/logo-clear-white.png")}></img> */}
           {/* <Icon component={stocktdLogoWhite} /> */}
-          <div />
+          <div style={{width: 140, height: 30, opacity: .3, background: '#fff'}}></div>
           <div>
             options
           </div>
         </div>
-        <div className="app-dashboard">
-          <div id="app-sidebar" className="app-column">
-            <Sider
-              width="255"
-              collapsedWidth={this.state.clientWidth >= 1000 ? '80' : '0'}
-              className="stkd-sidebar"
-              trigger={null}
-              collapsible
-              collapsed={this.state.collapsed}
-            >
-              <div className="logo">
-                {/* {this.state.collapsed ? <img src={check} width='30px' /> : <img src={logo} width='130px' /> } */}
-              </div>
+        <Layout>
+          <Sider
+            width="200"
+            collapsedWidth={this.state.clientWidth >= 1000 ? '80' : '0'}
+            className="stkd-sidebar"
+            trigger={null}
+            collapsible
+            collapsed={this.state.collapsed}
+          >
+            <div className="flex space-between flex-col" style={{height: 'calc(100% - 60px)'}}>
               <Menu onClick={this.handleMenuClick} theme="light" mode="inline" selectedKeys={this.state.activeMenuItems}>
                 <Menu.Item className="stkd-menu-item" key="appHome">
-                  {/* <Icon type="dashboard" theme="twoTone" twoToneColor={this.state.activeMenuItems.includes("appHome") ? "#7933e1" : "#5a6195"} /> */}
                   <Icon component={homeSvg} />
                   <span>Home</span>
                 </Menu.Item>
@@ -167,32 +166,21 @@ class Dashboard extends Component {
                   <Menu.Item className="stkd-dark sub-menu-item" key="account">Account</Menu.Item>
                 </SubMenu>
               </Menu>
-            </Sider>
-          </div>
-          <div id="app-content" className="app-column">
-            {this.props.notifications.length > 0 && (
-              this.props.notifications.map((n,i)=>(
-                <StkdNotification key={n.id+i} config={n} nType={n.nType} />
-              ))
-            )}
-            <div className="top" style={{}}>
-              {this.state.clientWidth >= 1000 ?
-                <Navbar
-                  onSiderToggle={this.toggle}
-                  collapsed={this.state.collapsed}
-                  clientWidth={this.state.clientWidth}
-                  currentUser={this.props.currentUser}
-                />
-                :
-                <NavbarMobile
-                  onSiderToggle={this.toggle}
-                  collapsed={this.state.collapsed}
-                  clientWidth={this.state.clientWidth}
-                  currentUser={this.props.currentUser}
-                />
-              }
+              <Menu>
+                <Menu.Item onClick={this.toggle}>
+                  <Icon style={this.state.collapsed ? {transform: 'rotate(180deg)'} : {}} component={arrowCircle} />
+                  <span>{this.state.collapsed ? 'Expand' : 'Collapse'}</span>
+                </Menu.Item>
+              </Menu>
             </div>
-            <div className="app-body" className="full-pad">
+          </Sider>
+          <Layout style={{ padding: '0 24px 24px', background: '#fefefe' }}>
+            <Breadcrumb style={{ margin: '16px 0' }}>
+              <Breadcrumb.Item>Home</Breadcrumb.Item>
+              <Breadcrumb.Item>List</Breadcrumb.Item>
+              <Breadcrumb.Item>App</Breadcrumb.Item>
+            </Breadcrumb>
+            <div>
               <Switch>
                 <Route exact path="/app/po-products" render={props => (
                   <PoProductTable showHeader {...props} />
@@ -217,11 +205,7 @@ class Dashboard extends Component {
                 )} />
                 <Route exact path="/app" render={props => (
                   <div>
-                    <Breadcrumb style={{ margin: '16px 0' }}>
-                      <Breadcrumb.Item>User</Breadcrumb.Item>
-                      <Breadcrumb.Item>Bill</Breadcrumb.Item>
-                    </Breadcrumb>
-                    <Row gutter={16}>
+                    <Row>
                       <Col lg={24} xl={8}>
                         <div className="stkd-content stkd-widget" style={{ minHeight: 360 }}>
                           Bill is a cat.
@@ -238,7 +222,7 @@ class Dashboard extends Component {
                         </div>
                       </Col>
                     </Row>
-                    <Row gutter={16}>
+                    <Row>
                       <Col lg={24} xl={8}>
                         <div className="stkd-content stkd-widget" style={{ minHeight: 360 }}>
                           Bill is a cat.
@@ -255,7 +239,7 @@ class Dashboard extends Component {
                         </div>
                       </Col>
                     </Row>
-                    <Row gutter={16}>
+                    <Row>
                       <Col lg={24} xl={8}>
                         <div className="stkd-content stkd-widget" style={{ minHeight: 360 }}>
                           Bill is a cat.
@@ -277,20 +261,18 @@ class Dashboard extends Component {
                 <Route render={props => <NotFound currentUser={this.props.currentUser} {...props} />} />
               </Switch>
             </div>
-          </div>
-        </div>
-      </div>
-    );
+          </Layout>
+        </Layout>
+      </Layout>
+    )
   }
 }
-
-
 function mapStateToProps(state) {
-	return {
-		currentUser: state.currentUser,
+  return {
+    currentUser: state.currentUser,
     errors: state.errors,
     notifications: state.notifications,
-	};
+  };
 }
 
-export default withRouter(connect(mapStateToProps, {logout,})(Dashboard));
+export default withRouter(connect(mapStateToProps, { logout, })(DashboardNew));
