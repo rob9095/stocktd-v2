@@ -208,6 +208,10 @@ i.xl svg {
   font-size: 48px;
 }
 
+.link {
+  cursor: pointer;
+}
+
 .warning-bg {
   background: #faad14;
 }
@@ -555,6 +559,11 @@ input.ant-input.no-border {
 .not-found .action-group button {
   margin: 10px;
 }
+
+/* Dashboard Header */
+.dashboard-header .link:hover {
+  background: #0000002b;
+} 
 
 /* Navbar */
 /* .nav-popover {
