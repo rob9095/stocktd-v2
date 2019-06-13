@@ -2,7 +2,7 @@ import React, { Component } from 'react' ;
 import { Switch, Route, withRouter, Redirect, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { logout } from '../store/actions/auth';
-import { Avatar, Layout, Menu, Breadcrumb, Icon, Row, Col } from 'antd'
+import { Layout, Menu, Breadcrumb, Icon, Row, Col } from 'antd'
 import NotFound from '../components/NotFound';
 import ProductTable from '../components/ProductTable';
 import ProductTableNew from '../components/ProductTableNew';
@@ -13,6 +13,7 @@ import ReceiveInventory from '../components/ReceiveInventory';
 import ScanTable from '../components/ScanTable';
 import AccountPage from '../components/AccountPage';
 import StkdNotification from '../components/StkdNotification';
+import DashboardHeader from '../components/DashboardHeader';
 import Svg from '../svg/svgs';
 
 
@@ -121,15 +122,7 @@ class DashboardNew extends Component {
             <StkdNotification key={n.id + i} config={n} nType={n.nType} />
           ))
         )}
-        <div className="flex space-between align-items-center dashboard-header" style={{ color: "#fff", background: '#7933e1', height: 60, padding: '0px 15px' }}>
-          {/* <img style={{ height: 30 }} src={require("../images/logo-clear-white.png")}></img> */}
-          {/* <Icon component={stocktdLogoWhite} /> */}
-          <div style={{width: 140, height: 30, opacity: .3, background: '#fff'}}></div>
-          <div className="flex align-items-center link" style={{padding: 10, height: '100%', fontSize: 15}}>
-            <span>{this.props.currentUser.user.company}</span>
-            <Avatar icon={'user'} style={{marginLeft: 10, backgroundColor: 'rgba(255, 255, 255, 0.33)'}} />
-          </div>
-        </div>
+        <DashboardHeader {...this.props} />
         <Layout>
           <Sider
             width="200"
