@@ -134,16 +134,15 @@ class DashboardNew extends Component {
           >
             <div className="flex space-between flex-col" style={{height: 'calc(100% - 60px)'}}>
               <Menu onClick={this.handleMenuClick} theme="light" mode="inline" selectedKeys={this.state.activeMenuItems}>
-                <Menu.Item className="stkd-menu-item" key="appHome">
+                <Menu.Item key="appHome">
                   <Icon component={homeSvg} />
                   <span>Home</span>
                 </Menu.Item>
-                <Menu.Item className="stkd-menu-item" key="orders">
+                <Menu.Item key="orders">
                   <Icon component={basketSvg} />
                   <span>Orders</span>
                 </Menu.Item>
                 <SubMenu
-                  className="stkd-dark menu-item"
                   key="products"
                   title={<span><Icon component={tags} /><span>Inventory</span></span>}
                 >
@@ -153,7 +152,6 @@ class DashboardNew extends Component {
                   <Menu.Item key="receive-inventory">Receive Inventory</Menu.Item>
                 </SubMenu>
                 <SubMenu
-                  className="stkd-dark menu-item"
                   key="settings"
                   title={<span><Icon component={sliders} /><span>Settings</span></span>}
                 >

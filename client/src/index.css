@@ -129,7 +129,7 @@ code {
 }
 
 .border-bottom {
-  border-bottom: 1px solid rgb(232, 232, 232);
+  border-bottom: 1px solid rgb(222, 226, 242);
 }
 
 .contain {
@@ -266,6 +266,26 @@ a.no-color {
   color: rgba(0, 0, 0, 0.65);
 }
 
+.overflow-e {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; 
+}
+
+.ant-popover .ant-popover-content {
+  margin-top: -10px !important;
+}
+
+.ant-popover-content > .ant-popover-arrow {
+  display: none;
+}
+
+.ant-btn-primary:hover, .ant-btn-primary:focus {
+  background-color: #672bbf !important;
+  border-color: #672bbf !important;
+}
+
+
 /* Basic Menu */
 
 .ant-menu-inline, .ant-menu-vertical, .ant-menu-vertical-left {
@@ -282,6 +302,10 @@ ul.ant-menu.small-menu.ant-menu-light.ant-menu-root.ant-menu-vertical .ant-menu-
 
 ul.ant-menu.small-menu.ant-menu-light.ant-menu-root.ant-menu-vertical .ant-menu-item:hover {
   background: #f2f4f7;
+}
+
+ul.ant-menu.small-menu.ant-menu-light.ant-menu-root.ant-menu-vertical .ant-menu-item a:hover {
+  color: initial;
 }
 
 .basic-menu .ant-menu-item-group-title {
@@ -318,7 +342,7 @@ ul.ant-menu.small-menu.ant-menu-light.ant-menu-root.ant-menu-vertical .ant-menu-
 .stkd-widget {
   box-shadow:#f1f3f4 0px 2px 0px;
   border-radius: 3px;
-  border: 1px solid rgb(222, 226, 242);;
+  border: 1px solid rgb(222, 226, 242);
   margin: 16px;
 }
 
@@ -704,14 +728,14 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
 
 .basic-form .ant-form-item {
   margin-bottom: 0px !important;
-  padding: 15px 30px;
+  padding: 12px 24px;
   display: flex;
   flex-wrap: wrap;
 }
 
 @media screen and (max-width:400px) {
  .basic-form .ant-form-item {
-    padding: 7px 15px;
+    padding: 6px 12px;
   } 
 }
 
@@ -721,7 +745,7 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
 }
 
 .basic-form .ant-col.form-section:not(:last-child) {
-  border-bottom: 1px solid #c4c8d3;
+  border-bottom: 1px solid rgb(222, 226, 242);
 }
 
 /* Ant Spinner */
@@ -815,7 +839,7 @@ label.container input {
   left: 0;
   width: 18px;
   height: 18px;
-  border: 1px solid #d9d9d9;
+  border: 1px solid rgb(222, 226, 242);
   border-radius: 2px;
   background-color: #fff;
 }
