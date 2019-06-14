@@ -280,9 +280,9 @@ class BForm extends Component {
       } else {
         return (
           <Col xs={i.span * 3} md={i.span} key={id} className="form-section">
-            {this.state.loadingInputs.includes(id) || true && (
+            {this.state.loadingInputs.includes(id) && (
               <div className="input-loader">
-                <CircularProgress {...this.state[id] ? { ...this.state[id] } : {status: 'done'}} />
+                <CircularProgress {...this.state[id] ? { ...this.state[id] } : {}} />
               </div>
             )}
             <FormItem key={id} {...this.state.customFeedback[id] && { ...this.state.customFeedback[id] }} label={i.text || ''} colon={!i.text && false} labelCol={i.labelCol} wrapperCol={i.wrapperCol}>

@@ -617,16 +617,20 @@ class ProductTable extends Component {
     })
       return(
         <div>
-          <h1>{this.props.title || null}</h1>
-          {tableMenuOptions && (
-            <Form layout="inline">
-            <Dropdown overlay={tableMenuOptions}>
-              <Button style={{float: 'right', marginLeft: 10}} type="primary" icon="setting">
-                Options <Icon type="down" />
-              </Button>
-            </Dropdown>
-          </Form>
-          )}
+          <div className="flex align-items-center space-between border-bottom" style={{paddingBottom: 16}}>
+            <h1 className="no-margin">{this.props.title}</h1>
+            <div>
+              {tableMenuOptions && (
+                <Form layout="inline">
+                  <Dropdown overlay={tableMenuOptions} onVisibleChange={(tableOptionsMenuOpen) => this.setState({ tableOptionsMenuOpen })}>
+                    <Button style={{display: 'flex'}} type="primary">
+                      Options <Icon style={{display: 'flex', transition: 'transform .3s',...this.state.tableOptionsMenuOpen && {transform: 'rotate(180deg)'}}} type={"down"} />
+                    </Button>
+                  </Dropdown>
+                </Form>
+              )}
+            </div>
+          </div>
           <WrappedFilterForm
             inputs={[...this.props.headers.filter(h => h.noFilter !== true && h.noSort !== true), ...Array.isArray(this.props.additionalSearchInputs) && this.props.additionalSearchInputs]}
             onFilterSearch={this.handleFilterSearch}
@@ -714,7 +718,7 @@ class ProductTable extends Component {
             />
           )}
           <div className="ant-table stkd-content no-pad contain">
-            <div className="flex align-items-center space-between" style={{padding: '12px 0px'}}>
+            <div className="flex align-items-center space-between">
               <div className="flex">
                 <Skeleton paragraph={false} loading={this.state.loading} active>
                   {bulkMenu && (
