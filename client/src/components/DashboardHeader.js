@@ -17,12 +17,12 @@ class DashboardHeader extends Component {
         <div style={{ width: 140, height: 30, backgroundColor: 'rgba(255,255,255,.35)' }}></div>
         <Popover onVisibleChange={(profilePopover)=>this.setState({profilePopover})} className="Test" placement="bottomRight" content={
           <div style={{ minWidth: 150, maxWidth: 300, margin: '0px -12px' }}>
-            <div className="flex align-items-center half-pad">
+            <div className="flex align-items-center" style={{padding: '0px 12px 8px 12px'}}>
               <Avatar size={40} shape={"square"} style={{ backgroundColor: '#a6aed8', marginRight: 10 }}>
                 <Icon type="shop" style={{ fontSize: 25, marginTop: 7 }} />
               </Avatar>
               <div>
-                <div style={{ fontSize: 16, fontWeight: 700, maxWidth: 220 }} className="overflow-e">{this.props.currentUser.user.company}</div>
+                <div style={{ fontSize: 16, fontWeight: 600, maxWidth: 220 }} className="overflow-e">{this.props.currentUser.user.company}</div>
                 <div style={{ fontSize: 14, maxWidth: 220 }} className="overflow-e">{this.props.currentUser.user.email}</div>
               </div>
             </div>
@@ -43,10 +43,9 @@ class DashboardHeader extends Component {
         } trigger="click" visible={this.state.profilePopover}>
           <div onClick={({profilePopover = true}) => this.setState({ profilePopover })} className="flex align-items-center link half-pad" style={{
             height: '100%', fontSize: 16, ...this.state.profilePopover && {
-              background:
-                '#0000002b'
+              background: '#0000002b'
             }}}>
-            <span className="overflow-e" style={{ maxWidth: 140}}>{this.props.currentUser.user.company}</span>
+            <span className="overflow-e" style={{fontWeight: 600, maxWidth: 140}}>{this.props.currentUser.user.company}</span>
             <Avatar icon={'user'} style={{ marginLeft: 10, backgroundColor: 'rgba(255,255,255,.35)' }} />
           </div>
         </Popover>

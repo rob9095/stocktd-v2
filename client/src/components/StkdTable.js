@@ -150,12 +150,12 @@ class ProductTable extends Component {
       this.setState({ selected: [], selectAll: false, });
     };
 
-    handleRowEdit = async (e) => {
-      let drawerItem = this.state.data.find(p=>p._id === e.target.id)._id
+    handleRowEdit = async (id) => {
+      let drawerItem = this.state.data.find(p=>p._id === id)._id
       this.setState({
         drawerItem,
       })
-      console.log(e.target.id)
+      console.log(id)
     }
 
     showConfirm(title, action, items) {
@@ -177,11 +177,14 @@ class ProductTable extends Component {
       })
     }
 
-    handleActionMenuClick = async ({ item, key, keyPath }) => {
-      console.log(item.props.children.props.name)
-      switch(item.props.children.props.name) {
+    handleActionMenuClick = async ({ item, key, keyPath, id }) => {
+      console.log({item})
+      switch(item.props.children.key) {
+        case 'edit':
+          this.handleRowEdit(id)
+          break;
         case 'delete':
-          let items = await this.showConfirm(null,'Delete',[item.props.children.props.id])
+          let items = await this.showConfirm(null,'Delete',[id])
           if (items !== 'cancel') {
             this.handleRowDelete(items)
           }
@@ -528,7 +531,7 @@ class ProductTable extends Component {
         }
         if (col.id === 'actions' && Array.isArray(col.actionOptions)) {
           const menu = (
-            <Menu key={`${r._id}-action-menu`} onClick={this.handleActionMenuClick}>
+            <Menu key={`${r._id}-action-menu`} onClick={(data)=>this.handleActionMenuClick({...data, id: r._id})}>
               {col.actionOptions.map(o=>(
                 <Menu.Item key={`${r._id}-action-menu-option-${o.name}`}>
                   <a id={r._id} key={o.key} name={o.name}>{o.name}</a>
@@ -540,10 +543,10 @@ class ProductTable extends Component {
             <td key={`${r._id}-${col.id}`} className="stkd-td actions center-a no-wrap">
               <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
                 <span>
-                  <a id={r._id} onClick={this.handleRowEdit}>Edit</a>
-                  <Divider type="vertical" />
+                  {/* <a id={r._id} onClick={this.handleRowEdit}>Edit</a>
+                  <Divider type="vertical" /> */}
                   <Dropdown overlay={menu}>
-                    <a className="ant-dropdown-link"><Icon type="down" /></a>
+                    <Icon type="ellipsis" style={{ color: '#a6aece', fontSize: 25, cursor: 'pointer'}} />
                   </Dropdown>
                 </span>
               </Skeleton>

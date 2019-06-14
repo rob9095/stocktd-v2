@@ -13,6 +13,7 @@ module.exports = function override(config, env) {
       "@layout-sider - background - light": "#f6f9fc",
       "@layout-trigger - background - light": "#f6f9fc",
       "@text-color": "#483b7d",
+      "@heading-color": "#2d225f",
       "@skeleton-color": "#dee3f2",
       "@background-color-base": "#f6f9fc", // Default grey background color
       "background-color-light": "#f6f9fc", // background of header and selected item

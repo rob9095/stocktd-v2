@@ -316,7 +316,7 @@ class ProductTableNew extends Component {
               },
               handler: this.handleCascaderUpdate,
             },
-            { id: 'actions', text: 'Actions', width: 100, noSort: true, actionOptions: [{ name: 'Add to Order', key: 'add-to-order', },{ name: 'Copy', key: 'copy', },{ name: 'Delete', key: 'delete', }] },
+            { id: 'actions', width: 100, noSort: true, actionOptions: [{name: 'Edit', key: 'edit'},{ name: 'Add to Order', key: 'add-to-order', },{ name: 'Copy', key: 'copy', },{ name: 'Delete', key: 'delete', }] },
           ]}
         />
       </div>
