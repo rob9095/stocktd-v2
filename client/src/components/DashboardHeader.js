@@ -15,7 +15,7 @@ class DashboardHeader extends Component {
         {/* <img style={{ height: 30 }} src={require("../images/logo-clear-white.png")}></img> */}
         {/* <Icon component={stocktdLogoWhite} /> */}
         <div style={{ width: 140, height: 30, backgroundColor: 'rgba(255,255,255,.35)' }}></div>
-        <Popover className="Test" placement="bottomRight" content={
+        <Popover onVisibleChange={(profilePopover)=>this.setState({profilePopover})} className="Test" placement="bottomRight" content={
           <div style={{ minWidth: 150, maxWidth: 300, margin: '0px -12px' }}>
             <div className="flex align-items-center half-pad">
               <Avatar size={40} shape={"square"} style={{ backgroundColor: '#a6aed8', marginRight: 10 }}>
@@ -27,7 +27,7 @@ class DashboardHeader extends Component {
               </div>
             </div>
             <div>
-              <Menu selectedKeys={[]} className="small-menu">
+              <Menu onSelect={({profilePopover = false}) => this.setState({ profilePopover })} selectedKeys={[]} className="small-menu">
                 <Menu.Item>
                   <Link to="/app/account">Account</Link>
                 </Menu.Item>
@@ -40,8 +40,12 @@ class DashboardHeader extends Component {
               </Menu>
             </div>
           </div>
-        } trigger="click">
-          <div className="flex align-items-center link half-pad" style={{ height: '100%', fontSize: 16,}}>
+        } trigger="click" visible={this.state.profilePopover}>
+          <div onClick={({profilePopover = true}) => this.setState({ profilePopover })} className="flex align-items-center link half-pad" style={{
+            height: '100%', fontSize: 16, ...this.state.profilePopover && {
+              background:
+                '#0000002b'
+            }}}>
             <span className="overflow-e" style={{ maxWidth: 140}}>{this.props.currentUser.user.company}</span>
             <Avatar icon={'user'} style={{ marginLeft: 10, backgroundColor: 'rgba(255,255,255,.35)' }} />
           </div>
