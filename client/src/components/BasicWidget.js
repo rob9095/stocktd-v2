@@ -13,7 +13,7 @@ class BasicWidget extends Component {
     let contentRows = this.props.contentRows || 3
     let content = this.props.renderContent ? this.props.renderContent() : this.props.content || <Empty description={'Nothing to see here'} />
     return(
-      <div className="stkd-widget stkd-content" style={{padding: 0}}>
+      <div className="stkd-widget stkd-content" style={{padding: 0, ...this.props.style && this.props.style}}>
         <div className="half-pad widget-header border-bottom">
           <Skeleton loading={this.props.titleLoading} paragraph={false} active>
             {this.props.renderTitle ? this.props.renderTitle() : this.props.title || ''}

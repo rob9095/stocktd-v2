@@ -166,7 +166,7 @@ class DashboardNew extends Component {
               </Menu>
             </div>
           </Sider>
-          <Layout style={{ padding: '0 24px 24px', background: '#fefefe' }}>
+          <Layout className="full-pad" style={{ background: '#fefefe' }}>
             <Breadcrumb style={{ margin: '16px 0' }}>
               <Breadcrumb.Item>Home</Breadcrumb.Item>
               <Breadcrumb.Item>List</Breadcrumb.Item>

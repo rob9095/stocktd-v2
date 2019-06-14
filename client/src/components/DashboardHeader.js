@@ -14,7 +14,7 @@ class DashboardHeader extends Component {
       <div className="flex space-between align-items-center dashboard-header" style={{ color: "#fff", background: '#7933e1', height: 60, padding: '0px 15px' }}>
         {/* <img style={{ height: 30 }} src={require("../images/logo-clear-white.png")}></img> */}
         {/* <Icon component={stocktdLogoWhite} /> */}
-        <div style={{ width: 140, height: 30, opacity: .3, background: '#fff' }}></div>
+        <div style={{ width: 140, height: 30, backgroundColor: 'rgba(255,255,255,.35)' }}></div>
         <Popover className="Test" placement="bottomRight" content={
           <div style={{ minWidth: 150, maxWidth: 300, margin: '0px -12px' }}>
             <div className="flex align-items-center half-pad">
@@ -22,28 +22,28 @@ class DashboardHeader extends Component {
                 <Icon type="shop" style={{ fontSize: 25, marginTop: 7 }} />
               </Avatar>
               <div style={{ fontWeight: 700 }}>
-                <div style={{ fontSize: 15, maxWidth: 150 }} className="overflow-e">{this.props.currentUser.user.company}</div>
-                <div style={{ fontSize: 13, maxWidth: 150 }} className="overflow-e">{this.props.currentUser.user.email}</div>
+                <div style={{ fontSize: 16, maxWidth: 150 }} className="overflow-e">{this.props.currentUser.user.company}</div>
+                <div style={{ fontSize: 14, maxWidth: 150 }} className="overflow-e">{this.props.currentUser.user.email}</div>
               </div>
             </div>
             <div>
               <Menu selectedKeys={[]} className="small-menu">
                 <Menu.Item>
-                 <Link to="/app/account">Account</Link>
+                  <Link to="/app/account">Account</Link>
                 </Menu.Item>
                 <Menu.Item>
                   <Link to="/app/team">Team</Link>
                 </Menu.Item>
                 <Menu.Item>
-                  <a href="#" onClick={()=>this.props.logout()}>Logout</a>
+                  <a href="#" onClick={() => this.props.logout()}>Logout</a>
                 </Menu.Item>
               </Menu>
             </div>
           </div>
         } trigger="click">
-          <div className="flex align-items-center link half-pad" style={{ height: '100%', fontSize: 15,}}>
+          <div className="flex align-items-center link half-pad" style={{ height: '100%', fontSize: 16,}}>
             <span className="overflow-e" style={{ maxWidth: 140}}>{this.props.currentUser.user.company}</span>
-            <Avatar icon={'user'} style={{ marginLeft: 10, backgroundColor: '#a170ea' }} />
+            <Avatar icon={'user'} style={{ marginLeft: 10, backgroundColor: 'rgba(255,255,255,.35)' }} />
           </div>
         </Popover>
       </div>

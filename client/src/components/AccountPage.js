@@ -7,7 +7,7 @@ import { updateAccount, sendVerficationEmail } from '../store/actions/account';
 import { addNotification, removeNotification } from '../store/actions/notifications';
 import BasicForm from './BasicForm';
 import CircularProgress from './CircularProgress';
-import { Tag, Tabs} from 'antd';
+import { Tag, Tabs, Icon } from 'antd';
 const TabPane = Tabs.TabPane;
 
 class AccountPage extends Component {
@@ -17,8 +17,8 @@ class AccountPage extends Component {
     this.state = {
       loading: true,
       selected: {
-        selectedKeys: ['Account Details'],
-        key: 'Account Details'
+        selectedKeys: ['General'],
+        key: 'General'
       },
       account: {},
     }
@@ -134,28 +134,25 @@ class AccountPage extends Component {
     return (
       <div style={{ background: '#fff', flexDirection: 'column', height: '100%'}} className="flex">
         <div className="flex space-between" style={{height: '100%'}}>
-          <div style={{ minWidth: 220, padding: '24px 0px'}}>
+          <div style={{ minWidth: 220,}}>
             <BasicNavigation
               defaultSelectedKeys={this.state.selected.selectedKeys}
               onSelect={this.handleNavigationUpdate}
               data={[
-                {id: 'account-group', title: 'Account', type: 'itemGroup', children: [
-                  {title: 'Account Details'},
-                  {title: 'Security'},
-                  {title: 'Notifications'},
-                  {title: 'Email'},
-                  {title: 'Close Account'},
-                ]}
+                { title: 'General', icon: <Icon type="profile" /> },
+                { title: 'Security', icon: <Icon type="unlock" /> },
+                { title: 'Notifications', icon: <Icon type="notification" /> },
               ]}
             />
           </div>
-          <div className="flex full-pad" style={{ width: '100%', borderLeft: '1px solid #dad2e0', marginLeft: 1}}>
+          <div className="flex full-pad" style={{ width: '100%', paddingTop: 0}}>
             <div style={{width: '100%', maxWidth: 1200}}>
-              <h2>{this.state.selected.key}</h2>
+              <h2 style={{marginBottom: 0}}>{this.state.selected.key}</h2>
               <Tabs animated={false} renderTabBar={()=><div />} activeKey={this.state.selected.key} tabPosition={'top'}>
-                <TabPane tab="Account Details" key="Account Details">
+                <TabPane tab="General" key="General">
                   <BasicWidget
-                    title="Account Details"
+                    style={{margin: '12px 0px'}}
+                    title="General"
                     contentLoading={this.state.loading}
                     renderContent={() =>
                       <div>
@@ -171,6 +168,7 @@ class AccountPage extends Component {
                     }
                   />
                   <BasicWidget
+                    style={{ margin: '12px 0px' }}
                     title="Preferences"
                     contentLoading={this.state.loading}
                     renderContent={() =>
@@ -187,6 +185,7 @@ class AccountPage extends Component {
                 </TabPane>
                 <TabPane tab="Security" key="Security">
                   <BasicWidget
+                    style={{ margin: '12px 0px' }}
                     title="Password"
                     contentLoading={this.state.loading}
                     renderContent={() =>

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Menu, Icon, } from 'antd';
+import { Menu } from 'antd';
 
 class BasicNavigation extends Component {
   constructor(props) {
@@ -18,7 +18,7 @@ class BasicNavigation extends Component {
                 style={{paddingRight: 24}}
                 key={c.id || c.title || ci}
               >
-                {c.icon && (<Icon type={c.icon.type} style={c.icon.style} />)}
+                {c.icon && c.icon}
                 {c.title}
               </Menu.Item>
             ))}
@@ -30,7 +30,7 @@ class BasicNavigation extends Component {
             key={mi.id || mi.title || i}
             style={{ paddingRight: 24 }}
           >
-            {mi.icon && (<Icon type={mi.icon.type} style={mi.icon.style} />)}
+            {mi.icon && mi.icon}
             {mi.title}
           </Menu.Item>
         )
