@@ -152,15 +152,15 @@ class AccountPage extends Component {
                 <TabPane tab="General" key="General">
                   <BasicWidget
                     style={{margin: '12px 0px'}}
-                    title="General"
+                    title="Account Details"
                     contentLoading={this.state.loading}
                     renderContent={() =>
                       <div>
                         <BasicForm
                           onBlur={this.handleInputUpdate}
                           inputs={[
-                            { id: 'email', text: 'Email', span: 24, validType: 'email', labelCol: { span: 12 }, wrapperCol: { span: 12 }, required: true, initialValue: account.email, handler: this.props.updateAccount, ...!this.props.currentUser.user.emailVerified && { extra: (<div className="flex align-items-center flex-wrap" style={{ fontSize: 'small' }}><Tag style={{ opacity: 1 }} color="volcano">unverified</Tag><a onClick={this.handleEmailVerification}>Resend Email</a>{this.state.sendEmail && (<span><CircularProgress style={{ marginRight: 5 }} {...this.state.sendEmail} /></span>)}</div>) } },
-                            { id: 'firstName', confirm: true, text: 'First Name', span: 24, labelCol: { span: 12 }, wrapperCol: { span: 12 }, initialValue: account.firstName, handler: this.props.updateAccount },
+                            { id: 'email', confirm: true, text: 'Email', span: 24, validType: 'email', labelCol: { span: 12 }, wrapperCol: { span: 12 }, required: true, initialValue: account.email, handler: this.props.updateAccount, ...!this.props.currentUser.user.emailVerified && { extra: (<div className="flex align-items-center flex-wrap" style={{ fontSize: 'small' }}><Tag style={{ opacity: 1 }} color="volcano">unverified</Tag><a onClick={this.handleEmailVerification}>Resend Email</a>{this.state.sendEmail && (<span><CircularProgress style={{ marginRight: 5 }} {...this.state.sendEmail} /></span>)}</div>) } },
+                            { id: 'firstName', text: 'First Name', span: 24, labelCol: { span: 12 }, wrapperCol: { span: 12 }, initialValue: account.firstName, handler: this.props.updateAccount },
                             { id: 'lastName', text: 'Last Name', span: 24, labelCol: { span: 12 }, wrapperCol: { span: 12 }, initialValue: account.lastName, handler: this.props.updateAccount },
                           ]}
                         />
@@ -188,6 +188,7 @@ class AccountPage extends Component {
                     style={{ margin: '12px 0px' }}
                     title="Password"
                     contentLoading={this.state.loading}
+                    contentRows={4}
                     renderContent={() =>
                       <div>
                         <BasicForm

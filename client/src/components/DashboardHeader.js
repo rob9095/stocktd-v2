@@ -21,9 +21,9 @@ class DashboardHeader extends Component {
               <Avatar size={40} shape={"square"} style={{ backgroundColor: '#a6aed8', marginRight: 10 }}>
                 <Icon type="shop" style={{ fontSize: 25, marginTop: 7 }} />
               </Avatar>
-              <div style={{ fontWeight: 700 }}>
-                <div style={{ fontSize: 16, maxWidth: 150 }} className="overflow-e">{this.props.currentUser.user.company}</div>
-                <div style={{ fontSize: 14, maxWidth: 150 }} className="overflow-e">{this.props.currentUser.user.email}</div>
+              <div>
+                <div style={{ fontSize: 16, fontWeight: 700, maxWidth: 220 }} className="overflow-e">{this.props.currentUser.user.company}</div>
+                <div style={{ fontSize: 14, maxWidth: 220 }} className="overflow-e">{this.props.currentUser.user.email}</div>
               </div>
             </div>
             <div>

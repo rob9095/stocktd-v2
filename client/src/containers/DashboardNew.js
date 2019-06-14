@@ -167,11 +167,6 @@ class DashboardNew extends Component {
             </div>
           </Sider>
           <Layout className="full-pad" style={{ background: '#fefefe' }}>
-            <Breadcrumb style={{ margin: '16px 0' }}>
-              <Breadcrumb.Item>Home</Breadcrumb.Item>
-              <Breadcrumb.Item>List</Breadcrumb.Item>
-              <Breadcrumb.Item>App</Breadcrumb.Item>
-            </Breadcrumb>
             <div>
               <Switch>
                 <Route exact path="/app/po-products" render={props => (

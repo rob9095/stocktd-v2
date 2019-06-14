@@ -714,8 +714,8 @@ class ProductTable extends Component {
             />
           )}
           <div className="ant-table stkd-content no-pad contain">
-            <div className="table-options">
-              <div className="flex" style={{ minWidth: '20%', padding: '0px 20px' }}>
+            <div className="flex align-items-center space-between" style={{padding: '12px 0px'}}>
+              <div className="flex">
                 <Skeleton paragraph={false} loading={this.state.loading} active>
                   {bulkMenu && (
                     <Dropdown className="bulk-dropdown" overlay={bulkMenu} disabled={this.state.selected.length === 0}>
@@ -726,22 +726,24 @@ class ProductTable extends Component {
                   )}
                 </Skeleton>
               </div>
-              <div className="flex" style={{minWidth: '40%', padding: '0px 20px'}}>
+              <div className="flex">
                 <Skeleton paragraph={false} loading={this.state.loading} active>
                   <Pagination className="ant-table-pagination" {...this.state.pagination} />
                 </Skeleton>
               </div>
             </div>
-            <table>
-              <thead className="ant-table-thead">
-                <tr>
-                  {headers}
-                </tr>
-              </thead>
-              <tbody className="ant-table-tbody">
-                {rows}
-              </tbody>
-            </table>
+            <div className="stkd-widget" style={{margin: 0}}>
+              <table>
+                <thead className="ant-table-thead">
+                  <tr>
+                    {headers}
+                  </tr>
+                </thead>
+                <tbody className="ant-table-tbody">
+                  {rows}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )

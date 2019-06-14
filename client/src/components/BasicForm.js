@@ -140,7 +140,7 @@ class BForm extends Component {
         return (
           <Col xs={i.span * 3} md={i.span} key={id} className="form-section">
             {this.state.loadingInputs.includes(id) && (
-              <CircularProgress style={{ position: 'absolute', top: 25, right: 7 }} {...this.state[id] ? { ...this.state[id] } : {}} />
+              <CircularProgress className="input-loader" {...this.state[id] ? { ...this.state[id] } : {}} />
             )}
             <FormItem key={id} {...this.state.customFeedback[id] && { ...this.state.customFeedback[id] }} label={i.text || ''} colon={!i.text && false} labelCol={i.labelCol} wrapperCol={i.wrapperCol}>
               {getFieldDecorator(id, {
@@ -186,7 +186,7 @@ class BForm extends Component {
         return (
           <Col xs={i.span * 3} md={i.span} key={id} className="form-section">
             {this.state.loadingInputs.includes(id) && (
-              <CircularProgress style={{ position: 'absolute', top: 25, right: 7 }} {...this.state[id] ? { ...this.state[id] } : {}} />
+              <CircularProgress className="input-loader" {...this.state[id] ? { ...this.state[id] } : {}} />
             )}
             <FormItem key={id} {...this.state.customFeedback[id] && { ...this.state.customFeedback[id] }} label={i.text || ''} colon={!i.text && false} labelCol={i.labelCol} wrapperCol={i.wrapperCol}>
               {getFieldDecorator(id, {
@@ -226,7 +226,7 @@ class BForm extends Component {
         return (
           <Col xs={i.span * 3} md={i.span} key={id} className="form-section">
             {this.state.loadingInputs.includes(id) && (
-              <CircularProgress style={{ position: 'absolute', top: 25, right: 7 }} {...this.state[id] ? { ...this.state[id] } : {}} />
+              <CircularProgress className="input-loader" {...this.state[id] ? { ...this.state[id] } : {}} />
             )}
             <FormItem key={id} {...this.state.customFeedback[id] && { ...this.state.customFeedback[id] }} label={i.text || ''} colon={!i.text && false} labelCol={i.labelCol} wrapperCol={i.wrapperCol}>
               {getFieldDecorator(id, {
@@ -280,8 +280,10 @@ class BForm extends Component {
       } else {
         return (
           <Col xs={i.span * 3} md={i.span} key={id} className="form-section">
-            {this.state.loadingInputs.includes(id) && (
-              <CircularProgress style={{position: 'absolute', top: 25, right: 7}} {...this.state[id] ? { ...this.state[id] } : {}} />
+            {this.state.loadingInputs.includes(id) || true && (
+              <div className="input-loader">
+                <CircularProgress {...this.state[id] ? { ...this.state[id] } : {status: 'done'}} />
+              </div>
             )}
             <FormItem key={id} {...this.state.customFeedback[id] && { ...this.state.customFeedback[id] }} label={i.text || ''} colon={!i.text && false} labelCol={i.labelCol} wrapperCol={i.wrapperCol}>
               {getFieldDecorator(id, {

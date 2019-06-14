@@ -21,8 +21,8 @@ class BasicWidget extends Component {
         </div>
         <div className="widget-content">
           {this.props.contentLoading ? 
-          Array(contentRows).fill({}).map((s,i)=>(
-            <div key={i} className="flex align-items-center" style={{ padding: '30px 30px 15px', height: 70, width: '100%', }}>
+          Array(parseInt(contentRows)).fill({}).map((s,i)=>(
+            <div key={i} className="flex align-items-center" style={{ borderBottom: '1px solid #dee3f2', margin: 0, padding: '12px 24px', minHeight: 70, width: '100%', }}>
               <Skeleton paragraph={{ rows: 1, width: '100%' }} title={false} loading={true} active />
             </div>
           ))
