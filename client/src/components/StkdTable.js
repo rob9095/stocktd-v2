@@ -542,13 +542,13 @@ class ProductTable extends Component {
           return (
             <td key={`${r._id}-${col.id}`} className="stkd-td actions center-a no-wrap">
               <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
-                <span>
                   {/* <a id={r._id} onClick={this.handleRowEdit}>Edit</a>
                   <Divider type="vertical" /> */}
-                  <Dropdown overlay={menu}>
-                    <Icon type="ellipsis" style={{ color: '#a6aece', fontSize: 25, cursor: 'pointer'}} />
+                  <Dropdown overlay={menu} placement="bottomRight">
+                    <Button className="no-border no-bg">
+                      <Icon type="ellipsis" style={{ color: '#a6aece', fontSize: 25, cursor: 'pointer' }} />
+                    </Button>
                   </Dropdown>
-                </span>
               </Skeleton>
             </td>
           )
@@ -746,7 +746,7 @@ class ProductTable extends Component {
                     {headers}
                   </tr>
                 </thead>
-                <tbody className="ant-table-tbody">
+                <tbody className="ant-table-tbody" style={{height: 500, overflow: 'auto'}}>
                   {rows}
                 </tbody>
               </table>

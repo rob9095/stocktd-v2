@@ -8,6 +8,12 @@ body {
 
 button {
   font-family: 'Open Sans', sans-serif !important;
+  cursor: pointer;
+}
+
+.no-border {
+  border: 0px solid #fff;
+  box-shadow: none;
 }
 
 ul {
@@ -187,7 +193,7 @@ h1, h2 {
   font-weight: 700 !important;
 }
 
-button, a, p, h1, h2, h3, h4, h5 {
+a, p, h1, h2, h3, h4, h5 {
   font-family: 'Open Sans', sans-serif;
 }
 
@@ -206,6 +212,7 @@ i.lg {
 i.xl svg {
   font-size: 48px;
 }
+
 
 .link {
   cursor: pointer;
@@ -968,8 +975,14 @@ input:checked + .stkd-slider:before {
   background: #f3f0ff;
 }
 
-.ant-table-thead > tr > th, .ant-table-tbody > tr > td {
-  padding: 12px;
+.ant-table-thead > tr > th {
+  padding: 12px !important;
+  border-bottom: 1px solid #dee3f2 !important;   
+}
+
+.ant-table-tbody > tr > td {
+  padding: 12px !important;
+  border-bottom: 1px solid #dee3f2 !important; 
 }
 
 .ant-table table th {
