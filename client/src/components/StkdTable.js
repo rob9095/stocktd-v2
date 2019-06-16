@@ -11,6 +11,7 @@ import ImportModal from './ImportModal';
 import InsertDataModal from './InsertDataModal';
 import AutoCompleteInput from './AutoCompleteInput';
 import CascaderSelect from './CascaderSelect';
+import SingleInputFilter from './SingleInputFilter';
 
 const confirm = Modal.confirm;
 const FormItem = Form.Item;
@@ -720,9 +721,10 @@ class ProductTable extends Component {
               onSuccess={this.handleDataFetch}
             />
           )}
-          <div className="ant-table stkd-content no-pad contain">
-            <div className="flex align-items-center space-between">
-              <div className="flex">
+          <div className="ant-table">
+            <SingleInputFilter onSearch={this.handleFilterSearch} />
+            <div className="flex flex-wrap align-items-center space-between">
+              <div className="flex" style={{ margin: '14px 0px' }}>
                 <Skeleton paragraph={false} loading={this.state.loading} active>
                   {bulkMenu && (
                     <Dropdown className="bulk-dropdown" overlay={bulkMenu} disabled={this.state.selected.length === 0}>
@@ -733,20 +735,20 @@ class ProductTable extends Component {
                   )}
                 </Skeleton>
               </div>
-              <div className="flex">
+              <div className="flex" style={{ margin: '14px 0px' }}>
                 <Skeleton paragraph={false} loading={this.state.loading} active>
                   <Pagination className="ant-table-pagination" {...this.state.pagination} />
                 </Skeleton>
               </div>
             </div>
-            <div className="stkd-widget" style={{margin: 0}}>
+            <div className="stkd-widget no-margin contain">
               <table>
                 <thead className="ant-table-thead">
                   <tr>
                     {headers}
                   </tr>
                 </thead>
-                <tbody className="ant-table-tbody" style={{height: 500, overflow: 'auto'}}>
+                <tbody className="ant-table-tbody">
                   {rows}
                 </tbody>
               </table>
