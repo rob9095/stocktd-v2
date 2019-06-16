@@ -79,7 +79,7 @@ class BForm extends Component {
     //reset state after timeout to show success/exception
     setTimeout(()=>{
       //reset value if we errored out onBlur
-      this.state[id].status === 'error' && this.props.form.setFieldsValue({ [id]: input.initialValue })
+      this.state[id] && this.state[id].status === 'error' && this.props.form.setFieldsValue({ [id]: input.initialValue })
       this.setState({
         loadingInputs: this.state.loadingInputs.filter(fid => fid !== id),
         [id]: null,
