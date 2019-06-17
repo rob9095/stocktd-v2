@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Icon, Input, AutoComplete } from 'antd';
+import { Icon, Input, AutoComplete, Menu, Dropdown } from 'antd';
 
 const { Option, OptGroup } = AutoComplete;
 
@@ -47,41 +47,34 @@ function renderTitle(title) {
   );
 }
 
-const options = dataSource
-  .map(group => (
-    <OptGroup key={group.title} label={renderTitle(group.title)}>
-      {group.children.map(opt => (
-        <Option key={opt.title} value={opt.title}>
-          {opt.title}
-        </Option>
-      ))}
-    </OptGroup>
-  ))
-
 class SingleInputFilter extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      searchValue: '',
     }
   }
 
   updateSearchValue = (config) => {
     let { value, clear } = config
-    let searchValue = this.state.searchValue +`${this.state.searchValue ? ' ': ''}${value}:`
+    let current = this.state.searchValue || ''
+    let searchValue = current +`${current ? ' ': ''}${value}:`
+    console.log({searchValue})
     this.setState({searchValue})
   }
 
-  handleSelect = (value,option) => {
+  handleSelect = ({ item, key, keyPath, domEvent}) => {
     console.log({
-      value,
-      option,
+      item,
+      key,
     })
-    this.updateSearchValue({value})
+    this.updateSearchValue({value: key})
   }
 
-  handleChange = (searchValue) => {
-    console.log({searchValue})
+  handleChange = (searchValue,e) => {
+    console.log({
+      searchValue,
+      e
+    })
     this.setState({searchValue})
   }
 
@@ -107,26 +100,37 @@ class SingleInputFilter extends Component {
   }
 
   render() {
+    let options = () => (
+      <Menu onClick={this.handleSelect}>
+        {dataSource
+          .map(group => (
+            <Menu.ItemGroup key={group.title} title={renderTitle(group.title)}>
+              {group.children.map(opt => (
+                <Menu.Item style={{ marginLeft: -40, listStyle: 'none' }} key={opt.title} value={opt.title}>
+                  {opt.title}
+                </Menu.Item>
+              ))}
+            </Menu.ItemGroup>
+          ))}
+      </Menu>
+    )
     return (
-      <div onKeyDown={this.handleKeyPress} className="certain-category-search-wrapper" style={{ width: 250 }}>
-        <AutoComplete
+      <div onKeyDown={this.handleKeyPress} style={{ width: 250 }}>
+        <Dropdown overlay={options} visible={this.state.visible} onVisibleChange={(visible)=>this.setState({visible})}>
+          <Input onFocus={()=>this.setState({visible: true})} value={this.state.searchValue} onChange={(e) => this.handleChange(e.target.value, e)} suffix={<Icon onClick={() => this.handleKeyPress({ key: 'Enter' })} type="search" className="certain-category-icon" />} />
+        </Dropdown>
+        {/* <AutoComplete
           //filterOption={this.handleFilter}
           defaultActiveFirstOption={false}
-          className="certain-category-search"
           dropdownClassName="certain-category-search-dropdown"
-          dropdownMatchSelectWidth={false}
-          dropdownStyle={{ width: 300 }}
           size="large"
-          style={{ width: '100%' }}
+          style={{ width: '100%',}}
           dataSource={options}
-          placeholder="input here"
           optionLabelProp="value"
           onSelect={this.handleSelect}
-          onSearch={this.handleChange}
-          value={this.state.searchValue}
         >
-          <Input suffix={<Icon onClick={()=>this.handleKeyPress({key: 'Enter'})} type="search" className="certain-category-icon" />} />
-        </AutoComplete>
+          <Input style={{display: 'none'}} />
+        </AutoComplete> */}
       </div>
     )
   }

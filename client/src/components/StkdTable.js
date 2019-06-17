@@ -4,7 +4,7 @@ import { fetchAllProducts, updateProducts, importProducts } from '../store/actio
 import { queryModelData, deleteModelDocuments } from '../store/actions/models';
 import { upsertModelDocuments } from '../store/actions/models';
 import { addBoxScan } from '../store/actions/boxScans';
-import { Button, Pagination, Divider, Icon, Spin, Form, Dropdown, Menu, Modal, message, Empty, Skeleton, Input } from 'antd';
+import { Button, Pagination, Icon, Spin, Form, Dropdown, Menu, Modal, message, Empty, Skeleton, Input } from 'antd';
 import WrappedFilterForm from './FilterForm';
 import EditItemDrawer from './EditItemDrawer';
 import ImportModal from './ImportModal';
