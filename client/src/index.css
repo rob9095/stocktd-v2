@@ -594,6 +594,14 @@ input.ant-input.no-border {
   margin-right: 0px;
 }
 
+.ant-input-suffix .ant-input-clear-icon {
+  color: #a6aed8;
+}
+
+.ant-input-suffix .ant-input-clear-icon:hover {
+  color: #8c96c7;
+}
+
 /* Not Found (404) page */
 .not-found h1 {
   font-size: 3em;

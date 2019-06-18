@@ -40,6 +40,7 @@ class SingleInputFilter extends Component {
       key,
     })
     this.updateSearchValue({value: key})
+    this.inputRef.focus()
   }
 
   handleChange = (searchValue,e) => {
@@ -60,8 +61,9 @@ class SingleInputFilter extends Component {
       })
       //loop the provided iputs(form fields) and remove any inputs with nestedKeys(populated fields), and create a populateArray query
       let populateArray = [];
-      if (this.props.options.filter(input => input.nestedKey).length > 0) {
-        for (let input of this.props.options) {
+      let popFields = this.props.options.filter(input => input.nestedKey)
+      if (popFields.length > 0) {
+        for (let input of popFields) {
           let match = query.find(val => val[0] === input.id)
           if (match) {
             query = query.filter(val => val[0] !== match[0])
@@ -132,7 +134,7 @@ class SingleInputFilter extends Component {
     return (
       <div onKeyDown={this.handleKeyPress} style={{ width: 250 }}>
         <Dropdown overlay={options} visible={this.state.visible} onVisibleChange={(visible)=>this.setState({visible})}>
-          <Input placeholder="Search" allowClear onFocus={()=>this.setState({visible: true})} value={this.state.searchValue} onChange={(e) => this.handleChange(e.target.value, e)} prefix={<Icon onClick={() => this.handleKeyPress({ key: 'Enter' })} type="search" className="certain-category-icon" />} />
+          <Input ref={node => (this.inputRef = node)} placeholder="Search" allowClear onFocus={()=>this.setState({visible: true})} value={this.state.searchValue} onChange={(e) => this.handleChange(e.target.value, e)} prefix={<Icon onClick={() => this.handleKeyPress({ key: 'Enter' })} type="search" className="certain-category-icon" />} />
         </Dropdown>
         {/* <AutoComplete
           //filterOption={this.handleFilter}
