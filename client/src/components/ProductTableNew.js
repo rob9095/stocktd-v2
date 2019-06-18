@@ -202,7 +202,7 @@ class ProductTableNew extends Component {
 
   render() {
     return(
-      <div>
+      <div style={{height: '100%'}}>
         <StkdTable
           queryModel="Product"
           editTitle="Product"

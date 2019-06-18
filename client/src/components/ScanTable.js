@@ -65,7 +65,7 @@ class ScanTable extends Component {
 
   render() {
     return(
-      <div>
+      <div style={{height: '100%'}}>
         <div className="flex align-items-center space-between">
           <h1 style={{display: 'inline', margin: 0}}>Scans</h1>
           <div>

@@ -620,7 +620,7 @@ class ProductTable extends Component {
       )
     })
       return(
-        <div>
+        <div className="flex flex-col" style={{height: '100%'}}>
           <div className="flex align-items-center space-between border-bottom" style={{paddingBottom: 16}}>
             <h1 className="no-margin">{this.props.title}</h1>
             <div>
@@ -721,8 +721,10 @@ class ProductTable extends Component {
               onSuccess={this.handleDataFetch}
             />
           )}
-          <div className="ant-table">
-            <SingleInputFilter onSearch={this.handleFilterSearch} options={[...this.props.headers.filter(h => h.noFilter !== true && h.noSort !== true), ...Array.isArray(this.props.additionalSearchInputs) && this.props.additionalSearchInputs]} />
+          <div className="ant-table flex flex-col">
+            <div className="flex justify-flex-end">
+              <SingleInputFilter onSearch={this.handleFilterSearch} options={[...this.props.headers.filter(h => h.noFilter !== true && h.noSort !== true), ...Array.isArray(this.props.additionalSearchInputs) && this.props.additionalSearchInputs]} />
+            </div>
             <div className="flex flex-wrap align-items-center space-between">
               <div className="flex" style={{ margin: '14px 0px' }}>
                 <Skeleton paragraph={false} loading={this.state.loading} active>
@@ -741,8 +743,8 @@ class ProductTable extends Component {
                 </Skeleton>
               </div>
             </div>
-            <div className="stkd-widget no-margin contain">
-              <table>
+            <div className="stkd-widget no-margin contain" style={{height: '100%'}}>
+              <table className="fixed">
                 <thead className="ant-table-thead">
                   <tr>
                     {headers}

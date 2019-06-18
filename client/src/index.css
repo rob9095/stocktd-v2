@@ -367,9 +367,23 @@ ul.ant-menu.ant-menu-light.ant-menu-root.ant-menu-vertical .ant-menu-item a:hove
   margin: 0 !important;
 }
 
-/* App dashboard structure */
+/* Default Widget Scrollbar */
+.stkd-widget::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    background-color: #F5F5F5;
+}
+.stkd-widget::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+}
+.stkd-widget::-webkit-scrollbar-track {
+    background-color: transparent;
+}
 
-.app-container {
+/* App dashboard structure - depreciated */
+
+/* .app-container {
   padding: 100px 15px;
 }
 
@@ -414,7 +428,7 @@ ul.ant-menu.ant-menu-light.ant-menu-root.ant-menu-vertical .ant-menu-item a:hove
 .app-dashboard .app-body {
   flex-grow: 1;
   overflow-y: auto;
-}
+} */
 
 /* body #root .ant-layout.ant-layout-has-sider {
   height: 100%;
@@ -1020,6 +1034,20 @@ i.sort-icon {
   display: flex;
   justify-content: flex-start;
   align-items: center;
+}
+
+/* Fixed Tables with Scrolling Header */
+
+table.fixed  {
+  border-collapse: collapse !important;
+  width: 100% !important;
+}
+table.fixed thead th {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 2;
+  background: #f6f9fc !important;
+  box-shadow: 1px 1px 0 #dee3f2;
 }
 
 /* table pagination select */
