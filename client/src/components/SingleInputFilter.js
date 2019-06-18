@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Icon, Input, AutoComplete, Menu, Dropdown } from 'antd';
+import { Icon, Input, AutoComplete, Menu, Dropdown, Tooltip } from 'antd';
 
 const { Option, OptGroup } = AutoComplete;
 
@@ -134,7 +134,7 @@ class SingleInputFilter extends Component {
     return (
       <div onKeyDown={this.handleKeyPress} style={{ width: 250 }}>
         <Dropdown overlay={options} visible={this.state.visible} onVisibleChange={(visible)=>this.setState({visible})}>
-          <Input ref={node => (this.inputRef = node)} placeholder="Search" allowClear onFocus={()=>this.setState({visible: true})} value={this.state.searchValue} onChange={(e) => this.handleChange(e.target.value, e)} prefix={<Icon onClick={() => this.handleKeyPress({ key: 'Enter' })} type="search" className="certain-category-icon" />} />
+          <Input ref={node => (this.inputRef = node)} placeholder="Search" onFocus={() => this.setState({ visible: true })} value={this.state.searchValue} onChange={(e) => this.handleChange(e.target.value, e)} suffix={<Tooltip placement="left" title={<span style={{fontSize: 12}}>Toggle search builder</span>}><Icon type="setting" /></Tooltip>} />
         </Dropdown>
         {/* <AutoComplete
           //filterOption={this.handleFilter}

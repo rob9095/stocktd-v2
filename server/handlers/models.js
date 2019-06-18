@@ -43,7 +43,7 @@ const buildQuery = (queryArr) => {
 			} else {
 				query = {
 					...query,
-					[val[0]]: { $regex: new RegExp(val[1], "i") },
+					[val[0]]: !isNaN(val[1]) ? val[1] : { $regex: new RegExp(val[1], "i") },
 				}
 			}
 		}
