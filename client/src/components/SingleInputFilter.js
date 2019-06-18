@@ -3,34 +3,6 @@ import { Icon, Input, AutoComplete, Menu, Dropdown } from 'antd';
 
 const { Option, OptGroup } = AutoComplete;
 
-const dataSource = [
-  {
-    title: 'Common Search Terms',
-    children: [
-      {
-        title: 'sku',
-      },
-      {
-        title: 'title',
-      },
-      {
-        title: 'quantity',
-      },
-    ],
-  },
-  {
-    title: 'Recent Searches',
-    children: [
-      {
-        title: 'sku: rh0135-a-1/2',
-      },
-      {
-        title: 'quantity gt: 1',
-      },
-    ],
-  },
-];
-
 function renderTitle(title) {
   return (
     <span>
@@ -86,8 +58,24 @@ class SingleInputFilter extends Component {
       let query = this.state.searchValue.split(" ").map(q=>{
         return q.split(":")
       })
-      console.log({query})
-      this.props.onSearch(query,[])
+      //loop the provided iputs(form fields) and remove any inputs with nestedKeys(populated fields), and create a populateArray query
+      let populateArray = [];
+      if (this.props.options.filter(input => input.nestedKey).length > 0) {
+        for (let input of this.props.options) {
+          let match = query.find(val => val[0] === input.id)
+          if (match) {
+            query = query.filter(val => val[0] !== match[0])
+            match[0] = input.nestedKey
+            let defaultQuery = input.defaultQuery || []
+            input.populatePath ?
+              populateArray.push({ path: input.populatePath, populate: [{ path: input.id, query: [match] }, ...input.defaultPopulateArray], query: defaultQuery })
+              :
+              populateArray.push({ path: input.id, query: [match, ...defaultQuery] })
+          }
+        }
+      }
+      console.log({query,populateArray})
+      this.props.onSearch(query,populateArray)
     }
   }
 
@@ -100,14 +88,41 @@ class SingleInputFilter extends Component {
   }
 
   render() {
+    const dataSource = [
+      {
+        title: 'Common Search Terms',
+        children: [
+          {
+            title: 'sku',
+          },
+          {
+            title: 'title',
+          },
+          {
+            title: 'quantity',
+          },
+        ],
+      },
+      // {
+      //   title: 'Recent Searches',
+      //   children: [
+      //     {
+      //       title: 'sku: rh0135-a-1/2',
+      //     },
+      //     {
+      //       title: 'quantity gt: 1',
+      //     },
+      //   ],
+      // },
+    ]
     let options = () => (
       <Menu onClick={this.handleSelect}>
         {dataSource
           .map(group => (
             <Menu.ItemGroup key={group.title} title={renderTitle(group.title)}>
-              {group.children.map(opt => (
-                <Menu.Item style={{ marginLeft: -40, listStyle: 'none' }} key={opt.title} value={opt.title}>
-                  {opt.title}
+              {this.props.options.map(opt => (
+                <Menu.Item style={{ marginLeft: -40, listStyle: 'none' }} key={opt.id} value={opt.id}>
+                  {opt.text}
                 </Menu.Item>
               ))}
             </Menu.ItemGroup>
@@ -117,7 +132,7 @@ class SingleInputFilter extends Component {
     return (
       <div onKeyDown={this.handleKeyPress} style={{ width: 250 }}>
         <Dropdown overlay={options} visible={this.state.visible} onVisibleChange={(visible)=>this.setState({visible})}>
-          <Input onFocus={()=>this.setState({visible: true})} value={this.state.searchValue} onChange={(e) => this.handleChange(e.target.value, e)} suffix={<Icon onClick={() => this.handleKeyPress({ key: 'Enter' })} type="search" className="certain-category-icon" />} />
+          <Input placeholder="Search" allowClear onFocus={()=>this.setState({visible: true})} value={this.state.searchValue} onChange={(e) => this.handleChange(e.target.value, e)} prefix={<Icon onClick={() => this.handleKeyPress({ key: 'Enter' })} type="search" className="certain-category-icon" />} />
         </Dropdown>
         {/* <AutoComplete
           //filterOption={this.handleFilter}

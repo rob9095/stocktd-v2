@@ -722,7 +722,7 @@ class ProductTable extends Component {
             />
           )}
           <div className="ant-table">
-            <SingleInputFilter onSearch={this.handleFilterSearch} />
+            <SingleInputFilter onSearch={this.handleFilterSearch} options={[...this.props.headers.filter(h => h.noFilter !== true && h.noSort !== true), ...Array.isArray(this.props.additionalSearchInputs) && this.props.additionalSearchInputs]} />
             <div className="flex flex-wrap align-items-center space-between">
               <div className="flex" style={{ margin: '14px 0px' }}>
                 <Skeleton paragraph={false} loading={this.state.loading} active>
