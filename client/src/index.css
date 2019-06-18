@@ -1037,17 +1037,50 @@ i.sort-icon {
 }
 
 /* Fixed Tables with Scrolling Header */
-
-table.fixed  {
-  border-collapse: collapse !important;
-  width: 100% !important;
-}
 table.fixed thead th {
-  position: sticky !important;
-  top: 0 !important;
+  position: sticky;
+  top: 0;
   z-index: 2;
   background: #f6f9fc !important;
   box-shadow: 1px 1px 0 #dee3f2;
+}
+
+.table-footer {
+  height: 55px;
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  background: #fff;
+  padding: 12px;
+  box-shadow: -1px -1px 0 #dee3f2;
+}
+
+.table-footer .size-changer .ant-select-selection.ant-select-selection--single {
+  border: 1px solid transparent;
+  margin-top: 1px;
+}
+
+.table-footer .size-changer .ant-select-selection-selected-value i {
+  display: none;
+}
+
+.table-footer .size-changer .ant-select-selection__rendered {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+}
+
+.table-footer .size-changer .ant-skeleton {
+  min-width: 25px;
+}
+
+.table-footer .ant-skeleton-title {
+  margin: 0px !important;
+}
+
+.table-footer .pagination-simple .ant-skeleton {
+  min-width: 200px;
+  margin-left: 5px;
 }
 
 /* table pagination select */

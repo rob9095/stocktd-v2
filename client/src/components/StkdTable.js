@@ -4,7 +4,7 @@ import { fetchAllProducts, updateProducts, importProducts } from '../store/actio
 import { queryModelData, deleteModelDocuments } from '../store/actions/models';
 import { upsertModelDocuments } from '../store/actions/models';
 import { addBoxScan } from '../store/actions/boxScans';
-import { Button, Pagination, Icon, Spin, Form, Dropdown, Menu, Modal, message, Empty, Skeleton, Input } from 'antd';
+import { Button, Pagination, Select, Icon, Spin, Form, Dropdown, Menu, Modal, message, Empty, Skeleton, Input } from 'antd';
 import WrappedFilterForm from './FilterForm';
 import EditItemDrawer from './EditItemDrawer';
 import ImportModal from './ImportModal';
@@ -40,16 +40,14 @@ class ProductTable extends Component {
       populateArray: [],
       hiddenCols: ['supplier'],
       pagination: {
-        position: 'bottom',
         current: 1,
         total: 0,
         defaultPageSize: 10,
         pageSize: 10,
         hideOnSinglePage: true,
         showSizeChanger: true,
-        showQuickJumper: true,
-        pageSizeOptions: ['10','50','100','250','500'],
-        size: 'small',
+        showQuickJumper: false,
+        pageSizeOptions: [10,50,100,250,500],
         onChange: (requestedPage, requestedRowsPerPage) => {
           this.handleDataFetch({requestedPage, requestedRowsPerPage})
         },
@@ -722,9 +720,6 @@ class ProductTable extends Component {
             />
           )}
           <div className="ant-table flex flex-col">
-            <div className="flex justify-flex-end">
-              <SingleInputFilter onSearch={this.handleFilterSearch} options={[...this.props.headers.filter(h => h.noFilter !== true && h.noSort !== true), ...Array.isArray(this.props.additionalSearchInputs) && this.props.additionalSearchInputs]} />
-            </div>
             <div className="flex flex-wrap align-items-center space-between">
               <div className="flex" style={{ margin: '14px 0px' }}>
                 <Skeleton paragraph={false} loading={this.state.loading} active>
@@ -739,7 +734,7 @@ class ProductTable extends Component {
               </div>
               <div className="flex" style={{ margin: '14px 0px' }}>
                 <Skeleton paragraph={false} loading={this.state.loading} active>
-                  <Pagination className="ant-table-pagination" {...this.state.pagination} />
+                  <SingleInputFilter onSearch={this.handleFilterSearch} options={[...this.props.headers.filter(h => h.noFilter !== true && h.noSort !== true), ...Array.isArray(this.props.additionalSearchInputs) && this.props.additionalSearchInputs]} />
                 </Skeleton>
               </div>
             </div>
@@ -754,6 +749,35 @@ class ProductTable extends Component {
                   {rows}
                 </tbody>
               </table>
+              <div className="table-footer flex justify-flex-end">
+                <div className="flex align-items-center">
+                    <span style={{marginRight: 5, whiteSpace: 'nowrap'}}>Items per page:</span>
+                      <Select
+                        dropdownMatchSelectWidth={false}
+                        dropdownRender={(menu)=>(<div style={{minWidth: 100}}>{menu}</div>)}
+                        className="size-changer"
+                        value={this.state.pagination.pageSize}
+                        defaultValue={this.state.pagination.defaultPageSize}
+                        onSelect={(selected) => this.state.pagination.onShowSizeChange(this.state.pagination.current, selected)}
+                      >
+                        {this.state.pagination.pageSizeOptions.map(op => (
+                          <Select.Option key={op} value={op} className="flex-i align-items-center justify-content-center">
+                            <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.length > 0} active>
+                            {this.state.pagination.pageSize === op &&
+                              <Icon style={{marginRight: 5, marginLeft: -20}} type="check" />
+                            }
+                            <span>{op}</span>
+                            </Skeleton>
+                          </Select.Option>
+                        ))}
+                      </Select>
+                      <div className="pagination-simple">
+                        <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.length > 0} active>
+                          <Pagination simple className="flex align-items-center" {...this.state.pagination} />
+                        </Skeleton>
+                      </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
