@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Icon, Input, AutoComplete, Menu, Dropdown, Tooltip } from 'antd';
+import { Icon, Input, AutoComplete, Menu, Dropdown, Tooltip, Select } from 'antd';
 
 const { Option, OptGroup } = AutoComplete;
 
@@ -128,16 +128,34 @@ class SingleInputFilter extends Component {
                 </Menu.Item>
               ))}
             </Menu.ItemGroup>
-          ))}
+          ))
+          .concat(
+            <div className="dropdown-extra">
+              <a href="#" onClick={()=>this.setState({visible: false}) || this.props.onSearchBuilderToggle()}>Advanced Search</a>
+            </div>
+          )
+          }
       </Menu>
-    )
+       )
+    let selectOptions = this.props.options.map(op => (
+      <Select.Option key={op.id} value={op.id} className="flex-i align-items-center justify-content-center">
+        {'sku' === op.id &&
+          <Icon style={{ marginRight: 5, marginLeft: -20 }} type="check" />
+        }
+        <span>{op.text}</span>
+      </Select.Option>
+    ))
     return (
       <div onKeyDown={this.handleKeyPress} style={{ width: 250 }}>
         <Dropdown overlay={options} visible={this.state.visible} onVisibleChange={(visible)=>this.setState({visible})}>
-          <Input ref={node => (this.inputRef = node)} placeholder="Search" onFocus={() => this.setState({ visible: true })} value={this.state.searchValue} onChange={(e) => this.handleChange(e.target.value, e)} suffix={<Tooltip placement="left" title={<span style={{fontSize: 12}}>Toggle search builder</span>}><Icon type="setting" /></Tooltip>} />
+          <Input ref={node => (this.inputRef = node)} placeholder="Search" onFocus={() => this.setState({ visible: true })} value={this.state.searchValue} onChange={(e) => this.handleChange(e.target.value, e)} addonBefore={(
+            <Select style={{width: 80}}>
+              {selectOptions}
+            </Select>
+          )} suffix={<Icon type="search" />} />
         </Dropdown>
         {/* <AutoComplete
-          //filterOption={this.handleFilter}
+          //filterOption={this.handleFilter}    
           defaultActiveFirstOption={false}
           dropdownClassName="certain-category-search-dropdown"
           size="large"

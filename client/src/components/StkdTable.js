@@ -4,7 +4,7 @@ import { fetchAllProducts, updateProducts, importProducts } from '../store/actio
 import { queryModelData, deleteModelDocuments } from '../store/actions/models';
 import { upsertModelDocuments } from '../store/actions/models';
 import { addBoxScan } from '../store/actions/boxScans';
-import { Button, Pagination, Select, Icon, Spin, Form, Dropdown, Menu, Modal, message, Empty, Skeleton, Input } from 'antd';
+import { Button, Pagination, Select, Icon, Spin, Form, Dropdown, Menu, Modal, message, Empty, Skeleton, Input, Layout } from 'antd';
 import WrappedFilterForm from './FilterForm';
 import EditItemDrawer from './EditItemDrawer';
 import ImportModal from './ImportModal';
@@ -39,6 +39,7 @@ class ProductTable extends Component {
       showImportModal: false,
       populateArray: [],
       hiddenCols: ['supplier'],
+      siderClosed: true,
       pagination: {
         current: 1,
         total: 0,
@@ -618,6 +619,7 @@ class ProductTable extends Component {
       )
     })
       return(
+        <Layout style={{height: '100%', background: 'transparent'}}>
         <div className="flex flex-col" style={{height: '100%'}}>
           <div className="flex align-items-center space-between border-bottom" style={{paddingBottom: 16}}>
             <h1 className="no-margin">{this.props.title}</h1>
@@ -734,11 +736,11 @@ class ProductTable extends Component {
               </div>
               <div className="flex" style={{ margin: '14px 0px' }}>
                 <Skeleton paragraph={false} loading={this.state.loading} active>
-                  <SingleInputFilter onSearch={this.handleFilterSearch} options={[...this.props.headers.filter(h => h.noFilter !== true && h.noSort !== true), ...Array.isArray(this.props.additionalSearchInputs) && this.props.additionalSearchInputs]} />
+                  <SingleInputFilter onSearchBuilderToggle={()=>this.setState({siderClosed: !this.state.siderClosed})} onSearch={this.handleFilterSearch} options={[...this.props.headers.filter(h => h.noFilter !== true && h.noSort !== true), ...Array.isArray(this.props.additionalSearchInputs) && this.props.additionalSearchInputs]} />
                 </Skeleton>
               </div>
             </div>
-            <div className="stkd-widget no-margin contain" style={{height: '100%'}}>
+            <div className="stkd-widget no-margin contain" style={{ height: '100%' }}>
               <table className="fixed">
                 <thead className="ant-table-thead">
                   <tr>
@@ -751,36 +753,38 @@ class ProductTable extends Component {
               </table>
               <div className="table-footer flex justify-flex-end">
                 <div className="flex align-items-center">
-                    <span style={{marginRight: 5, whiteSpace: 'nowrap'}}>Items per page:</span>
-                      <Select
-                        dropdownMatchSelectWidth={false}
-                        dropdownRender={(menu)=>(<div style={{minWidth: 100}}>{menu}</div>)}
-                        className="size-changer"
-                        value={this.state.pagination.pageSize}
-                        defaultValue={this.state.pagination.defaultPageSize}
-                        onSelect={(selected) => this.state.pagination.onShowSizeChange(this.state.pagination.current, selected)}
-                      >
-                        {this.state.pagination.pageSizeOptions.map(op => (
-                          <Select.Option key={op} value={op} className="flex-i align-items-center justify-content-center">
-                            <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.length > 0} active>
-                            {this.state.pagination.pageSize === op &&
-                              <Icon style={{marginRight: 5, marginLeft: -20}} type="check" />
-                            }
-                            <span>{op}</span>
-                            </Skeleton>
-                          </Select.Option>
-                        ))}
-                      </Select>
-                      <div className="pagination-simple">
+                  <span style={{ marginRight: 5, whiteSpace: 'nowrap' }}>Items per page:</span>
+                  <Select
+                    dropdownMatchSelectWidth={false}
+                    dropdownRender={(menu) => (<div style={{ minWidth: 100 }}>{menu}</div>)}
+                    className="size-changer"
+                    value={this.state.pagination.pageSize}
+                    defaultValue={this.state.pagination.defaultPageSize}
+                    onSelect={(selected) => this.state.pagination.onShowSizeChange(this.state.pagination.current, selected)}
+                  >
+                    {this.state.pagination.pageSizeOptions.map(op => (
+                      <Select.Option key={op} value={op} className="flex-i align-items-center justify-content-center">
                         <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.length > 0} active>
-                          <Pagination simple className="flex align-items-center" {...this.state.pagination} />
+                          {this.state.pagination.pageSize === op &&
+                            <Icon style={{ marginRight: 5, marginLeft: -20 }} type="check" />
+                          }
+                          <span>{op}</span>
                         </Skeleton>
-                      </div>
+                      </Select.Option>
+                    ))}
+                  </Select>
+                  <div className="pagination-simple">
+                    <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.length > 0} active>
+                      <Pagination simple className="flex align-items-center" {...this.state.pagination} />
+                    </Skeleton>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+          <Layout.Sider trigger={null} style={{ background: '#fefefe' }} collapsedWidth={0} collapsible collapsed={this.state.siderClosed} onCollapse={(siderClosed) => this.setState({siderClosed})}>Sider</Layout.Sider>
+        </Layout>
       )
     }
   }

@@ -528,11 +528,22 @@ ul.ant-menu.ant-menu-light.ant-menu-root.ant-menu-vertical .ant-menu-item a:hove
   padding-left: 10px;
 }
 
+/* Single Input Search filter */
+.dropdown-extra {
+  background: #f6f9fc;
+  border-top: 1px solid #dee3f2;
+  padding: 12px;
+  margin-bottom: -4px;
+  border-radius: 0px 0px 4px 4px;
+  font-size: small;
+}
+
+
 /* Search Dropdown */
 .drop-search {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .drop-search i svg {
