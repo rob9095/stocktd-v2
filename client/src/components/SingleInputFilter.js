@@ -5,7 +5,7 @@ const { Option, OptGroup } = AutoComplete;
 
 function renderTitle(title) {
   return (
-    <span>
+    <span style={{color: '#8c96c7'}}>
       {title}
       <a
         style={{ float: 'right' }}
@@ -29,6 +29,8 @@ class SingleInputFilter extends Component {
   updateSearchValue = (config) => {
     let { value, clear } = config
     let current = this.state.searchValue || ''
+    this.setState({searchTag: value})
+    return
     let searchValue = current +`${current ? ' ': ''}${value}:`
     console.log({searchValue})
     this.setState({searchValue})
@@ -39,7 +41,7 @@ class SingleInputFilter extends Component {
       item,
       key,
     })
-    this.updateSearchValue({value: key})
+    this.updateSearchValue({value: item.props.text})
     this.inputRef.focus()
   }
 
@@ -92,7 +94,7 @@ class SingleInputFilter extends Component {
   render() {
     const dataSource = [
       {
-        title: 'Common Search Terms',
+        title: 'Search By',
         children: [
           {
             title: 'sku',
@@ -123,7 +125,7 @@ class SingleInputFilter extends Component {
           .map(group => (
             <Menu.ItemGroup key={group.title} title={renderTitle(group.title)}>
               {this.props.options.map(opt => (
-                <Menu.Item style={{ marginLeft: -40, listStyle: 'none' }} key={opt.id} value={opt.id}>
+                <Menu.Item style={{ marginLeft: -40, listStyle: 'none' }} text={opt.text} key={opt.id} value={opt.id}>
                   {opt.text}
                 </Menu.Item>
               ))}
@@ -146,13 +148,9 @@ class SingleInputFilter extends Component {
       </Select.Option>
     ))
     return (
-      <div onKeyDown={this.handleKeyPress} style={{ width: 250 }}>
+      <div onKeyDown={this.handleKeyPress} style={{ minWidth: 250 }} className="single-input-search">
         <Dropdown overlay={options} visible={this.state.visible} onVisibleChange={(visible)=>this.setState({visible})}>
-          <Input ref={node => (this.inputRef = node)} placeholder="Search" onFocus={() => this.setState({ visible: true })} value={this.state.searchValue} onChange={(e) => this.handleChange(e.target.value, e)} addonBefore={(
-            <Select style={{width: 80}}>
-              {selectOptions}
-            </Select>
-          )} suffix={<Icon type="search" />} />
+          <Input ref={node => (this.inputRef = node)} placeholder="Search" onFocus={() => this.setState({ visible: true })} value={this.state.searchValue} onChange={(e) => this.handleChange(e.target.value, e)} addonBefore={this.state.searchTag ? <div><span className="search-tag">{this.state.searchTag}</span></div> : null} suffix={<Icon type="search" />} />
         </Dropdown>
         {/* <AutoComplete
           //filterOption={this.handleFilter}    

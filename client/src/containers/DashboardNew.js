@@ -166,7 +166,7 @@ class DashboardNew extends Component {
               </Menu>
             </div>
           </Sider>
-          <Layout className="full-pad" style={{ background: '#fefefe', height: '100%' }}>
+          <Layout className="full-pad" style={{overflow: 'auto', background: '#fefefe', height: '100%' }}>
             <div style={{height: '100%'}}>
               <Switch>
                 <Route exact path="/app/po-products" render={props => (

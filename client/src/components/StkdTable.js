@@ -727,7 +727,7 @@ class ProductTable extends Component {
                 <Skeleton paragraph={false} loading={this.state.loading} active>
                   {bulkMenu && (
                     <Dropdown className="bulk-dropdown" overlay={bulkMenu} disabled={this.state.selected.length === 0}>
-                      <Button size="small">
+                      <Button>
                         {`Action on ${this.state.selected.length} selected`} <Icon type="down" />
                       </Button>
                     </Dropdown>
@@ -783,7 +783,9 @@ class ProductTable extends Component {
             </div>
           </div>
         </div>
-          <Layout.Sider trigger={null} style={{ background: '#fefefe' }} collapsedWidth={0} collapsible collapsed={this.state.siderClosed} onCollapse={(siderClosed) => this.setState({siderClosed})}>Sider</Layout.Sider>
+          <Layout.Sider trigger={null} style={{ background: '#fefefe' }} collapsedWidth={0} collapsible collapsed={this.state.siderClosed} onCollapse={(siderClosed) => this.setState({siderClosed})}>
+            Sider
+          </Layout.Sider>
         </Layout>
       )
     }
