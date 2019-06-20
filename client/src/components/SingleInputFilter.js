@@ -3,28 +3,38 @@ import { Icon, Input, AutoComplete, Menu, Dropdown, Tooltip, Select } from 'antd
 
 const { Option, OptGroup } = AutoComplete;
 
-function renderTitle(title) {
-  return (
-    <span style={{color: '#8c96c7'}}>
-      {title}
-      <a
-        style={{ float: 'right' }}
-        href="https://www.google.com/search?q=antd"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        more
-      </a>
-    </span>
-  );
-}
-
 class SingleInputFilter extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      searchValue: ''
+      searchValue: '',
+      optionCount: 6,
     }
+  }
+
+  renderTitle = (title) => {
+    return (
+      <span style={{color: '#8c96c7', fontSize: 12}}>
+        {title}
+        {this.state.optionCount < this.props.options.length ? 
+          <a
+            style={{ float: 'right' }}
+            href="#"
+            onClick={() => this.setState({ optionCount: this.state.optionCount + 5 })}
+          >
+            more
+          </a>
+        :
+          <a
+            style={{ float: 'right' }}
+            href="#"
+            onClick={() => this.setState({ optionCount: this.state.optionCount - 5 })}
+          >
+            less
+          </a>
+        }
+      </span>
+    );
   }
 
   updateSearchValue = (config) => {
@@ -131,11 +141,11 @@ class SingleInputFilter extends Component {
       <Menu onClick={this.handleSelect}>
         {dataSource
           .map(group => (
-            <Menu.ItemGroup key={group.title} title={renderTitle(group.title)}>
-              {this.props.options.map((opt,i) => (
+            <Menu.ItemGroup key={group.title} title={this.renderTitle(group.title)}>
+              {this.props.options.filter((opt,i)=> i+1 <= this.state.optionCount).map((opt,i) => (
                 <Menu.Item style={{ marginLeft: -40, listStyle: 'none' }} text={opt.text} key={opt.id + i} id={opt.id} value={opt.id}>
                   {opt.text}
-                </Menu.Item>
+                </Menu.Item>                
               ))}
             </Menu.ItemGroup>
           ))

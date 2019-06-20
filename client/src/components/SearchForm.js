@@ -45,38 +45,40 @@ class BasicSearchForm extends Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
-    console.log(this.state)
-    this.props.form.validateFields((err, values) => {
-      console.log('Received values of form: ', values);
-      // fitler out any empty entries
-      let query = Object.entries(values).filter(val => val[1] !== '' && val[1] !== undefined && val[1].length > 0).map(val => {
-        //check if we have a select for the query value, if we do add it to the third element in the query array
-        if (this.props.inputs.find(i => i.type === 'number' && i.id === val[0])) {
-          return [...val, this.state.selects[val[0] + "Select"] || "="]
-        } else if (Array.isArray(val[1])) {
-          return [[val[0]], this.state.dates]
-        } else {
-          return [...val]
-        }
-      })
-      //loop the provided iputs(form fields) and remove any inputs with nestedKeys(populated fields), and create a populateArray query
-      let populateArray = [];
-      if (this.props.inputs.filter(input => input.nestedKey).length > 0) {
-        for (let input of this.props.inputs) {
-          let match = query.find(val => val[0] === input.id + input.nestedKey)
-          if (match) {
-            query = query.filter(val => val[0] !== match[0])
-            match[0] = input.nestedKey
-            let defaultQuery = input.defaultQuery || []
-            input.populatePath ?
-              populateArray.push({ path: input.populatePath, populate: [{ path: input.id, query: [match] }, ...input.defaultPopulateArray], query: defaultQuery })
-              :
-              populateArray.push({ path: input.id, query: [match, ...defaultQuery] })
+    //set super small timeout to wait for onClear to finish
+    setTimeout(() => {
+      this.props.form.validateFields((err, values) => {
+        console.log('Received values of form: ', values);
+        // fitler out any empty entries
+        let query = Object.entries(values).filter(val => val[1] !== '' && val[1] !== undefined && val[1].length > 0).map(val => {
+          //check if we have a select for the query value, if we do add it to the third element in the query array
+          if (this.props.inputs.find(i => i.type === 'number' && i.id === val[0])) {
+            return [...val, this.state.selects[val[0] + "Select"] || "="]
+          } else if (Array.isArray(val[1])) {
+            return [[val[0]], this.state.dates]
+          } else {
+            return [...val]
+          }
+        })
+        //loop the provided iputs(form fields) and remove any inputs with nestedKeys(populated fields), and create a populateArray query
+        let populateArray = [];
+        if (this.props.inputs.filter(input => input.nestedKey).length > 0) {
+          for (let input of this.props.inputs) {
+            let match = query.find(val => val[0] === input.id + input.nestedKey)
+            if (match) {
+              query = query.filter(val => val[0] !== match[0])
+              match[0] = input.nestedKey
+              let defaultQuery = input.defaultQuery || []
+              input.populatePath ?
+                populateArray.push({ path: input.populatePath, populate: [{ path: input.id, query: [match] }, ...input.defaultPopulateArray], query: defaultQuery })
+                :
+                populateArray.push({ path: input.id, query: [match, ...defaultQuery] })
+            }
           }
         }
-      }
-      this.props.onSearch(query, populateArray)
-    });
+        this.props.onSearch(query, populateArray)
+      });
+    }, 50);
   }
 
   render() {
@@ -103,6 +105,7 @@ class BasicSearchForm extends Component {
                 }],
               })(
                 <Input
+                  allowClear={i.allowClear || true}
                   type="number"
                   addonBefore={selectBefore}
                   placeholder={i.text}
@@ -151,6 +154,7 @@ class BasicSearchForm extends Component {
                 }],
               })(
                 <Input
+                  allowClear={i.allowClear || true}
                   size="small"
                   placeholder={i.text}
                 />

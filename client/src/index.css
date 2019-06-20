@@ -173,12 +173,12 @@ a:focus {
 
 .ant-form-item {
   font-family: 'Open Sans', sans-serif !important;
-  margin-bottom: 1em !important;
+  margin-bottom: .5em !important;
 }
 
 .ant-input {
   font-family: 'Open Sans', sans-serif !important;
-  min-height: 40px !important;
+  min-height: 35px !important;
 }
 
 .ant-input::placeholder {

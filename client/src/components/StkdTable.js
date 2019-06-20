@@ -732,7 +732,16 @@ class ProductTable extends Component {
                 </div>
               )}
               <div style={{ margin: '14px 0px' }}>
-                <SingleInputFilter onSearchBuilderToggle={()=>this.setState({siderClosed: !this.state.siderClosed, siderConfig: {title: 'Advanced Search'}})} onSearch={this.handleFilterSearch} options={[...this.props.headers.filter(h => h.noFilter !== true && h.noSort !== true), ...Array.isArray(this.props.additionalSearchInputs) && this.props.additionalSearchInputs]} />
+                <SingleInputFilter
+                  onSearchBuilderToggle={()=>this.setState({siderClosed: false, siderConfig: {title: 'Advanced Search'}})}
+                  onSearch={this.handleFilterSearch}
+                  searchBuilderClosed={this.state.siderClosed}
+                  query={this.state.query}
+                  options={[
+                    ...this.props.headers.filter(h => h.noFilter !== true && h.noSort !== true),
+                    ...Array.isArray(this.props.additionalSearchInputs) && this.props.additionalSearchInputs,
+                  ]}
+                />
               </div>
             </div>
             <div className="stkd-widget no-margin contain" style={{ height: '100%' }}>
