@@ -4,8 +4,9 @@ import { fetchAllProducts, updateProducts, importProducts } from '../store/actio
 import { queryModelData, deleteModelDocuments } from '../store/actions/models';
 import { upsertModelDocuments } from '../store/actions/models';
 import { addBoxScan } from '../store/actions/boxScans';
-import { Button, Pagination, Select, Icon, Spin, Form, Dropdown, Menu, Modal, message, Empty, Skeleton, Input, Layout } from 'antd';
+import { Button, Pagination, Select, Icon, Spin, Form, Dropdown, Menu, Modal, message, Empty, Skeleton, Input, Layout, PageHeader } from 'antd';
 import WrappedFilterForm from './FilterForm';
+import SearchForm from './SearchForm';
 import EditItemDrawer from './EditItemDrawer';
 import ImportModal from './ImportModal';
 import InsertDataModal from './InsertDataModal';
@@ -619,8 +620,8 @@ class ProductTable extends Component {
       )
     })
       return(
-        <Layout style={{height: '100%', background: 'transparent'}}>
-        <div className="flex flex-col" style={{height: '100%'}}>
+        <Layout style={{height: '100%', background: 'transparent',}}>
+        <div className="flex flex-col full-pad" style={{height: '100%', overflow: 'auto'}}>
           <div className="flex align-items-center space-between border-bottom" style={{paddingBottom: 16}}>
             <h1 className="no-margin">{this.props.title}</h1>
             <div>
@@ -731,7 +732,7 @@ class ProductTable extends Component {
                 </div>
               )}
               <div style={{ margin: '14px 0px' }}>
-                <SingleInputFilter onSearchBuilderToggle={()=>this.setState({siderClosed: !this.state.siderClosed})} onSearch={this.handleFilterSearch} options={[...this.props.headers.filter(h => h.noFilter !== true && h.noSort !== true), ...Array.isArray(this.props.additionalSearchInputs) && this.props.additionalSearchInputs]} />
+                <SingleInputFilter onSearchBuilderToggle={()=>this.setState({siderClosed: !this.state.siderClosed, siderConfig: {title: 'Advanced Search'}})} onSearch={this.handleFilterSearch} options={[...this.props.headers.filter(h => h.noFilter !== true && h.noSort !== true), ...Array.isArray(this.props.additionalSearchInputs) && this.props.additionalSearchInputs]} />
               </div>
             </div>
             <div className="stkd-widget no-margin contain" style={{ height: '100%' }}>
@@ -749,8 +750,7 @@ class ProductTable extends Component {
                 <div className="flex align-items-center">
                   <span style={{ marginRight: 5, whiteSpace: 'nowrap' }}>Items per page:</span>
                   <Select
-                    dropdownMatchSelectWidth={false}
-                    dropdownRender={(menu) => (<div style={{ minWidth: 100 }}>{menu}</div>)}
+                    style={{minWidth: 75}}
                     className="size-changer"
                     value={this.state.pagination.pageSize}
                     defaultValue={this.state.pagination.defaultPageSize}
@@ -760,7 +760,7 @@ class ProductTable extends Component {
                       <Select.Option key={op} value={op} className="flex-i align-items-center justify-content-center">
                         <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.length > 0} active>
                           {this.state.pagination.pageSize === op &&
-                            <Icon style={{ marginRight: 5, marginLeft: -20 }} type="check" />
+                            <Icon style={{ marginRight: 2, marginLeft: -10 }} type="check" />
                           }
                           <span>{op}</span>
                         </Skeleton>
@@ -777,8 +777,14 @@ class ProductTable extends Component {
             </div>
           </div>
         </div>
-          <Layout.Sider trigger={null} style={{ background: '#fefefe' }} collapsedWidth={0} collapsible collapsed={this.state.siderClosed} onCollapse={(siderClosed) => this.setState({siderClosed})}>
-            Sider
+          <Layout.Sider className="stkd-sidebar right" width={300} trigger={null} collapsedWidth={0} collapsible collapsed={this.state.siderClosed} onCollapse={(siderClosed) => this.setState({siderClosed})} style={{height: '100%', overflow: 'auto'}}>
+            <div className="half-pad">
+                <PageHeader onBack={(siderClosed = true) => this.setState({ siderClosed })} {...this.state.siderConfig} />
+                <SearchForm
+                  inputs={[...this.props.headers.filter(h => h.noFilter !== true && h.noSort !== true), ...Array.isArray(this.props.additionalSearchInputs) && this.props.additionalSearchInputs].map(i => ({ ...i, span: 24 }))}
+                  onSearch={this.handleFilterSearch}
+                />
+            </div>
           </Layout.Sider>
         </Layout>
       )

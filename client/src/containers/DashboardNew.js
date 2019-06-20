@@ -132,7 +132,7 @@ class DashboardNew extends Component {
             collapsible
             collapsed={this.state.collapsed}
           >
-            <div className="flex space-between flex-col" style={{height: 'calc(100% - 60px)'}}>
+            <div className="flex space-between flex-col" style={{height: '99%'}}>
               <Menu onClick={this.handleMenuClick} theme="light" mode="inline" selectedKeys={this.state.activeMenuItems}>
                 <Menu.Item key="appHome">
                   <Icon component={homeSvg} />
@@ -166,7 +166,7 @@ class DashboardNew extends Component {
               </Menu>
             </div>
           </Sider>
-          <Layout className="full-pad" style={{overflow: 'auto', background: '#fefefe', height: '100%' }}>
+          <Layout style={{overflow: 'auto', background: '#fefefe', height: '100%' }}>
             <div style={{height: '100%'}}>
               <Switch>
                 <Route exact path="/app/po-products" render={props => (

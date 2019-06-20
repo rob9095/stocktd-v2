@@ -15,6 +15,7 @@ module.exports = function override(config, env) {
       "@text-color": "#483b7d",
       "@heading-color": "#2d225f",
       "@skeleton-color": "#dee3f2",
+      "@input-placeholder-color": "#afb4d6",
       "@background-color-base": "#f6f9fc", // Default grey background color
       "background-color-light": "#f6f9fc", // background of header and selected item
       "@border-color-base": "#dee3f2", // base border outline a component

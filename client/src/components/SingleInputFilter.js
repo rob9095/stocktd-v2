@@ -23,14 +23,13 @@ class SingleInputFilter extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      searchValue: ''
     }
   }
 
   updateSearchValue = (config) => {
     let { value, clear } = config
     let current = this.state.searchValue || ''
-    this.setState({searchTag: value})
-    return
     let searchValue = current +`${current ? ' ': ''}${value}:`
     console.log({searchValue})
     this.setState({searchValue})
@@ -41,16 +40,45 @@ class SingleInputFilter extends Component {
       item,
       key,
     })
-    this.updateSearchValue({value: item.props.text})
-    this.inputRef.focus()
+    this.setState({searchTag: item.props})
+    setTimeout(() => {
+      this.inputRef.focus()
+    }, 50);
   }
 
   handleChange = (searchValue,e) => {
-    console.log({
-      searchValue,
-      e
-    })
     this.setState({searchValue})
+  }
+
+  buildQuery = (config) => {
+    let query = []
+    if (this.state.searchTag) {
+      //single search mode with tag
+      query = [[this.state.searchTag.id,this.state.searchValue]]
+    } else {
+      //multiple search mode, script over input and create query
+      query = this.state.searchValue.split(" ").map(q => {
+        return q.split(":")
+      })
+    }
+    //loop the provided iputs(form fields) and remove any inputs with nestedKeys(populated fields), and create a populateArray query
+    let populateArray = [];
+    let popFields = this.props.options.filter(input => input.nestedKey)
+    if (popFields.length > 0) {
+      for (let input of popFields) {
+        let match = query.find(val => val[0] === input.id)
+        if (match) {
+          query = query.filter(val => val[0] !== match[0])
+          match[0] = input.nestedKey
+          let defaultQuery = input.defaultQuery || []
+          input.populatePath ?
+            populateArray.push({ path: input.populatePath, populate: [{ path: input.id, query: [match] }, ...input.defaultPopulateArray], query: defaultQuery })
+            :
+            populateArray.push({ path: input.id, query: [match, ...defaultQuery] })
+        }
+      }
+    }
+    return ({query, populateArray})
   }
 
   handleKeyPress = (e) => {
@@ -58,27 +86,7 @@ class SingleInputFilter extends Component {
       console.log({
         searchValue: this.state.searchValue
       })
-      let query = this.state.searchValue.split(" ").map(q=>{
-        return q.split(":")
-      })
-      //loop the provided iputs(form fields) and remove any inputs with nestedKeys(populated fields), and create a populateArray query
-      let populateArray = [];
-      let popFields = this.props.options.filter(input => input.nestedKey)
-      if (popFields.length > 0) {
-        for (let input of popFields) {
-          let match = query.find(val => val[0] === input.id)
-          if (match) {
-            query = query.filter(val => val[0] !== match[0])
-            match[0] = input.nestedKey
-            let defaultQuery = input.defaultQuery || []
-            input.populatePath ?
-              populateArray.push({ path: input.populatePath, populate: [{ path: input.id, query: [match] }, ...input.defaultPopulateArray], query: defaultQuery })
-              :
-              populateArray.push({ path: input.id, query: [match, ...defaultQuery] })
-          }
-        }
-      }
-      console.log({query,populateArray})
+      const {query, populateArray} = this.buildQuery()
       this.props.onSearch(query,populateArray)
     }
   }
@@ -124,46 +132,38 @@ class SingleInputFilter extends Component {
         {dataSource
           .map(group => (
             <Menu.ItemGroup key={group.title} title={renderTitle(group.title)}>
-              {this.props.options.map(opt => (
-                <Menu.Item style={{ marginLeft: -40, listStyle: 'none' }} text={opt.text} key={opt.id} value={opt.id}>
+              {this.props.options.map((opt,i) => (
+                <Menu.Item style={{ marginLeft: -40, listStyle: 'none' }} text={opt.text} key={opt.id + i} id={opt.id} value={opt.id}>
                   {opt.text}
                 </Menu.Item>
               ))}
             </Menu.ItemGroup>
           ))
           .concat(
-            <div className="dropdown-extra">
+            <div className="dropdown-extra" key={'dropdown-extra'}>
               <a href="#" onClick={()=>this.setState({visible: false}) || this.props.onSearchBuilderToggle()}>Advanced Search</a>
             </div>
           )
           }
       </Menu>
-       )
-    let selectOptions = this.props.options.map(op => (
-      <Select.Option key={op.id} value={op.id} className="flex-i align-items-center justify-content-center">
-        {'sku' === op.id &&
-          <Icon style={{ marginRight: 5, marginLeft: -20 }} type="check" />
-        }
-        <span>{op.text}</span>
-      </Select.Option>
-    ))
+    )
     return (
       <div onKeyDown={this.handleKeyPress} style={{ minWidth: 250 }} className="single-input-search">
         <Dropdown overlay={options} visible={this.state.visible} onVisibleChange={(visible)=>this.setState({visible})}>
-          <Input ref={node => (this.inputRef = node)} placeholder="Search" onFocus={() => this.setState({ visible: true })} value={this.state.searchValue} onChange={(e) => this.handleChange(e.target.value, e)} addonBefore={this.state.searchTag ? <div><span className="search-tag">{this.state.searchTag}</span></div> : null} suffix={<Icon type="search" />} />
+          <Input
+            ref={node => this.inputRef = node}
+            placeholder="Search"
+            onFocus={() => this.setState({ visible: true })}
+            value={this.state.searchValue}
+            onChange={(e) => this.handleChange(e.target.value, e)}
+            addonBefore={this.state.searchTag ? <div><span className="search-tag">{this.state.searchTag.text}</span></div> : null}
+            suffix={this.state.searchValue || this.state.searchTag ?
+              <Icon onClick={()=>this.state.searchValue ? this.setState({searchValue: ''}) : this.setState({searchTag: null})} type="close-circle" theme="filled" />
+              :
+              <Icon type="search" />
+            }
+          />
         </Dropdown>
-        {/* <AutoComplete
-          //filterOption={this.handleFilter}    
-          defaultActiveFirstOption={false}
-          dropdownClassName="certain-category-search-dropdown"
-          size="large"
-          style={{ width: '100%',}}
-          dataSource={options}
-          optionLabelProp="value"
-          onSelect={this.handleSelect}
-        >
-          <Input style={{display: 'none'}} />
-        </AutoComplete> */}
       </div>
     )
   }
