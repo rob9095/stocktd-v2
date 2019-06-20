@@ -157,14 +157,18 @@ class SingleInputFilter extends Component {
           }
       </Menu>
     )
+    let currentQuery = this.props.query || []
+    let queryString = currentQuery.map(q=>(
+      q[2] ? ` ${q[0]} ${q[2]}:${q[1]} ` : `${q[0]}:${q[1]}` 
+    )).join(' ')
     return (
       <div onKeyDown={this.handleKeyPress} style={{ minWidth: 250 }} className="single-input-search">
-        <Dropdown overlay={options} visible={this.state.visible} onVisibleChange={(visible)=>this.setState({visible})}>
+        <Dropdown disabled={!this.props.searchBuilderClosed} overlay={options} visible={this.state.visible} onVisibleChange={(visible)=>this.setState({visible})}>
           <Input
             ref={node => this.inputRef = node}
             placeholder="Search"
             onFocus={() => this.setState({ visible: true })}
-            value={this.state.searchValue}
+            value={this.props.searchBuilderClosed ? this.state.searchValue : queryString}
             onChange={(e) => this.handleChange(e.target.value, e)}
             addonBefore={this.state.searchTag ? <div><span className="search-tag">{this.state.searchTag.text}</span></div> : null}
             suffix={this.state.searchValue || this.state.searchTag ?

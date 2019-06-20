@@ -78,7 +78,7 @@ class BasicSearchForm extends Component {
         }
         this.props.onSearch(query, populateArray)
       });
-    }, 50);
+    }, 200);
   }
 
   render() {
@@ -106,6 +106,7 @@ class BasicSearchForm extends Component {
               })(
                 <Input
                   allowClear={i.allowClear || true}
+                  onBlur={this.handleSubmit}
                   type="number"
                   addonBefore={selectBefore}
                   placeholder={i.text}
@@ -157,6 +158,7 @@ class BasicSearchForm extends Component {
                   allowClear={i.allowClear || true}
                   size="small"
                   placeholder={i.text}
+                  onBlur={this.handleSubmit}
                 />
               )}
             </FormItem>
@@ -169,7 +171,6 @@ class BasicSearchForm extends Component {
         <Form
           className="ant-advanced-search-form"
           onSubmit={this.handleSubmit}
-          onBlur={this.handleSubmit}
         >
           <Row gutter={24} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>{inputs}</Row>
         </Form>
