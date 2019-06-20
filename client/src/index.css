@@ -1068,8 +1068,8 @@ table.fixed thead th {
   height: 55px;
   position: sticky;
   bottom: 0;
-  right: 2px;
-  left: 2px;
+  right: 1px;
+  left: 1px;
   z-index: 2;
   background: #fff;
   padding: 12px;

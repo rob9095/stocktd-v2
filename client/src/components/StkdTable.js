@@ -625,13 +625,11 @@ class ProductTable extends Component {
             <h1 className="no-margin">{this.props.title}</h1>
             <div>
               {tableMenuOptions && (
-                <Form layout="inline">
-                  <Dropdown overlay={tableMenuOptions} onVisibleChange={(tableOptionsMenuOpen) => this.setState({ tableOptionsMenuOpen })}>
-                    <Button style={{display: 'flex'}} type="primary">
-                      Options <Icon style={{display: 'flex', transition: 'transform .3s',...this.state.tableOptionsMenuOpen && {transform: 'rotate(180deg)'}}} type={"down"} />
-                    </Button>
-                  </Dropdown>
-                </Form>
+                <Dropdown overlay={tableMenuOptions} onVisibleChange={(tableOptionsMenuOpen) => this.setState({ tableOptionsMenuOpen })}>
+                  <Button style={{ display: 'flex' }} type="primary">
+                    Options <Icon style={{ display: 'flex', transition: 'transform .3s', ...this.state.tableOptionsMenuOpen && { transform: 'rotate(180deg)' } }} type={"down"} />
+                  </Button>
+                </Dropdown>
               )}
             </div>
           </div>
@@ -723,21 +721,17 @@ class ProductTable extends Component {
           )}
           <div className="ant-table flex flex-col">
             <div className="flex flex-wrap align-items-center space-between">
-              <div className="flex" style={{ margin: '14px 0px' }}>
-                <Skeleton paragraph={false} loading={this.state.loading} active>
-                  {bulkMenu && (
-                    <Dropdown className="bulk-dropdown" overlay={bulkMenu} disabled={this.state.selected.length === 0}>
-                      <Button>
-                        {`Action on ${this.state.selected.length} selected`} <Icon type="down" />
-                      </Button>
-                    </Dropdown>
-                  )}
-                </Skeleton>
-              </div>
-              <div className="flex" style={{ margin: '14px 0px' }}>
-                <Skeleton paragraph={false} loading={this.state.loading} active>
-                  <SingleInputFilter onSearchBuilderToggle={()=>this.setState({siderClosed: !this.state.siderClosed})} onSearch={this.handleFilterSearch} options={[...this.props.headers.filter(h => h.noFilter !== true && h.noSort !== true), ...Array.isArray(this.props.additionalSearchInputs) && this.props.additionalSearchInputs]} />
-                </Skeleton>
+              {bulkMenu && (
+                <div style={{ margin: '14px 0px' }}>
+                  <Dropdown className="bulk-dropdown" overlay={bulkMenu} disabled={this.state.selected.length === 0}>
+                    <Button>
+                      {`Action on ${this.state.selected.length} selected`} <Icon type="down" />
+                    </Button>
+                  </Dropdown>
+                </div>
+              )}
+              <div style={{ margin: '14px 0px' }}>
+                <SingleInputFilter onSearchBuilderToggle={()=>this.setState({siderClosed: !this.state.siderClosed})} onSearch={this.handleFilterSearch} options={[...this.props.headers.filter(h => h.noFilter !== true && h.noSort !== true), ...Array.isArray(this.props.additionalSearchInputs) && this.props.additionalSearchInputs]} />
               </div>
             </div>
             <div className="stkd-widget no-margin contain" style={{ height: '100%' }}>
