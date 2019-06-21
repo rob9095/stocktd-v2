@@ -41,6 +41,7 @@ class ProductTable extends Component {
       populateArray: [],
       hiddenCols: ['supplier'],
       siderClosed: true,
+      pageSizeOptions: [10, 50, 100, 250, 500],
       pagination: {
         current: 1,
         total: 0,
@@ -49,7 +50,6 @@ class ProductTable extends Component {
         hideOnSinglePage: true,
         showSizeChanger: true,
         showQuickJumper: false,
-        pageSizeOptions: [10,50,100,250,500],
         onChange: (requestedPage, requestedRowsPerPage) => {
           this.handleDataFetch({requestedPage, requestedRowsPerPage})
         },
@@ -765,7 +765,7 @@ class ProductTable extends Component {
                     defaultValue={this.state.pagination.defaultPageSize}
                     onSelect={(selected) => this.state.pagination.onShowSizeChange(this.state.pagination.current, selected)}
                   >
-                    {this.state.pagination.pageSizeOptions.map(op => (
+                    {this.state.pageSizeOptions.map(op => (
                       <Select.Option key={op} value={op} className="flex-i align-items-center justify-content-center">
                         <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.length > 0} active>
                           {this.state.pagination.pageSize === op &&

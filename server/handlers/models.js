@@ -96,9 +96,9 @@ exports.queryModelData = async (req, res, next) => {
 			: []
 		console.log({populateArray})
 		let count = await db[req.body.model].count(query)
-		const limit = req.body.rowsPerPage
-		const skip = (req.body.activePage * req.body.rowsPerPage) - req.body.rowsPerPage
-    const totalPages = Math.floor(count / req.body.rowsPerPage)
+		const limit = parseInt(req.body.rowsPerPage)
+		const skip = (req.body.activePage * limit) - limit
+    const totalPages = Math.floor(count / limit)
 		let data = await db[req.body.model].find(query).skip(skip).limit(limit).sort({[req.body.sortBy]: req.body.sortDirection}).populate(populateArray)
 		for (let popConfig of populateArray) {
 			//if we had to match in the populate config, remove any empty arrays or null values from data
