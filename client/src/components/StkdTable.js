@@ -377,10 +377,11 @@ class ProductTable extends Component {
       })
     }
 
-    handleFilterSearch = async (query,populateArray) => {
+    handleFilterSearch = async (query,populateArray,populateQuery) => {
       await this.setState({
         query,
-        populateArray
+        populateArray,
+        populateQuery,
       });
       this.handleDataFetch()
     }
@@ -626,7 +627,7 @@ class ProductTable extends Component {
             <h1 className="no-margin">{this.props.title}</h1>
             <div>
               {tableMenuOptions && (
-                <Dropdown overlay={tableMenuOptions} onVisibleChange={(tableOptionsMenuOpen) => this.setState({ tableOptionsMenuOpen })}>
+                <Dropdown placement={"bottomRight"} overlay={tableMenuOptions} onVisibleChange={(tableOptionsMenuOpen) => this.setState({ tableOptionsMenuOpen })}>
                   <Button style={{ display: 'flex' }} type="primary">
                     Options <Icon style={{ display: 'flex', transition: 'transform .3s', ...this.state.tableOptionsMenuOpen && { transform: 'rotate(180deg)' } }} type={"down"} />
                   </Button>
@@ -737,6 +738,8 @@ class ProductTable extends Component {
                   onSearch={this.handleFilterSearch}
                   searchBuilderClosed={this.state.siderClosed}
                   query={this.state.query}
+                  populateQuery={this.state.populateQuery}
+                  populateArray={this.state.populateArray}
                   options={[
                     ...this.props.headers.filter(h => h.noFilter !== true && h.noSort !== true),
                     ...Array.isArray(this.props.additionalSearchInputs) && this.props.additionalSearchInputs,

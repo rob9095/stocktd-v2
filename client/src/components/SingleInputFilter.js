@@ -62,21 +62,25 @@ class SingleInputFilter extends Component {
 
   buildQuery = (config) => {
     let query = []
-    if (this.state.searchTag) {
+    if (this.state.searchTag && this.state.searchValue) {
       //single search mode with tag
       query = [[this.state.searchTag.id,this.state.searchValue]]
     } else if(this.state.searchValue) {
       //multiple search mode, script over input and create query
       query = this.state.searchValue.split(" ").map(q => {
-        return q.split(":")
+        return q.includes(":") ? q.split(":") : 'error'
       })
+      if (query.filter(q=>q==='error').length > 0) {
+        return {error: true}
+      }
     }
     //loop the provided iputs(form fields) and remove any inputs with nestedKeys(populated fields), and create a populateArray query
     let populateArray = [];
     let popFields = this.props.options.filter(input => input.nestedKey)
     if (popFields.length > 0) {
       for (let input of popFields) {
-        let match = query.find(val => val[0] === input.id)
+        //check if query has a match, toLowerCase the query field(val[0]) and the input.text to check for match
+        let match = query.find(val => val[0] === input.id || val[0].toLowerCase() === input.text.toLowerCase().split("").filter(l=>l!==" ").join(""))
         if (match) {
           query = query.filter(val => val[0] !== match[0])
           match[0] = input.nestedKey
@@ -96,7 +100,11 @@ class SingleInputFilter extends Component {
       console.log({
         searchValue: this.state.searchValue
       })
-      const {query, populateArray} = this.buildQuery()
+      const {query, populateArray, error} = this.buildQuery()
+      if (error) {
+        alert('Error Processing Query!')
+        return
+      }
       this.props.onSearch(query,populateArray)
     }
   }
@@ -107,6 +115,11 @@ class SingleInputFilter extends Component {
       option,
       filter: true,
     })
+  }
+
+  handleClear = async () => {
+    this.state.searchValue ? await this.setState({ searchValue: '' }) : await this.setState({ searchTag: null })
+    this.handleKeyPress({key: 'Enter'})
   }
 
   render() {
@@ -159,9 +172,17 @@ class SingleInputFilter extends Component {
         )
     let disabled = !this.props.searchBuilderClosed
     let currentQuery = this.props.query || []
-    let queryString = currentQuery.map(q=>(
-      q[2] ? `${q[0]}:${q[2]}:${q[1]}` : `${q[0]}:${q[1]}` 
-    )).join(' ')
+    let populateQuery = this.props.populateQuery || []
+    let queryString = [...currentQuery, ...populateQuery].map(q=>{
+      // if query is object with match use match otherwise use q
+      let query = q.match || q
+      // if query is objet with match set it as popData otherwise set it as empty obj
+      let popData = q.match ? q : {}
+      //pull the base query out of the query
+      let [field, searchValue, operator] = query
+      //if we have a popData.id use it otherwise use the default feild
+      return `${popData.id ? popData.text || popData.id : field}:${operator ? operator+":" : ''}${searchValue}`
+    }).join(' ')
     return (
       <div onKeyDown={this.handleKeyPress} style={{ minWidth: 250 }} className="single-input-search">
         <Dropdown disabled={disabled} overlay={options} visible={this.state.visible} onVisibleChange={(visible)=>this.setState({visible})}>
@@ -173,10 +194,10 @@ class SingleInputFilter extends Component {
             onChange={(e) => this.handleChange(e.target.value, e)}
             addonBefore={this.state.searchTag ? <div><span className="search-tag">{this.state.searchTag.text}</span></div> : null}
             suffix={this.state.searchValue || this.state.searchTag ?
-              <Icon className={disabled && 'not-allowed'} onClick={()=>this.state.searchValue ? this.setState({searchValue: ''}) : this.setState({searchTag: null})} type="close-circle" theme="filled" />
+              <Icon className={disabled && 'not-allowed'} onClick={this.handleClear} type="close-circle" theme="filled" />
               :
               <Icon className={disabled && 'not-allowed'} type="search" />
-               }    
+            }
           />
         </Dropdown>
       </div>

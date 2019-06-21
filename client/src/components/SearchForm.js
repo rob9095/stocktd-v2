@@ -65,6 +65,7 @@ class BasicSearchForm extends Component {
       })
       //loop the provided iputs(form fields) and remove any inputs with nestedKeys(populated fields), and create a populateArray query
       let populateArray = [];
+      let populateQuery = [];
       if (this.props.inputs.filter(input => input.nestedKey).length > 0) {
         for (let input of this.props.inputs) {
           let match = query.find(val => val[0] === input.id + input.nestedKey)
@@ -72,14 +73,19 @@ class BasicSearchForm extends Component {
             query = query.filter(val => val[0] !== match[0])
             match[0] = input.nestedKey
             let defaultQuery = input.defaultQuery || []
-            input.populatePath ?
+            //remove spaces from text label
+            let text = input.text.split("").filter(l=>l!==' ').join('')
+            if (input.populatePath) {
               populateArray.push({ path: input.populatePath, populate: [{ path: input.id, query: [match] }, ...input.defaultPopulateArray], query: defaultQuery })
-              :
+              populateQuery.push({ path: input.populatePath, id: input.id, text, match})
+            } else {
               populateArray.push({ path: input.id, query: [match, ...defaultQuery] })
+              populateQuery.push({ id: input.id, text, match })
+            }
           }
         }
       }
-      this.props.onSearch(query, populateArray)
+      this.props.onSearch(query, populateArray, populateQuery)
     });
   }
 
