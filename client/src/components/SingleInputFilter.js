@@ -65,7 +65,7 @@ class SingleInputFilter extends Component {
     if (this.state.searchTag) {
       //single search mode with tag
       query = [[this.state.searchTag.id,this.state.searchValue]]
-    } else {
+    } else if(this.state.searchValue) {
       //multiple search mode, script over input and create query
       query = this.state.searchValue.split(" ").map(q => {
         return q.split(":")
@@ -160,7 +160,7 @@ class SingleInputFilter extends Component {
     let disabled = !this.props.searchBuilderClosed
     let currentQuery = this.props.query || []
     let queryString = currentQuery.map(q=>(
-      q[2] ? ` ${q[0]} ${q[2]}:${q[1]} ` : `${q[0]}:${q[1]}` 
+      q[2] ? `${q[0]}:${q[2]}:${q[1]}` : `${q[0]}:${q[1]}` 
     )).join(' ')
     return (
       <div onKeyDown={this.handleKeyPress} style={{ minWidth: 250 }} className="single-input-search">

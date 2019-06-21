@@ -169,7 +169,7 @@ class BasicSearchForm extends Component {
       }
     })
     return (
-      <div>
+      <div onKeyDown={(e)=>e.key === 'Enter' && this.handleSubmit()}>
         <Form
           onSubmit={this.handleSubmit}
         >
