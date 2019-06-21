@@ -151,19 +151,20 @@ class SingleInputFilter extends Component {
           ))
           .concat(
             <div className="dropdown-extra" key={'dropdown-extra'}>
-              <a href="#" onClick={()=>this.setState({visible: false}) || this.props.onSearchBuilderToggle()}>Advanced Search</a>
+              <a href="#" onClick={()=>this.setState({visible: false, searchTag: null}) || this.props.onSearchBuilderToggle()}>Advanced Search</a>
             </div>
           )
           }
       </Menu>
-    )
+        )
+    let disabled = !this.props.searchBuilderClosed
     let currentQuery = this.props.query || []
     let queryString = currentQuery.map(q=>(
       q[2] ? ` ${q[0]} ${q[2]}:${q[1]} ` : `${q[0]}:${q[1]}` 
     )).join(' ')
     return (
       <div onKeyDown={this.handleKeyPress} style={{ minWidth: 250 }} className="single-input-search">
-        <Dropdown disabled={!this.props.searchBuilderClosed} overlay={options} visible={this.state.visible} onVisibleChange={(visible)=>this.setState({visible})}>
+        <Dropdown disabled={disabled} overlay={options} visible={this.state.visible} onVisibleChange={(visible)=>this.setState({visible})}>
           <Input
             ref={node => this.inputRef = node}
             placeholder="Search"
@@ -172,10 +173,10 @@ class SingleInputFilter extends Component {
             onChange={(e) => this.handleChange(e.target.value, e)}
             addonBefore={this.state.searchTag ? <div><span className="search-tag">{this.state.searchTag.text}</span></div> : null}
             suffix={this.state.searchValue || this.state.searchTag ?
-              <Icon onClick={()=>this.state.searchValue ? this.setState({searchValue: ''}) : this.setState({searchTag: null})} type="close-circle" theme="filled" />
+              <Icon className={disabled && 'not-allowed'} onClick={()=>this.state.searchValue ? this.setState({searchValue: ''}) : this.setState({searchTag: null})} type="close-circle" theme="filled" />
               :
-              <Icon type="search" />
-            }
+              <Icon className={disabled && 'not-allowed'} type="search" />
+               }    
           />
         </Dropdown>
       </div>

@@ -213,6 +213,9 @@ i.xl svg {
   font-size: 48px;
 }
 
+.not-allowed {
+  cursor: not-allowed !important;
+}
 
 .link {
   cursor: pointer;
