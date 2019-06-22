@@ -8,6 +8,7 @@ import ProductTable from '../components/ProductTable';
 import ProductTableNew from '../components/ProductTableNew';
 import PurchaseOrderTable from '../components/PurchaseOrderTable';
 import PoProductTable from '../components/PoProductTable';
+import PoTableNew from '../components/PoTableNew';
 import ProductTableLegacy from '../components/ProductTableLegacy';
 import ReceiveInventory from '../components/ReceiveInventory';
 import ScanTable from '../components/ScanTable';
@@ -172,8 +173,11 @@ class DashboardNew extends Component {
                 <Route exact path="/app/po-products" render={props => (
                   <PoProductTable showHeader {...props} />
                 )} />
-                <Route exact path="/app/purchase-orders" render={props => (
+                <Route exact path="/app/purchase-orders-old" render={props => (
                   <PurchaseOrderTable {...props} />
+                )} />
+                <Route exact path="/app/purchase-orders" render={props => (
+                  <PoTableNew {...props} />
                 )} />
                 <Route exact path="/app/products" render={props => (
                   <ProductTable {...props} />

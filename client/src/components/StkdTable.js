@@ -14,8 +14,8 @@ import AutoCompleteInput from './AutoCompleteInput';
 import CascaderSelect from './CascaderSelect';
 import SingleInputFilter from './SingleInputFilter';
 
+const moment = require('moment');
 const confirm = Modal.confirm;
-const FormItem = Form.Item;
 
 class ProductTable extends Component {
   constructor(props) {
@@ -87,7 +87,8 @@ class ProductTable extends Component {
     console.log({loadingRows: this.state.loadingRows, loading: this.state.loading})
     requestedPage = requestedPage || this.state.activePage;
     requestedRowsPerPage = requestedRowsPerPage || this.state.rowsPerPage;
-    let populateArray = this.props.populateArray.map(pC => {
+    let populateArray = this.props.populateArray || []
+    populateArray = populateArray.map(pC => {
       const foundPc = this.state.populateArray.find(p => p.path === pC.path)
       if (foundPc) {
         return ({
@@ -600,6 +601,15 @@ class ProductTable extends Component {
                 >
                   <Input style={{ display: "none" }} />
                 </AutoCompleteInput>
+              </Skeleton>
+            </td>
+          )
+        }
+        if (col.type === 'date') {
+          return (
+            <td key={`${r._id}-${col.id}-${col.nestedKey || i}`} className={col.className}>
+              <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
+                {col.render ? col.render(r[col.id]) : col.nestedKey && r[col.id] ? moment(new Date(r[col.id][col.nestedKey])).format('M/D/YY') : moment(new Date(r[col.id])).format('M/D/YY') || ''}
               </Skeleton>
             </td>
           )
