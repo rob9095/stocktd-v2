@@ -217,7 +217,7 @@ class BasicSearchForm extends Component {
         <Form
           onSubmit={this.handleSubmit}
         >
-          <Row gutter={24} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>{inputs}</Row>
+          <Row gutter={0}>{inputs}</Row>
         </Form>
       </div>
     );

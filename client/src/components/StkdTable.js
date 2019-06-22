@@ -797,7 +797,6 @@ class ProductTable extends Component {
                 query={this.state.query}
                 populateQuery={this.state.populateQuery}
                 onSearch={this.handleFilterSearch}
-                isHidden={this.state.siderClosed}
               />
             </div>
           </Layout.Sider>

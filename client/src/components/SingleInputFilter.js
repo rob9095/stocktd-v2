@@ -115,10 +115,6 @@ class SingleInputFilter extends Component {
   buildQueryString = () => {
     let currentQuery = this.props.query || []
     let populateQuery = this.props.populateQuery || []
-    console.log({
-      currentQuery,
-      populateQuery
-    })
     return [...currentQuery, ...populateQuery].map(q => {
       // if query is object with match use match otherwise use q
       let query = q.match || q
