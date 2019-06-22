@@ -6,12 +6,22 @@ const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
 
 class BasicSearchForm extends Component {
-  state = {
-    selects: {
+  constructor(props) {
+    super(props);
+    this.state = {
+      selects: {},
+      dates: {},
+    }
+  }
 
-    },
-    dates: [],
-  };
+  componentDidUpdate(prevProps) {
+    if (prevProps.query !== this.props.query || prevProps.populateQuery !== this.props.populateQuery) {
+      let pQuery = prevProps.query || []
+      let pPopQuery = prevProps.populateQuery || []
+      let pq = [...pQuery, ...pPopQuery]
+      this.setQueryValues(pq)
+    }
+  }
 
   toggle = (prop) => {
     return () => {
@@ -27,7 +37,6 @@ class BasicSearchForm extends Component {
   }
 
   handleSelect = (value, select) => {
-    console.log({ value, select })
     this.setState({
       selects: { ...this.state.selects, [select.props.id]: value },
     })
@@ -68,7 +77,8 @@ class BasicSearchForm extends Component {
       let populateQuery = [];
       if (this.props.inputs.filter(input => input.nestedKey).length > 0) {
         for (let input of this.props.inputs) {
-          let match = query.find(val => val[0] === input.id + input.nestedKey)
+          let popId = input.id + input.nestedKey
+          let match = query.find(val => val[0] === popId)
           if (match) {
             query = query.filter(val => val[0] !== match[0])
             match[0] = input.nestedKey
@@ -77,10 +87,10 @@ class BasicSearchForm extends Component {
             let text = input.text.split("").filter(l=>l!==' ').join('')
             if (input.populatePath) {
               populateArray.push({ path: input.populatePath, populate: [{ path: input.id, query: [match] }, ...input.defaultPopulateArray], query: defaultQuery })
-              populateQuery.push({ path: input.populatePath, id: input.id, text, match})
+              populateQuery.push({ popId, path: input.populatePath, id: input.id, text, match})
             } else {
               populateArray.push({ path: input.id, query: [match, ...defaultQuery] })
-              populateQuery.push({ id: input.id, text, match })
+              populateQuery.push({ popId, id: input.id, text, match })
             }
           }
         }
@@ -89,12 +99,39 @@ class BasicSearchForm extends Component {
     });
   }
 
+  setQueryValues = (prevQuery = []) => {
+    //parse any incoming queries and popQueries and set/reset fields if neccesary
+    let query = this.props.query || []
+    let popQuery = this.props.populateQuery || []
+    let comibinedQuery = [...query, ...popQuery]
+    // loop the combined query and update the fields
+    for (let q of comibinedQuery) {
+      let popData = q.match ? q : {}
+      q = q.match || q
+      let [field, value, operator] = q
+      field = popData.popId || field
+      operator && this.setState({ selects: { ...this.state.selects, [field + "Select"]: operator } })
+      this.props.form.setFieldsValue({ [popData.popId || field]: value })
+    }
+    //loop the previous query and reset values if prev query field isn't in new query
+    for (let pq of prevQuery) {
+      let popData = pq.match ? pq : {}
+      pq = pq.match || pq
+      let [field, value, operator] = pq
+      field = popData.popId || field
+      if (comibinedQuery.filter(q=>q[0] === field || q.popId === field).length === 0) {
+        operator && this.setState({ selects: { ...this.state.selects, [field + "Select"]: '=' } })
+        this.props.form.setFieldsValue({ [field]: undefined })
+      }
+    }
+  }
+
   render() {
     const { getFieldDecorator } = this.props.form;
     let inputs = this.props.inputs.map(i => {
       const id = i.nestedKey ? i.id + i.nestedKey : i.id
       const selectBefore = (
-        <Select key={`${id}Select`} defaultValue={'='} onChange={this.handleSelect} showArrow={false} className="number-input pre-select">
+        <Select key={`${id}Select`} value={this.state.selects[id+"Select"] || "="} onChange={this.handleSelect} showArrow={false} className="number-input pre-select">
           <Option id={`${id}Select`} className="center-a" value="=">=</Option>
           <Option id={`${id}Select`} className="center-a" value="gt">{'>'}</Option>
           <Option id={`${id}Select`} className="center-a" value="gte">{'≥'}</Option>
@@ -142,7 +179,8 @@ class BasicSearchForm extends Component {
         return (
           <Col xs={i.span * 3} sm={i.span} key={id}>
             <FormItem label={`${i.text}`}>
-              {getFieldDecorator(id)(
+              {getFieldDecorator(id, {
+              })(
                 <Select onBlur={this.handleSubmit} key={`${id}Select`} size="large">
                   {i.values.map(val => (
                     <Option key={id + val.id + "Select"} value={val.id}>{val.text}</Option>

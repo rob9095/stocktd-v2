@@ -12,6 +12,13 @@ class SingleInputFilter extends Component {
     }
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.props.searchBuilderClosed === true && prevProps.searchBuilderClosed === false) {
+      let searchValue = this.buildQueryString()
+      this.setState({ searchValue })
+    }
+  }
+
   renderTitle = (title) => {
     return (
       <span style={{color: '#8c96c7', fontSize: 12}}>
@@ -37,19 +44,7 @@ class SingleInputFilter extends Component {
     );
   }
 
-  updateSearchValue = (config) => {
-    let { value, clear } = config
-    let current = this.state.searchValue || ''
-    let searchValue = current +`${current ? ' ': ''}${value}:`
-    console.log({searchValue})
-    this.setState({searchValue})
-  }
-
   handleSelect = ({ item, key, keyPath, domEvent}) => {
-    console.log({
-      item,
-      key,
-    })
     this.setState({searchTag: item.props})
     setTimeout(() => {
       this.inputRef.focus()
@@ -76,50 +71,75 @@ class SingleInputFilter extends Component {
     }
     //loop the provided iputs(form fields) and remove any inputs with nestedKeys(populated fields), and create a populateArray query
     let populateArray = [];
+    let populateQuery = [];
     let popFields = this.props.options.filter(input => input.nestedKey)
     if (popFields.length > 0) {
       for (let input of popFields) {
         //check if query has a match, toLowerCase the query field(val[0]) and the input.text to check for match
+        let popId = input.id + input.nestedKey
         let match = query.find(val => val[0] === input.id || val[0].toLowerCase() === input.text.toLowerCase().split("").filter(l=>l!==" ").join(""))
         if (match) {
           query = query.filter(val => val[0] !== match[0])
           match[0] = input.nestedKey
           let defaultQuery = input.defaultQuery || []
-          input.populatePath ?
+          let text = input.text.split("").filter(l => l !== ' ').join('')
+          if (input.populatePath) {
             populateArray.push({ path: input.populatePath, populate: [{ path: input.id, query: [match] }, ...input.defaultPopulateArray], query: defaultQuery })
-            :
+            populateQuery.push({ popId, path: input.populatePath, id: input.id, text, match })
+          } else {
             populateArray.push({ path: input.id, query: [match, ...defaultQuery] })
+            populateQuery.push({ popId, id: input.id, text, match })
+          }
         }
       }
     }
-    return ({query, populateArray})
+    return ({query, populateArray, populateQuery})
   }
 
   handleKeyPress = (e) => {
     if (e.key === 'Enter') {
-      console.log({
-        searchValue: this.state.searchValue
-      })
-      const {query, populateArray, error} = this.buildQuery()
+      const {query, populateArray, populateQuery, error} = this.buildQuery()
       if (error) {
         alert('Error Processing Query!')
         return
       }
-      this.props.onSearch(query,populateArray)
+      this.props.onSearch(query,populateArray,populateQuery)
     }
-  }
-
-  handleFilter = (value,option) => {
-    console.log({
-      value,
-      option,
-      filter: true,
-    })
   }
 
   handleClear = async () => {
     this.state.searchValue ? await this.setState({ searchValue: '' }) : await this.setState({ searchTag: null })
     this.handleKeyPress({key: 'Enter'})
+  }
+
+  buildQueryString = () => {
+    let currentQuery = this.props.query || []
+    let populateQuery = this.props.populateQuery || []
+    console.log({
+      currentQuery,
+      populateQuery
+    })
+    return [...currentQuery, ...populateQuery].map(q => {
+      // if query is object with match use match otherwise use q
+      let query = q.match || q
+      // if query is objet with match set it as populdate data otherwise set it as empty obj
+      let popData = q.match ? q : {}
+      //pull the base query out of the query/match
+      let [field, searchValue, operator] = query
+      //if we have a popData.id use it otherwise use the default feild
+      return `${popData.id ? popData.text || popData.id : field}:${operator ? operator + ":" : ''}${searchValue}`
+    }).join(' ')
+  }
+
+  handleShowSearchBuilder = () => {
+    //if we have a searchValue or a searchValue and a searchTag
+    if (this.state.searchValue) {
+      this.handleKeyPress({key: 'Enter'})
+      let searchValue = this.buildQueryString()
+      this.setState({searchValue})
+    }
+    this.setState({ visible: false, searchTag: null })
+    this.props.onSearchBuilderToggle()
   }
 
   render() {
@@ -155,34 +175,23 @@ class SingleInputFilter extends Component {
         {dataSource
           .map(group => (
             <Menu.ItemGroup key={group.title} title={this.renderTitle(group.title)}>
-              {this.props.options.filter((opt,i)=> i+1 <= this.state.optionCount).map((opt,i) => (
+              {this.props.options.filter((opt, i) => i + 1 <= this.state.optionCount).map((opt, i) => (
                 <Menu.Item style={{ marginLeft: -40, listStyle: 'none' }} text={opt.text} key={opt.id + i} id={opt.id} value={opt.id}>
                   {opt.text}
-                </Menu.Item>                
+                </Menu.Item>
               ))}
             </Menu.ItemGroup>
           ))
           .concat(
             <div className="dropdown-extra" key={'dropdown-extra'}>
-              <a href="#" onClick={()=>this.setState({visible: false, searchTag: null}) || this.props.onSearchBuilderToggle()}>Advanced Search</a>
+              <a href="#" onClick={this.handleShowSearchBuilder}>Advanced Search</a>
             </div>
           )
-          }
+        }
       </Menu>
-        )
+    )
     let disabled = !this.props.searchBuilderClosed
-    let currentQuery = this.props.query || []
-    let populateQuery = this.props.populateQuery || []
-    let queryString = [...currentQuery, ...populateQuery].map(q=>{
-      // if query is object with match use match otherwise use q
-      let query = q.match || q
-      // if query is objet with match set it as popData otherwise set it as empty obj
-      let popData = q.match ? q : {}
-      //pull the base query out of the query
-      let [field, searchValue, operator] = query
-      //if we have a popData.id use it otherwise use the default feild
-      return `${popData.id ? popData.text || popData.id : field}:${operator ? operator+":" : ''}${searchValue}`
-    }).join(' ')
+    let queryString = this.buildQueryString()
     return (
       <div onKeyDown={this.handleKeyPress} style={{ minWidth: 250 }} className="single-input-search">
         <Dropdown disabled={disabled} overlay={options} visible={this.state.visible} onVisibleChange={(visible)=>this.setState({visible})}>
@@ -194,7 +203,7 @@ class SingleInputFilter extends Component {
             onChange={(e) => this.handleChange(e.target.value, e)}
             addonBefore={this.state.searchTag ? <div><span className="search-tag">{this.state.searchTag.text}</span></div> : null}
             suffix={this.state.searchValue || this.state.searchTag ?
-              <Icon className={disabled && 'not-allowed'} onClick={this.handleClear} type="close-circle" theme="filled" />
+              <Icon className={disabled && 'not-allowed'} {...!disabled && {onClick: this.handleClear}} type="close-circle" theme="filled" />
               :
               <Icon className={disabled && 'not-allowed'} type="search" />
             }

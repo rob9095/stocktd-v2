@@ -789,13 +789,16 @@ class ProductTable extends Component {
             </div>
           </div>
         </div>
-          <Layout.Sider className="stkd-sidebar right" width={300} trigger={null} collapsedWidth={0} collapsible collapsed={this.state.siderClosed} onCollapse={(siderClosed) => this.setState({siderClosed})} style={{height: '100%', overflow: 'auto'}}>
+          <Layout.Sider className="stkd-sidebar right" width={300} trigger={null} collapsedWidth={0} collapsible collapsed={this.state.siderClosed} onCollapse={() => this.setState({siderClosed: true})} style={{height: '100%', overflow: 'auto'}}>
             <div className="half-pad">
-                <PageHeader onBack={(siderClosed = true) => this.setState({ siderClosed })} {...this.state.siderConfig} />
-                <SearchForm
-                  inputs={[...this.props.headers.filter(h => h.noFilter !== true && h.noSort !== true), ...Array.isArray(this.props.additionalSearchInputs) && this.props.additionalSearchInputs].map(i => ({ ...i, span: 24 }))}
-                  onSearch={this.handleFilterSearch}
-                />
+              <PageHeader onBack={() => this.setState({ siderClosed: true })} {...this.state.siderConfig} />
+              <SearchForm
+                inputs={[...this.props.headers.filter(h => h.noFilter !== true && h.noSort !== true), ...Array.isArray(this.props.additionalSearchInputs) && this.props.additionalSearchInputs].map(i => ({ ...i, span: 24 }))}
+                query={this.state.query}
+                populateQuery={this.state.populateQuery}
+                onSearch={this.handleFilterSearch}
+                isHidden={this.state.siderClosed}
+              />
             </div>
           </Layout.Sider>
         </Layout>
