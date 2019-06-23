@@ -100,7 +100,11 @@ class BasicSearchForm extends Component {
           }
         }
       }
-      this.props.onSearch(query, populateArray, populateQuery)
+      //if there is no new queries and the old queries were empty, just return to avoid unneeded searches :)
+      if (!query.length && !this.props.query.length && !populateQuery.length && !this.props.populateQuery.length) {
+        return
+      }
+        this.props.onSearch(query, populateArray, populateQuery)
     });
   }
 

@@ -39,6 +39,7 @@ class ProductTable extends Component {
       itemDrawerProduct: {},
       showImportModal: false,
       populateArray: [],
+      populateQuery:[],
       hiddenCols: ['supplier'],
       siderClosed: true,
       pageSizeOptions: [10, 50, 100, 250, 500],
