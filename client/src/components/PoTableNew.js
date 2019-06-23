@@ -254,7 +254,17 @@ class PoTableNew extends Component {
           ]}
           headers={[
             { id: 'select-all', text: '', width: 75, noSort: true },
-            { id: 'name', text: 'Name', width: 400, span: 6, className: 'no-wrap' },
+            {
+              id: 'name', text: 'Name', width: 400, span: 6, className: 'no-wrap',
+              render: (po) =>
+                <Link to={{
+                  pathname: '/app/po-products',
+                  poRefs: [{ ...po }],
+                }}
+                >
+                  {po.name}
+                </Link>,
+            },
             { id: 'type', text: 'Type', type: 'select', options: [{id: 'Inbound'},{id: 'Outbound'}], width: 250, span: 6, className: 'no-wrap' },
             { id: 'status', text: 'Status', width: 250, span: 6, className: 'no-wrap' },
             { id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 6, className: 'no-wrap' },
