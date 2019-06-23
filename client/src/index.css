@@ -1047,9 +1047,13 @@ i.sort-icon {
 table.fixed thead th {
   position: sticky;
   top: 0;
-  z-index: 2;
+  z-index: 999;
   background: #f6f9fc !important;
   box-shadow: 1px 1px 0 #dee3f2;
+}
+
+table.fixed .ant-cascader-menus, table.fixed .ant-select-dropdown, table.fixed .ant-dropdown {
+  z-index: 998 !important;
 }
 
 .table-footer {

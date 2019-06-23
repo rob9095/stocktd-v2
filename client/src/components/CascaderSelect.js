@@ -16,7 +16,7 @@ class CascaderSelect extends Component {
               <Icon type="plus" style={{ marginRight: 5, fontSize: 'small' }} /> {this.props.addOptionText || 'Add'}
             </div>
           </div>
-        ), value: 'addNewItem', key: 'addNewItem',
+        ), value: 'addNewItem', key: 'addNewItem', text: 'addNewItem',
       },
     }
   }
@@ -24,6 +24,7 @@ class CascaderSelect extends Component {
   componentDidMount() {
     this._isMounted = true;
     //loop through provided data and configure options
+    console.log({initialData: this.props.data})
     let data = this.props.data.map((option,i) => {
       let nestedObj = option[this.props.parent.subChild.key] || {}
       return ({
@@ -37,6 +38,7 @@ class CascaderSelect extends Component {
             </div>
           </div>
         ),
+        text: option[this.props.parent.label] || option._id || i + nestedObj[this.props.parent.subChild.label],
         value: option[this.props.parent.value] + nestedObj._id || option._id || i,
         key: option._id || i,
         id: option._id,
@@ -44,6 +46,7 @@ class CascaderSelect extends Component {
         ...this.props.parent.sortKey && { [this.props.parent.sortKey]: option[this.props.parent.sortKey] },
         ...this.props.parent.subChild.key && {
           [this.props.parent.subChild.key]: {
+            text: nestedObj[this.props.parent.subChild.label],
             label: nestedObj[this.props.parent.subChild.label],
             value: nestedObj[this.props.parent.subChild.value],
             key: nestedObj._id,
@@ -53,6 +56,7 @@ class CascaderSelect extends Component {
           }
         },
         children: option[this.props.child.arrayKey].map((child, ci) => ({
+          text: child[this.props.child.label] || child[this.props.parent.label] || child._id || ci,
           label: child[this.props.child.label] || child[this.props.parent.label] || child._id || ci,
           value: child[this.props.child.value] || child[this.props.parent.value] || child._id || ci,
           key: child._id || ci,
@@ -79,6 +83,10 @@ class CascaderSelect extends Component {
     let defaultParent = data.length === 0 ? { children: [] } : data.find(parent=>parent.isDefault) || data.sort((a,b)=>b[this.props.parent.sortKey] - a[this.props.parent.sortKey])[0]
     let defaultChild = defaultParent.children.length === 0 ? {} : defaultParent.children.find(child => child.isDefault) || defaultParent.children[0]
     let value = [defaultParent.value, defaultChild.value]
+    console.log({
+      data,
+      value
+    })
     this.setState({
       data,
       value,
@@ -113,23 +121,26 @@ class CascaderSelect extends Component {
   }
 
   filter(inputValue, path) {
-    return (path.some(option => (option.label).toLowerCase().indexOf(inputValue.toLowerCase()) > -1));
+    console.log({
+      inputValue, path
+    })
+    return (path.some(option => (option.text).toLowerCase().indexOf(inputValue.toLowerCase()) > -1));
   }
 
   render() {
-    const id = this.props.id || this.props.placeholder + 'cascader'
+    const domRef = this.props.domRef || 'cascader'
     return (
-      <div id={id}>
+      <div id={domRef} style={{position: 'relative'}}>
         <Skeleton paragraph={false} loading={this.state.loading} active>
           <Cascader
             options={this.state.data.length > 0 ? this.props.showAddOption ? [...this.state.data, this.state.addNewOption] : this.state.data : [this.state.emptyOption, this.state.addNewOption]}
             onChange={this.onChange}
             placeholder={this.props.placeholder || "Please select"}
-            showSearch={this.state.data.length > 0 ? { filter: this.filter } : false}
+            //showSearch={this.state.data.length > 0 ? { filter: this.filter } : false}
             style={{ minWidth: 200 }}
             popupClassName={'cascader-popup'}
             notFoundContent={<Empty imageStyle={{ height: 20 }} />}
-            getPopupContainer={() => document.getElementById(id)}
+            getPopupContainer={() => document.getElementById(domRef)}
             value={this.state.value}
             displayRender={(label) => {
               if (label[this.props.reverseData ? 1 : 0]) {

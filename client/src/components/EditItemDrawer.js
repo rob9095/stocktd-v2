@@ -172,7 +172,7 @@ class DrawerForm extends Component {
         )
       } else if (i.type === 'cascader') {
         return (
-          <Col xs={i.span * 3} sm={i.span} key={id}>
+          <Col xs={i.span * 3} sm={i.span} key={`${item._id || ''}-${i.id}cascader-select`}>
             <FormItem label={`${i.text}`}>
               {getFieldDecorator(i.id, {
                 rules: [{
@@ -181,7 +181,7 @@ class DrawerForm extends Component {
                 }],
               })(
                 <CascaderSelect
-                  id={`${i.id}-cascader-select`}
+                  domRef={`${item._id || ''}-${i.id}edit-cascader-select`}
                   data={Array.isArray(item[i.id]) ? item[i.id].map(box => ({ ...box, [i.parent.defaultKey]: item[i.parent.defaultKey], [i.child.defaultKey]: item[i.child.defaultKey] })).filter(box => box.scanToPo == true) : []}
                   parent={i.parent}
                   child={i.child}
@@ -190,16 +190,6 @@ class DrawerForm extends Component {
                 >
                   <Input style={{ display: "none" }} />
                 </CascaderSelect>
-              )}
-            </FormItem>
-            <FormItem style={{display: 'none'}}>
-              {getFieldDecorator(i.parent.defaultKey, { initialValue: item[i.parent.defaultKey] })(
-                <Input style={{ display: "none" }} />
-              )}
-            </FormItem>
-            <FormItem style={{ display: 'none' }}>
-              {getFieldDecorator(i.child.defaultKey, { initialValue: item[i.child.defaultKey] })(
-                <Input style={{ display: "none" }} />
               )}
             </FormItem>
           </Col>

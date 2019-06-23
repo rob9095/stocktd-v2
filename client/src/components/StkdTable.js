@@ -543,11 +543,9 @@ class ProductTable extends Component {
             </Menu>
           )
           return (
-            <td key={`${r._id}-${col.id}`} className="stkd-td actions center-a no-wrap">
+            <td key={`${r._id}-${col.id}`} id={`${r._id}-${col.id}-dropdown`} className="stkd-td actions center-a no-wrap" style={{position: 'relative'}}>
               <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
-                  {/* <a id={r._id} onClick={this.handleRowEdit}>Edit</a>
-                  <Divider type="vertical" /> */}
-                  <Dropdown overlay={menu} placement="bottomRight">
+                <Dropdown getPopupContainer={()=>document.getElementById(`${r._id}-${col.id}-dropdown`)} overlay={menu} placement="bottomRight">
                     <Button className="no-border no-bg">
                       <Icon type="ellipsis" style={{ color: '#a6aece', fontSize: 25, cursor: 'pointer' }} />
                     </Button>
@@ -561,12 +559,12 @@ class ProductTable extends Component {
             <td key={`${r._id}-${col.id}`} className="stkd-td no-wrap">
               <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
                 <CascaderSelect
-                  id={`${r._id}-${col.id}-cascader-select`}
+                  domRef={`${r._id}-${col.id}cascader-select`}
                   data={Array.isArray(r[col.id]) ? col.filter ? col.filter(r[col.id].map(option => ({ ...r, ...option, }))) : r[col.id].map(option => ({ ...r, ...option, })) : []}
                   parent={col.parent}
                   child={col.child}
                   onUpdate={(value, options) => this.handleAutoCompleteUpdate({ rowId: r._id, handler: col.handler, clicked: {value, options}, colId: col.id, })}
-                  showAddOption={true}
+                  showAddOption
                   reverseData={col.reverseData}
                   onAddNewItem={()=>{
                     let insertDataModal = this.props.onGetInsertDataConfig(this.state.data.filter(row => row._id === r._id), 'addNewBox')

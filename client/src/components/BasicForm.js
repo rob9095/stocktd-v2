@@ -241,7 +241,7 @@ class BForm extends Component {
                   }
                 }],
               })(
-                <Select key={`${id}Select`} size="large" showSearch={i.showSearch} onChange={() => this.handleBlur(i, id)}>
+                <Select key={`${id}Select`} showSearch={i.showSearch} onChange={() => this.handleBlur(i, id)}>
                   {i.values.map(val => (
                     <Option key={id + val.id + "Select"} value={val.id}>{val.text}</Option>
                   ))}
