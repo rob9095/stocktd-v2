@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { Icon, Input, AutoComplete, Menu, Dropdown, Tooltip, Select } from 'antd';
+import { Icon, Input, Menu, Dropdown, Tooltip, Select } from 'antd';
 
-const { Option, OptGroup } = AutoComplete;
+const moment = require('moment');
 
 class SingleInputFilter extends Component {
   constructor(props) {
@@ -58,12 +58,21 @@ class SingleInputFilter extends Component {
   buildQuery = (config) => {
     let query = []
     if (this.state.searchTag && this.state.searchValue) {
+      let input = this.props.options.find(i=>i.id === this.state.searchTag.id) || {}
+      let searchValue = input.type === 'date' || input.type === 'array' ? this.state.searchValue.split(",") : this.state.searchValue 
       //single search mode with tag
-      query = [[this.state.searchTag.id,this.state.searchValue]]
+      query = [[this.state.searchTag.id,searchValue]]
     } else if(this.state.searchValue) {
       //multiple search mode, script over input and create query
       query = this.state.searchValue.split(" ").map(q => {
-        return q.includes(":") ? q.split(":") : 'error'
+        if (q.includes("")) {
+          q = q.split(":")
+          let input = this.props.options.find(i=>i.id === q[0]) || {}
+          let fq = input.type === 'date' || input.type === 'array' ? [q[0], q[1].split(",")] : q
+          return fq
+        } else {
+          return 'error'
+        }
       })
       if (query.filter(q=>q==='error').length > 0) {
         return {error: true}
@@ -172,7 +181,7 @@ class SingleInputFilter extends Component {
           .map(group => (
             <Menu.ItemGroup key={group.title} title={this.renderTitle(group.title)}>
               {this.props.options.filter((opt, i) => i + 1 <= this.state.optionCount).map((opt, i) => (
-                <Menu.Item style={{ marginLeft: -40, listStyle: 'none' }} text={opt.text} key={opt.id + i} id={opt.id} value={opt.id}>
+                <Menu.Item style={{ marginLeft: -40, listStyle: 'none' }} type={opt.type} text={opt.text} key={opt.id + i} id={opt.id} value={opt.id}>
                   {opt.text}
                 </Menu.Item>
               ))}

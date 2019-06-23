@@ -596,18 +596,10 @@ ul.ant-menu.ant-menu-light.ant-menu-root.ant-menu-vertical .ant-menu-item a:hove
   margin-left: 0px !important;
 }
 
-.ant-select-selection--single {
-  height: 40px;
-}
-
 .ant-select-selection, .ant-select-selection--multiple, .ant-select-selection--single {
-  padding: 4px 11px;
-  min-height: 40px !important;
+  padding: 1px 7px;
+  min-height: 35px !important;
   padding-bottom: 0px;
-}
-
-.ant-select-selection--multiple .ant-select-selection__clear, .ant-select-selection--multiple .ant-select-arrow {
-  top: 20px !important;
 }
 
 /* Inputs */

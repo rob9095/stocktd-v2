@@ -18,11 +18,11 @@ class DashboardHeader extends Component {
       <div className="flex space-between align-items-center dashboard-header" style={{ color: "#fff", background: '#7933e1', height: 60, padding: '0px 15px' }}>
         {/* <img style={{ height: 30 }} src={require("../images/logo-clear-white.png")}></img> */}
         {/* <Icon component={stocktdLogoWhite} /> */}
-        {/* <div className="flex align-items-center">
+        <div className="flex align-items-center">
           <Icon component={()=>rocketSvg({color: '#fff'})} style={{ width: 18, marginRight: 5 }} />
           <Icon component={()=>queRocketLogoSvg({color: '#fff'})} style={{width: 105}} />
-        </div> */}
-        <div style={{ width: 140, height: 30, backgroundColor: 'rgba(255,255,255,.35)' }}></div>
+        </div>
+        {/* <div style={{ width: 140, height: 30, backgroundColor: 'rgba(255,255,255,.35)' }}></div> */}
         <Popover onVisibleChange={(profilePopover)=>this.setState({profilePopover})} className="Test" placement="bottomRight" content={
           <div style={{ minWidth: 150, maxWidth: 300, margin: '0px -12px' }}>
             <div className="flex align-items-center" style={{padding: '0px 12px 8px 12px'}}>

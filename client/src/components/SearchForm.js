@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Form, Row, Col, Input, Button, Select, Switch, DatePicker, Icon } from 'antd';
 
+const moment = require('moment');
 const Option = Select.Option;
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
@@ -10,7 +11,6 @@ class BasicSearchForm extends Component {
     super(props);
     this.state = {
       selects: {},
-      dates: {},
     }
   }
 
@@ -19,6 +19,9 @@ class BasicSearchForm extends Component {
       let pQuery = prevProps.query || []
       let pPopQuery = prevProps.populateQuery || []
       let pq = [...pQuery, ...pPopQuery]
+      console.log({
+        currentQuery: this.props.query,
+      })
       this.setQueryValues(pq)
     }
   }
@@ -42,14 +45,16 @@ class BasicSearchForm extends Component {
     })
   }
 
-  handleDateSelect = (date, dateString) => {
+  handleDateSelect = async (date, dateString,id) => {
     console.log(date, dateString);
     let endDate = new Date(`${dateString[1]}T23:59:59.999Z`)
     let offSet = endDate.getTimezoneOffset()
-    this.setState({
+    await this.setState({
       // adds local offset in minutes to second date so query works, I have no clue why
-      dates: date.length > 0 ? [dateString[0], new Date(endDate).getTime() + offSet * 60000] : null,
+      //[id]: date.length > 0 ? [dateString[0], new Date(endDate).getTime() + offSet * 60000] : null,
+      [id]: date.length > 0 ? dateString : null,
     })
+    this.handleSubmit()
   }
 
   handleClear = (id) => {
@@ -67,7 +72,7 @@ class BasicSearchForm extends Component {
         if (this.props.inputs.find(i => i.type === 'number' && i.id === val[0])) {
           return [...val, this.state.selects[val[0] + "Select"] || "="]
         } else if (Array.isArray(val[1])) {
-          return [[val[0]], this.state.dates]
+          return [[val[0]], this.state[val[0]]]
         } else {
           return [...val]
         }
@@ -104,15 +109,6 @@ class BasicSearchForm extends Component {
     let query = this.props.query || []
     let popQuery = this.props.populateQuery || []
     let comibinedQuery = [...query, ...popQuery]
-    // loop the combined query and update the fields
-    for (let q of comibinedQuery) {
-      let popData = q.match ? q : {}
-      q = q.match || q
-      let [field, value, operator] = q
-      field = popData.popId || field
-      operator && this.setState({ selects: { ...this.state.selects, [field + "Select"]: operator } })
-      this.props.form.setFieldsValue({ [popData.popId || field]: value })
-    }
     //loop the previous query and reset values if prev query field isn't in new query
     for (let pq of prevQuery) {
       let popData = pq.match ? pq : {}
@@ -123,6 +119,17 @@ class BasicSearchForm extends Component {
         operator && this.setState({ selects: { ...this.state.selects, [field + "Select"]: '=' } })
         this.props.form.setFieldsValue({ [field]: undefined })
       }
+    }
+    
+    // loop the combined query and update the fields
+    for (let q of comibinedQuery) {
+      let popData = q.match ? q : {}
+      q = q.match || q
+      let [field, value, operator] = q
+      field = popData.popId || field
+      operator && this.setState({ selects: { ...this.state.selects, [field + "Select"]: operator } })
+      value = Array.isArray(value) ? value.map(d => moment(d)) : value
+      this.props.form.setFieldsValue({ [popData.popId || field]: value })
     }
   }
 
@@ -170,20 +177,20 @@ class BasicSearchForm extends Component {
                   message: '',
                 }],
               })(
-                <RangePicker onBlur={this.handleSubmit} key={id} onChange={this.handleDateSelect} />
+                <RangePicker key={id} onChange={(a,b)=>this.handleDateSelect(a,b,id)} />
               )}
             </FormItem>
           </Col>
         )
-      } else if (i.type === 'dropdown') {
+      } else if (i.type === 'select') {
         return (
           <Col xs={i.span * 3} sm={i.span} key={id}>
             <FormItem label={`${i.text}`}>
               {getFieldDecorator(id, {
               })(
-                <Select onBlur={this.handleSubmit} key={`${id}Select`} size="large">
-                  {i.values.map(val => (
-                    <Option key={id + val.id + "Select"} value={val.id}>{val.text}</Option>
+                <Select allowClear onChange={(value)=>this.props.form.setFieldsValue({[id]: value}) || this.handleSubmit()} key={`${id}Select`}>
+                  {i.options.map(val => (
+                    <Option key={id + val.id + "Select"} value={val.id}>{val.text || val.id}</Option>
                   ))}
                 </Select>
               )}
