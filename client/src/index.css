@@ -1052,7 +1052,7 @@ table.fixed thead th {
   box-shadow: 1px 1px 0 #dee3f2;
 }
 
-table.fixed .ant-cascader-menus, table.fixed .ant-select-dropdown, table.fixed .ant-dropdown {
+table.fixed .ant-cascader-menus, table.fixed .ant-select-dropdown {
   z-index: 998 !important;
 }
 

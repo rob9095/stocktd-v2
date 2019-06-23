@@ -39,10 +39,13 @@ class BasicSearchForm extends Component {
     this.props.onSearch([], []);
   }
 
-  handleSelect = (value, select) => {
-    this.setState({
+  handleSelect = async (value, select) => {
+    await this.setState({
       selects: { ...this.state.selects, [select.props.id]: value },
     })
+    if (this.props.form.getFieldValue(select.props.iref)) {
+      this.handleSubmit()
+    }
   }
 
   handleDateSelect = async (date, dateString,id) => {
@@ -143,11 +146,11 @@ class BasicSearchForm extends Component {
       const id = i.nestedKey ? i.id + i.nestedKey : i.id
       const selectBefore = (
         <Select key={`${id}Select`} value={this.state.selects[id+"Select"] || "="} onChange={this.handleSelect} showArrow={false} className="number-input pre-select">
-          <Option id={`${id}Select`} className="center-a" value="=">=</Option>
-          <Option id={`${id}Select`} className="center-a" value="gt">{'>'}</Option>
-          <Option id={`${id}Select`} className="center-a" value="gte">{'≥'}</Option>
-          <Option id={`${id}Select`} className="center-a" value="lt">{'<'}</Option>
-          <Option id={`${id}Select`} className="center-a" value="lte">{'≤'}</Option>
+          <Option id={`${id}Select`} iref={id} className="center-a" value="=">=</Option>
+          <Option id={`${id}Select`} iref={id} className="center-a" value="gt">{'>'}</Option>
+          <Option id={`${id}Select`} iref={id} className="center-a" value="gte">{'≥'}</Option>
+          <Option id={`${id}Select`} iref={id} className="center-a" value="lt">{'<'}</Option>
+          <Option id={`${id}Select`} iref={id} className="center-a" value="lte">{'≤'}</Option>
         </Select>
       )
       if (i.type === 'number') {
@@ -161,7 +164,7 @@ class BasicSearchForm extends Component {
                 }],
               })(
                 <Input
-                  suffix={<Icon style={{ ...!this.props.form.getFieldValue(id) && { display: 'none' } }} onClick={() => this.handleClear(id)} type="close-circle" theme="filled" />}
+                  addonAfter={this.props.form.getFieldValue(id) ? <Icon onClick={() => this.handleClear(id)} type="close-circle" theme="filled" /> : null}
                   onBlur={this.handleSubmit}
                   type="number"
                   addonBefore={selectBefore}
