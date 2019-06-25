@@ -285,53 +285,71 @@ exports.handlePOImport = async (req, res, next) => {
 
 /*
 * UPDATE Purchase Order and associated PoProducts
-* Accepted Values: updates obj array in req.body. ex:  [{name, createdOn, type, status}]
+* Accepted Values: updates obj array in req.body. accepted values include:  [{name, createdOn, type, status}]
 * Returns: bulkWrite array result
 */
 exports.updatePurchaseOrder = async (req, res, next) => {
   try {
+    let { updates, company } = req.body
+    //add validation check here, updates is array with id, createdOn cannot be changed moved forward past today's date
+    if (updates.length > 3000) {
+      return next({
+        status: 400,
+        message: ['Request to large'],
+      })
+    }
+    if (!updates || updates.length === 0) {
+      return({
+        status: 400,
+        message: ['No updates found']
+      })
+    }
     //basic update for each po
-    let poUpdates = req.body.updates.map(po=>{
-      delete po.oldQty, po.selectType;
+    let poUpdates = updates.map(po=>{
+      let update = {name, createdOn, type, status } = po
+      console.log({update})
       return ({
         updateOne: {
-          filter: { _id: po.id},
-          update: {
-            ...po
-          },
+          filter: { _id: po.id, company},
+          update,
         }
       })
     })
     let poProductUpdates = []
     let productUpdates = []
-    //loop each po and find poProducts for po
-    for (let po of req.body.updates) {
-      delete po.oldQty, po.selectType;
-      let products = await db.PoProduct.find({company: req.body.company, poRef: po.poRef}).populate('po')
-      //poProduct updates
-      let ppUpdates = products.map(poLine => ({
-        updateOne: {
-          filter: { skuCompany: poLine.skuCompany, poRef: poLine.poRef},
-          update: {...po},
-        }
-      }))
-      poProductUpdates.push(...ppUpdates);
-      //update quantity on main product if new po.type is different than current poProduct type
-      let pUpdates = products.filter(p=>p.type !== po.type).map(poLine => ({
-        updateOne: {
-          filter: {skuCompany: poLine.skuCompany},
-          update: {
-            $inc: po.type === 'outbound' ?
-              { quantity: parseInt(-poLine.quantity) }
-              :
-              { quantity: parseInt(poLine.quantity) }
+    //andQuery to grab all products on pos beings in updates
+    let andQuery = updates.map(({id})=>({po: id}))
+    let poProducts = await db.PoProduct.find({company, $and: [{ $or: andQuery }]}).populate('po')
+    //loop each po and find poProducts for 
+    if (poProducts.length > 0) {
+      for (let poU of updates) {
+        let po = { name, createdOn, type, status } = poU
+        let products = poProducts.filter(pp => pp.po._id == poU.id)
+        //poProduct updates
+        let ppUpdates = products.map(poLine => ({
+          updateOne: {
+            filter: { _id: poLine._id },
+            update: { ...po },
+          }
+        }))
+        poProductUpdates.push(...ppUpdates);
+        //update quantity on main product if new po.type is different than current poProduct type
+        let pUpdates = products.filter(p => p.type !== po.type).map(poLine => ({
+          updateOne: {
+            filter: { skuCompany: poLine.skuCompany },
+            update: {
+              $inc: po.type === 'outbound' ?
+                { quantity: parseInt(-poLine.quantity) }
+                :
+                { quantity: parseInt(poLine.quantity) }
             }
           }
         })
-      )
-      productUpdates.push(...pUpdates)
+        )
+        productUpdates.push(...pUpdates)
+      }
     }
-    let updatedPurchaseOrders = poUpdates.length > 0 && await db.PurchaseOrder.bulkWrite(poUpdates)
+    let updatedPurchaseOrders = await db.PurchaseOrder.bulkWrite(poUpdates)
     let updatedPoProducts = poProductUpdates.length > 0 && await db.PoProduct.bulkWrite(poProductUpdates)
     let updatedProducts = productUpdates.length > 0 && await db.Product.bulkWrite(productUpdates);
     return res.status(200).json({
@@ -340,6 +358,7 @@ exports.updatePurchaseOrder = async (req, res, next) => {
       updatedProducts,
     });
   } catch(err) {
+    console.log({err})
     return next(err)
   }
 }
@@ -351,14 +370,27 @@ exports.updatePurchaseOrder = async (req, res, next) => {
 */
 exports.removePurchaseOrder = async (req, res, next) => {
   try {
-    let poRemovals = req.body.data.map(po => ({
+    let { data, company } = req.body
+    if (data.length > 3000) {
+      return next({
+        status: 400,
+        message: ['Request to large'],
+      })
+    }
+    if (!data || data.length === 0) {
+      return ({
+        status: 400,
+        message: ['No removals found']
+      })
+    }
+    
+    let poRemovals = data.map(po => ({
       deleteOne: {
         filter: {_id: po.id}
       }
     }))
-    let andQuery = req.body.data.map(po=>({poRef: po.poRef}))
-    console.log(andQuery)
-    let poProducts = await db.PoProduct.find({company: req.body.company, $and: [{$or: andQuery}]})
+    let andQuery = data.map(({id})=>({po: id}))
+    let poProducts = await db.PoProduct.find({company, $and: [{$or: andQuery}]}).populate('po')
     let poProductRemovals = poProducts.map(p=>{
       return ({
         deleteOne: {
@@ -369,9 +401,9 @@ exports.removePurchaseOrder = async (req, res, next) => {
     let productUpdates = poProducts.map(p => {
       return({
         updateOne: {
-          filter: {skuCompany: p.sku+"-"+req.body.company},
+          filter: {_id: p.product},
           update: {
-            $inc: p.type === 'outbound' ?
+            $inc: p.po.type === 'outbound' ?
               { quantity: parseInt(p.quantity) }
               :
               { quantity: parseInt(-p.quantity) },
@@ -379,7 +411,7 @@ exports.removePurchaseOrder = async (req, res, next) => {
         }
       })
     })
-    let removedPos = poRemovals.length > 0 && await db.PurchaseOrder.bulkWrite(poRemovals)
+    let removedPos = await db.PurchaseOrder.bulkWrite(poRemovals)
     let removedPoProducts = poProductRemovals.length> 0 && await db.PoProduct.bulkWrite(poProductRemovals)
     let updatedProducts = productUpdates.length > 0 && await db.Product.bulkWrite(productUpdates)
     return res.status(200).json({

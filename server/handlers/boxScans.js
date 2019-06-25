@@ -655,7 +655,7 @@ exports.importBoxScans = async (req, res, next) => {
   try {
     if (req.body.data.length > 7000) {
       return next({
-        status: 404,
+        status: 400,
         message: ['Request to large'],
       })
     }

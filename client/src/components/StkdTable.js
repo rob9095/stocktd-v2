@@ -4,7 +4,7 @@ import { fetchAllProducts, updateProducts, importProducts } from '../store/actio
 import { queryModelData, deleteModelDocuments } from '../store/actions/models';
 import { upsertModelDocuments } from '../store/actions/models';
 import { addBoxScan } from '../store/actions/boxScans';
-import { Button, Pagination, Select, Icon, Spin, Form, Dropdown, Menu, Modal, message, Empty, Skeleton, Input, Layout, PageHeader } from 'antd';
+import { Button, Pagination, Select, Icon, Spin, Form, Dropdown, Menu, Modal, message, Empty, Skeleton, Input, Layout, PageHeader, Cascader } from 'antd';
 import WrappedFilterForm from './FilterForm';
 import SearchForm from './SearchForm';
 import EditItemDrawer from './EditItemDrawer';
@@ -42,6 +42,7 @@ class ProductTable extends Component {
       populateQuery:[],
       hiddenCols: ['supplier'],
       siderClosed: true,
+      triggerDropMenuClose: 0,
       pageSizeOptions: [10, 50, 100, 250, 500],
       pagination: {
         current: 1,
@@ -85,7 +86,7 @@ class ProductTable extends Component {
         data,
       })
     }
-    console.log({loadingRows: this.state.loadingRows, loading: this.state.loading})
+    //console.log({loadingRows: this.state.loadingRows, loading: this.state.loading})
     requestedPage = requestedPage || this.state.activePage;
     requestedRowsPerPage = requestedRowsPerPage || this.state.rowsPerPage;
     let populateArray = this.props.populateArray || []
@@ -123,10 +124,10 @@ class ProductTable extends Component {
       await this.setState({
         ...rowId ? { loadingRows: [] } : { loading: false }
       })
-      console.log({
-        loadingRows: this.state.loadingRows,
-        loading: this.state.loading
-      });
+      // console.log({
+      //   loadingRows: this.state.loadingRows,
+      //   loading: this.state.loading
+      // });
     }
     
     componentDidMount() {
@@ -206,7 +207,7 @@ class ProductTable extends Component {
             let foundOption = this.props.bulkMenuOptions.find(o=>o.handler && o.key === key)
             let result = foundOption ? await foundOption.handler(items) : this.handleRowDelete(items);
             if (foundOption) {
-              result.error ? console.log(result) : this.handleRowDelete(items,false)
+              result.error ? console.log(result) : this.handleRowDelete(items)
             }
           }
           break;
@@ -544,7 +545,7 @@ class ProductTable extends Component {
             </Menu>
           )
           return (
-            <td key={`${r._id}-${col.id}`} id={`${r._id}-${col.id}-dropdown`} className="stkd-td actions center-a no-wrap" style={{position: 'relative'}}>
+            <td key={`${r._id}-${col.id}`} id={`${r._id}-${col.id}-dropdown`} className="stkd-td actions center-a no-wrap" style={this.state.data.length>8?{position: 'relative'}:{}}>
               <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
                 <Dropdown getPopupContainer={()=>document.getElementById(`${r._id}-${col.id}-dropdown`)} overlay={menu} placement="bottomRight">
                     <Button className="no-border no-bg">
@@ -557,7 +558,7 @@ class ProductTable extends Component {
         }
         if (col.type === 'cascader') {
           return (
-            <td key={`${r._id}-${col.id}`} className="stkd-td no-wrap">
+            <td key={`${r._id}-${col.id}`} className="stkd-td no-wrap" style={this.state.data.length>8?{position: 'relative'}:{}}>
               <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
                 <CascaderSelect
                   domRef={`${r._id}-${col.id}cascader-select`}
@@ -577,6 +578,7 @@ class ProductTable extends Component {
                       insertDataModal,
                     })
                   }}
+                  triggerClose={this.state.triggerDropMenuClose}
                 >
                   <Input style={{ display: "none" }} />
                 </CascaderSelect>
@@ -586,7 +588,7 @@ class ProductTable extends Component {
         }
         if (Array.isArray(r[col.id]) || col.type === 'autoComplete') {
           return (
-            <td key={`${r._id}-${col.id}`} className="stkd-td no-wrap">
+            <td key={`${r._id}-${col.id}`} className="stkd-td no-wrap" style={this.state.data.length>8?{position: 'relative'}:{}}>
               <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
                 <AutoCompleteInput
                   key={`${r._id}-${col.id}-auto-complete`}
@@ -756,7 +758,7 @@ class ProductTable extends Component {
                 />
               </div>
             </div>
-            <div className="stkd-widget no-margin contain" style={{ height: '100%' }}>
+            <div className="stkd-widget no-margin contain" style={{ height: '100%',}}>
               <table className="fixed">
                 <thead className="ant-table-thead">
                   <tr>

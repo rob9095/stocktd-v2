@@ -18,8 +18,8 @@ class PoTableNew extends Component {
 
   handleDelete = (ids) => {
     return new Promise((resolve, reject) => {
-      const updates = ids.map(id => ({ id, action: 'delete' }))
-      return this.handleImport(updates)
+      let updates = ids.map(id=>({id}))
+      return this.props.removePurchaseOrders(updates, this.props.currentUser)
         .then(res => {
           console.log(res)
           resolve(res)
@@ -33,7 +33,7 @@ class PoTableNew extends Component {
 
   handleRowEditSave = (updates, id) => {
     return new Promise((resolve, reject) => {
-      return this.handleImport(updates)
+      return this.props.updatePurchaseOrders(updates, this.props.currentUser)
         .then(res => {
           console.log(res)
           resolve(res)
@@ -46,15 +46,15 @@ class PoTableNew extends Component {
   }
 
   handleImport = (data) => {
-    // return new Promise((resolve, reject) => {
-    //   this.props.importProducts(data, this.props.currentUser)
-    //     .then(res => {
-    //       resolve(res)
-    //     })
-    //     .catch(err => {
-    //       reject(err)
-    //     })
-    // })
+    return new Promise((resolve, reject) => {
+      this.props.importPurchaseOrder(data, this.props.currentUser)
+        .then(res => {
+          resolve(res)
+        })
+        .catch(err => {
+          reject(err)
+        })
+    })
   }
 
   updateFilters = (key, value, operator) => {

@@ -32,6 +32,10 @@ code {
   padding: 2px;
 }
 
+.ant-divider {
+  background: #dee3f2 !important;
+}
+
 .ant-layout {
   height: 100%;
   position: relative;
@@ -1052,7 +1056,7 @@ table.fixed thead th {
   box-shadow: 1px 1px 0 #dee3f2;
 }
 
-table.fixed .ant-cascader-menus, table.fixed .ant-select-dropdown {
+table.fixed .ant-cascader-menus, table.fixed .ant-select-dropdown, table.fixed .ant-dropdown {
   z-index: 998 !important;
 }
 
@@ -1127,10 +1131,6 @@ table.fixed .ant-cascader-menus, table.fixed .ant-select-dropdown {
 
 .stkd-sidebar .ant-page-header-title-view-sub-title {
   color: #483b7d;
-}
-
-.stkd-sidebar .ant-divider {
-  background: #dee3f2;
 }
 
 .stkd-sidebar .ant-menu {

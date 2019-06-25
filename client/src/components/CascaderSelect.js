@@ -21,10 +21,17 @@ class CascaderSelect extends Component {
     }
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.props.triggerClose > prevProps.triggerClose) {
+      this.setState({
+        popupVisible: false,
+      },)
+    }
+  }
+
   componentDidMount() {
     this._isMounted = true;
     //loop through provided data and configure options
-    console.log({initialData: this.props.data})
     let data = this.props.data.map((option,i) => {
       let nestedObj = option[this.props.parent.subChild.key] || {}
       return ({
@@ -83,10 +90,6 @@ class CascaderSelect extends Component {
     let defaultParent = data.length === 0 ? { children: [] } : data.find(parent=>parent.isDefault) || data.sort((a,b)=>b[this.props.parent.sortKey] - a[this.props.parent.sortKey])[0]
     let defaultChild = defaultParent.children.length === 0 ? {} : defaultParent.children.find(child => child.isDefault) || defaultParent.children[0]
     let value = [defaultParent.value, defaultChild.value]
-    console.log({
-      data,
-      value
-    })
     this.setState({
       data,
       value,
@@ -130,15 +133,18 @@ class CascaderSelect extends Component {
   render() {
     const domRef = this.props.domRef || 'cascader'
     return (
-      <div id={domRef} style={{position: 'relative'}}>
+      <div id={domRef}>
         <Skeleton paragraph={false} loading={this.state.loading} active>
           <Cascader
+            onPopupVisibleChange={(popupVisible) => this.setState({ popupVisible})}
+            popupVisible={this.state.popupVisible}
+            placement="bottomRight"
             options={this.state.data.length > 0 ? this.props.showAddOption ? [...this.state.data, this.state.addNewOption] : this.state.data : [this.state.emptyOption, this.state.addNewOption]}
             onChange={this.onChange}
             placeholder={this.props.placeholder || "Please select"}
             //showSearch={this.state.data.length > 0 ? { filter: this.filter } : false}
             style={{ minWidth: 200 }}
-            popupClassName={'cascader-popup'}
+            popupClassName={'cascader-popup '+domRef}
             notFoundContent={<Empty imageStyle={{ height: 20 }} />}
             getPopupContainer={() => document.getElementById(domRef)}
             value={this.state.value}

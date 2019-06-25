@@ -130,7 +130,7 @@ class ScanTable extends Component {
             { id: 'po', nestedKey: 'name', text: 'PO Name', width: 175, span: 8, className: 'no-wrap', disabled: true },
             { id: 'po', nestedKey: 'type', text: 'PO Type', width: 175, span: 8, className: 'no-wrap', disabled: true },
             { id: 'locations', type: 'autoComplete', autoCompleteMode: 'tags', nestedKey: 'name', refModel: 'BoxScan', queryModel: 'Location', upsertOnChange: true,text: 'Location', width: 175, span: 8, className: 'no-wrap', },
-            { id: 'actions', text: 'Actions', width: 100, noSort: true, actionOptions: [{ name: 'Delete', key: 'delete', }] },
+            { id: 'actions', text: 'Actions', width: 100, noSort: true, actionOptions: [{ name: 'Edit', key: 'edit', },{ name: 'Delete', key: 'delete', }] },
           ]}
         />
       </div>
