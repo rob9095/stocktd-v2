@@ -1,0 +1,55 @@
+import React, { Component } from "react";
+import { TreeSelect } from "antd";
+
+const { TreeNode } = TreeSelect;
+
+class BasicTreeSelect extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {}
+  }
+
+  onChange = (value, node, extra) => {
+    console.log({ value, parent: extra.triggerNode.props.parent, node, extra });
+    this.setState({ value: extra.triggerNode.props.parent.title + " / " + extra.triggerNode.props.title });
+  };
+
+  renderOptions = (options=[],childOptions=[],reverseData) => (
+    options.map(o=>
+      <TreeNode selectable={o.selectable} disableCheckBox={o.disableCheckBox} value={o.value} title={o.title} key={o.value}>
+        {childOptions.filter(c=>c.parentTitles.includes(o.title)).map(c=>
+          <TreeNode
+            parent={o}
+            value={c.value + o.value}
+            title={c.title}
+            key={c.value + o.value}
+          />
+        )}
+      </TreeNode>
+    )
+  )
+
+  render() {
+    let options = this.renderOptions(this.props.options,this.props.childOptions,this.props.reverseData)
+    return (
+      <TreeSelect
+        // treeCheckable
+        // treeCheckStrictly
+        showCheckedStrategy="SHOW_ALL"
+        showSearch
+        style={{ minWidth: 100 }}
+        value={this.state.value}
+        dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
+        placeholder="Please select"
+        allowClear
+        treeDefaultExpandAll
+        onChange={this.onChange}
+        defaultValue={"parent / sss -s"}
+      >
+        {options}
+      </TreeSelect>
+    );
+  }
+}
+
+export default BasicTreeSelect

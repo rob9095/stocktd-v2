@@ -7,7 +7,7 @@ class CascaderSelect extends Component {
     super(props)
     this.state = {
       data: [],
-      emptyOption: { label: (<div style={{minWidth: 176}}><Empty imageStyle={{ height: 20 }} /></div>), value: 'empty', key: 'empty', disabled: true },
+      emptyOption: { label: (<div style={{minWidth: 176}}><Empty imageStyle={{ height: 20 }} /></div>), value: 'empty', key: 'empty', disabled: true, text: '' },
       addNewOption: {
         label: (
           <div style={{width: '100%'}}>
@@ -123,11 +123,16 @@ class CascaderSelect extends Component {
     this.setState({ value })
   }
 
-  filter(inputValue, path) {
+  filter = (inputValue, path) => {
     console.log({
       inputValue, path
     })
-    return (path.some(option => (option.text).toLowerCase().indexOf(inputValue.toLowerCase()) > -1));
+    //searches two levels deep for now
+    return this.state.data.filter(o=>o.text.toLowerCase() === inputValue.toLowerCase() || Array.isArray(o.children) && o.children.map(c=>c.text.toLowerCase()).includes(inputValue.toLowerCase()))
+    //return (path.some(option => option.text.toLowerCase().includes(inputValue.toLowerCase())));
+    // this.setState({
+    //   data: inputValue ? data : this.state.data
+    // })
   }
 
   render() {
@@ -142,7 +147,7 @@ class CascaderSelect extends Component {
             options={this.state.data.length > 0 ? this.props.showAddOption ? [...this.state.data, this.state.addNewOption] : this.state.data : [this.state.emptyOption, this.state.addNewOption]}
             onChange={this.onChange}
             placeholder={this.props.placeholder || "Please select"}
-            //showSearch={this.state.data.length > 0 ? { filter: this.filter } : false}
+            //showSearch={this.filter}
             style={{ minWidth: 200 }}
             popupClassName={'cascader-popup '+domRef}
             notFoundContent={<Empty imageStyle={{ height: 20 }} />}

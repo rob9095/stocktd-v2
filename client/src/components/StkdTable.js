@@ -12,6 +12,7 @@ import ImportModal from './ImportModal';
 import InsertDataModal from './InsertDataModal';
 import AutoCompleteInput from './AutoCompleteInput';
 import CascaderSelect from './CascaderSelect';
+import BasicTreeSelect from './BasicTreeSelect';
 import SingleInputFilter from './SingleInputFilter';
 
 const moment = require('moment');
@@ -517,11 +518,12 @@ class ProductTable extends Component {
       })
       let rows = this.state.data.map((r,i) => {
       const isSelected = this.isSelected(r._id);
+      const rowLoading = this.state.loading || this.state.loadingRows.includes(r._id)
       let activeColumns = this.props.headers.filter(h=>this.state.hiddenCols.indexOf(h.id) === -1).map(col=>{
         if (col.id === 'select-all') {
           return (
             <td key={`${r._id}-select-all`} className="ant-table-selection-column">
-              <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
+              <Skeleton paragraph={false} loading={rowLoading} active>
                 <label className="container">
                   <input
                     type="checkbox"
@@ -546,7 +548,7 @@ class ProductTable extends Component {
           )
           return (
             <td key={`${r._id}-${col.id}`} id={`${r._id}-${col.id}-dropdown`} className="stkd-td actions center-a no-wrap" style={this.state.data.length>8?{position: 'relative'}:{}}>
-              <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
+              <Skeleton paragraph={false} loading={rowLoading} active>
                 <Dropdown getPopupContainer={()=>document.getElementById(`${r._id}-${col.id}-dropdown`)} overlay={menu} placement="bottomRight">
                     <Button className="no-border no-bg">
                       <Icon type="ellipsis" style={{ color: '#a6aece', fontSize: 25, cursor: 'pointer' }} />
@@ -556,10 +558,38 @@ class ProductTable extends Component {
             </td>
           )
         }
+        if (col.type === 'treeSelect') {
+          return(
+            <td key={`${r._id}-${col.id}`} className="stkd-td no-wrap" style={this.state.data.length > 8 ? { position: 'relative' } : {}}>
+              <Skeleton paragraph={false} loading={rowLoading} active>
+                <BasicTreeSelect
+                  domRef={`${r._id}-${col.id}-tree-select`}
+                  options={col.mapReduce.parents(r)}
+                  childOptions={col.mapReduce.childOptions(r)}
+                  onUpdate={(value, options) => this.handleAutoCompleteUpdate({ rowId: r._id, handler: col.handler, clicked: { value, options }, colId: col.id, })}
+                  showAddOption
+                  onAddNewItem={() => {
+                    let insertDataModal = this.props.onGetInsertDataConfig(this.state.data.filter(row => row._id === r._id), 'addNewBox')
+                    insertDataModal = {
+                      ...insertDataModal,
+                      ...!insertDataModal.onSave && { onSave: this.props.onInsertDataSave }
+                    }
+                    this.setState({
+                      insertDataModal,
+                    })
+                  }}
+                  triggerClose={this.state.triggerDropMenuClose}
+                >
+                  <Input style={{ display: "none" }} />
+                </BasicTreeSelect>
+              </Skeleton>
+            </td>
+          )
+        }
         if (col.type === 'cascader') {
           return (
             <td key={`${r._id}-${col.id}`} className="stkd-td no-wrap" style={this.state.data.length>8?{position: 'relative'}:{}}>
-              <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
+              <Skeleton paragraph={false} loading={rowLoading} active>
                 <CascaderSelect
                   domRef={`${r._id}-${col.id}cascader-select`}
                   data={Array.isArray(r[col.id]) ? col.filter ? col.filter(r[col.id].map(option => ({ ...r, ...option, }))) : r[col.id].map(option => ({ ...r, ...option, })) : []}
@@ -589,7 +619,7 @@ class ProductTable extends Component {
         if (Array.isArray(r[col.id]) || col.type === 'autoComplete') {
           return (
             <td key={`${r._id}-${col.id}`} className="stkd-td no-wrap" style={this.state.data.length>8?{position: 'relative'}:{}}>
-              <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
+              <Skeleton paragraph={false} loading={rowLoading} active>
                 <AutoCompleteInput
                   domRef={`${r._id}-${col.id}-auto-complete`}
                   queryModel={col.queryModel}
@@ -609,7 +639,7 @@ class ProductTable extends Component {
         if (col.type === 'date') {
           return (
             <td key={`${r._id}-${col.id}-${col.nestedKey || i}`} className={col.className}>
-              <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
+              <Skeleton paragraph={false} loading={rowLoading} active>
                 {col.render ? col.render(r[col.id]) : col.nestedKey && r[col.id] ? moment(new Date(r[col.id][col.nestedKey])).format('M/D/YY') : moment(new Date(r[col.id])).format('M/D/YY') || ''}
               </Skeleton>
             </td>
@@ -617,7 +647,7 @@ class ProductTable extends Component {
         }
         return (
           <td key={`${r._id}-${col.id}-${col.nestedKey || i}`} className={col.className}>
-            <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
+            <Skeleton paragraph={false} loading={rowLoading} active>
               {col.render ? col.render(r) : col.nestedKey && r[col.id] ? r[col.id][col.nestedKey] : r[col.id] || ''}
             </Skeleton>
           </td>
@@ -781,7 +811,7 @@ class ProductTable extends Component {
                   >
                     {this.state.pageSizeOptions.map(op => (
                       <Select.Option key={op} value={op} className="flex-i align-items-center justify-content-center">
-                        <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.length > 0} active>
+                        <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.length} active>
                           {this.state.pagination.pageSize === op &&
                             <Icon style={{ marginRight: 2, marginLeft: -10 }} type="check" />
                           }
@@ -791,7 +821,7 @@ class ProductTable extends Component {
                     ))}
                   </Select>
                   <div className="pagination-simple">
-                    <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.length > 0} active>
+                      <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.length} active>
                       <Pagination simple className="flex align-items-center" {...this.state.pagination} />
                     </Skeleton>
                   </div>
