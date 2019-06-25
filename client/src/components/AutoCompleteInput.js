@@ -136,9 +136,9 @@ class AutoCompleteInputForm extends Component {
         {this.props.renderOption ? this.props.renderOption(item) : item[this.props.searchKey]}
       </Option>
     ));
-    const id = this.props.key || this.props.placeholder + 'auto-complete'
+    const domRef = this.props.domRef || this.props.placeholder + 'auto-complete'
     return (
-      <div id={id}>
+      <div id={domRef}>
         <Skeleton paragraph={false} loading={this.state.transition} active>
           {this.state.addItem ?
             <Input
@@ -166,7 +166,7 @@ class AutoCompleteInputForm extends Component {
                 labelInValue
                 ref={node => (this.selectRef = node)}
                 onMouseLeave={(e) => e.stopPropagation()}
-                getPopupContainer={() => document.getElementById(id)}
+                getPopupContainer={() => document.getElementById(domRef)}
                 dropdownRender={(menu) => (
                   <div>
                     {menu}

@@ -591,7 +591,7 @@ class ProductTable extends Component {
             <td key={`${r._id}-${col.id}`} className="stkd-td no-wrap" style={this.state.data.length>8?{position: 'relative'}:{}}>
               <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.includes(r._id)} active>
                 <AutoCompleteInput
-                  key={`${r._id}-${col.id}-auto-complete`}
+                  domRef={`${r._id}-${col.id}-auto-complete`}
                   queryModel={col.queryModel}
                   searchKey={col.nestedKey}
                   placeholder={col.text}

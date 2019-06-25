@@ -205,6 +205,7 @@ class DrawerForm extends Component {
                 }],
               })(
                 <AutoCompleteInput
+                  domRef={`${item._id || ''}-${i.id}edit-auto-select`}
                   queryModel={i.queryModel}
                   searchKey={i.nestedKey}
                   placeholder={i.text}
