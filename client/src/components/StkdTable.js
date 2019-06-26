@@ -230,6 +230,9 @@ class ProductTable extends Component {
     }
 
     handleOptionsMenuClick = async ({ item, key, keyPath }) => {
+      this.setState({
+        tableOptionsMenuOpen: false,
+      })
       let option = this.props.tableMenuOptions.find(o => o.handler && o.key === key) || {}
       switch(key) {
         case 'add':
