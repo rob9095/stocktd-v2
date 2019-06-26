@@ -281,61 +281,65 @@ class ProductTableNew extends Component {
             { id: 'weight', text: 'Weight', width: 75, type: 'number', span: 4, className: 'no-wrap' },
             { id: 'brand', text: 'Brand', width: 100, span: 8 },
             { id: 'supplier', text: 'Supplier', width: 100, span: 8 },
-            // { id: 'scanToPo', text: 'Scan Type', width: 175, span: 6, className: 'no-wrap', disabled: true, render: (val)=>(val === true ? 'Scan To' : 'Scan From'), noFilter: true},
-            // { id: 'po', nestedKey: 'type', text: 'PO Type', width: 175, span: 8, className: 'no-wrap', disabled: true },
-            // { id: 'locations', type: 'autoComplete', autoCompleteMode: 'tags', nestedKey: 'name', refModel: 'BoxScan', queryModel: 'Location', text: 'Location', width: 175, span: 8, className: 'no-wrap', },
-            //{ id: 'boxscans', type: 'autoComplete', autoCompleteMode: 'default', nestedKey: 'name', queryModel: 'Location', text: 'Location', width: 175, span: 8, className: 'no-wrap', },
-            { id: 'boxscans',
-              type: 'treeSelect',
-              text: 'Locations New',
-              width: 175,
-              span: 8,
-              className: 'no-wrap',
-              filter: (arr) => arr.filter(item => item.scanToPo === true),
-              mapReduce: {
-                parents: (r)=> {
-                  let children = Array.isArray(r.boxscans) ? r.boxscans.filter(box => box.scanToPo === true).map(box => [...box.locations.map((l) => ({ title: l.name, value: l._id + "-" + box.po._id + "-" + box._id, childValue: box._id+"-"+box.po._id, disableCheckbox: true, selectable: false }))]).flat().reduce((acc,cv)=>acc.filter(v=>cv.title === v.title).length > 0 ? [...acc] : [...acc,cv],[])
-                  : []
-                  return children
-                },
-                childOptions: (r) => Array.isArray(r.boxscans) ? 
-                  r.boxscans.filter(box=>box.scanToPo === true).map(box=>({title: box.name +" "+box.po.name, value: box._id+"-"+box.po._id, parentTitles: box.locations.map(({name})=>name)})).reduce((acc,cv)=>acc.filter(v=>cv.value === v.value).length > 0 ? [...acc] : [...acc,cv],[])
-                 : []
-                // children: ({boxscans = []}) => Array.isArray(boxscans) ? boxscans.filter(box => box.scanToPo === true).reduce((acc,cv)=>[...acc,...cv.locations.map(l=>({name: l.name, value: l._id+"-"+cv.po._id+"-"+cv._id, parentValue: cv._id+"-"+cv.po._id,}))],[]) : [],
-                // parents: ({boxscans = []}) => Array.isArray(boxscans) ? boxscans.filter(item => item.scanToPo === true).reduce((acc,cv)=>[...acc,({name: cv.name, value: cv._id+"-"+cv.po._id})],[]) : [],
-              },
-            },
+            { id: 'scanToPo', text: 'Scan Type', width: 175, span: 6, className: 'no-wrap', disabled: true, render: (val)=>(val === true ? 'Scan To' : 'Scan From'), noFilter: true},
+            { id: 'po', nestedKey: 'type', text: 'PO Type', width: 175, span: 8, className: 'no-wrap', disabled: true },
             // { id: 'boxscans',
-            //   type: 'cascader',
-            //   autoCompleteMode: 'default',
-            //   text: 'Locations',
+            //   type: 'treeSelect',
+            //   text: 'Locations New',
             //   width: 175,
             //   span: 8,
             //   className: 'no-wrap',
-            //   reverseData: true,
-            //   nestedKey: 'name',
-            //   noFilter: true,
-            //   filter: (arr)=>arr.filter(item=>item.scanToPo === true),
-            //   parent: {
-            //     label: 'name',
-            //     value: 'name',
-            //     defaultKey: 'defaultBox',
-            //     sortKey: 'quantity',
-            //     subChild: {
-            //       key: 'po',
-            //       label: 'name',
-            //       value: 'name',
-            //       defaultKey: 'po'
-            //     }
+            //   filter: (arr) => arr.filter(item => item.scanToPo === true),
+            //   mapReduce: {
+            //     parents: (r)=> {
+            //       let children = Array.isArray(r.boxscans) ? r.boxscans.filter(box => box.scanToPo === true).map(box => [...box.locations.map((l) => ({ title: l.name, value: l._id + "-" + box.po._id + "-" + box._id, childValue: box._id+"-"+box.po._id, disableCheckbox: true, selectable: false }))]).flat().reduce((acc,cv)=>acc.filter(v=>cv.title === v.title).length > 0 ? [...acc] : [...acc,cv],[])
+            //       : []
+            //       return children
+            //     },
+            //     childOptions: (r) => Array.isArray(r.boxscans) ? 
+            //       r.boxscans.filter(box=>box.scanToPo === true)
+            //       .map(box=>({po: box.po, title: box.name, value: box._id+"-"+box.po._id, parentTitles: box.locations.map(({name})=>name)}))
+            //       .reduce((acc,cv,i,a)=>{
+            //         let foundChild = acc.find(v => cv.name === v.name)
+            //         let newAcc = acc.filter(v => foundChild.name !== v.name)
+            //         let children = a.filter(box => box.name === cv.name).map(box=>({parentTitles: [box.title],title: box.po.name, value: box.po._id+"-"+box._id+"-sc"}))
+            //         r.boxscans.length > 0 && console.log({ foundChild, newAcc, children })
+            //         return foundChild ? [...newAcc,{...foundChild, children}] : [...acc,cv]
+            //         },[])
+            //      : []
             //   },
-            //   child: {
-            //     label: 'name',
-            //     value: 'name',
-            //     arrayKey: 'locations',
-            //     defaultKey: 'defaultLocation'
-            //   },
-            //   handler: this.handleCascaderUpdate,
             // },
+            { id: 'boxscans',
+              type: 'cascader',
+              autoCompleteMode: 'default',
+              text: 'Locations',
+              width: 175,
+              span: 8,
+              className: 'no-wrap',
+              reverseData: true,
+              nestedKey: 'name',
+              noFilter: true,
+              filter: (arr)=>arr.filter(item=>item.scanToPo === true),
+              parent: {
+                label: 'name',
+                value: 'name',
+                defaultKey: 'defaultBox',
+                sortKey: 'quantity',
+                subChild: {
+                  key: 'po',
+                  label: 'name',
+                  value: 'name',
+                  defaultKey: 'po'
+                }
+              },
+              child: {
+                label: 'name',
+                value: 'name',
+                arrayKey: 'locations',
+                defaultKey: 'defaultLocation'
+              },
+              handler: this.handleCascaderUpdate,
+            },
             { id: 'actions', width: 100, noSort: true, actionOptions: [{name: 'Edit', key: 'edit'},{ name: 'Add to Order', key: 'add-to-order', },{ name: 'Copy', key: 'copy', },{ name: 'Delete', key: 'delete', }] },
           ]}
         />

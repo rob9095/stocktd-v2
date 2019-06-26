@@ -10,7 +10,7 @@ class BasicTreeSelect extends Component {
   }
 
   onChange = (value, node, extra) => {
-    console.log({ value, parent: extra.triggerNode.props.parent, node, extra });
+    console.log({ value, parent: extra.triggerNode.props.parent, subParent: extra.triggerNode.props.subParent, node, extra });
     this.setState({ value: extra.triggerNode.props.parent.title + " / " + extra.triggerNode.props.title });
   };
 
@@ -23,7 +23,19 @@ class BasicTreeSelect extends Component {
             value={c.value + o.value}
             title={c.title}
             key={c.value + o.value}
-          />
+          >
+           {Array.isArray(c.children) && (
+             c.children.filter(sc=>sc.parentTitles.includes(c.title)).map(sc=>
+               <TreeNode
+                 parent={o}
+                 subParent={c}
+                 value={sc.value + c.value + o.value}
+                 title={sc.title}
+                 key={sc.value + c.value + o.value}
+               />
+             )
+           )}
+          </TreeNode>
         )}
       </TreeNode>
     )
@@ -37,7 +49,7 @@ class BasicTreeSelect extends Component {
         // treeCheckStrictly
         showCheckedStrategy="SHOW_ALL"
         showSearch
-        style={{ minWidth: 100 }}
+        style={{ width: '100%' }}
         value={this.state.value}
         dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
         placeholder="Please select"

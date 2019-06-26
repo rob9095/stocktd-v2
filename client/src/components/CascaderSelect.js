@@ -1,12 +1,14 @@
 import React, { Component } from 'react'
-import { Cascader, Empty, Skeleton, Divider, Icon } from 'antd';
+import { Cascader, Empty, Skeleton, Divider, Icon, Input } from 'antd';
 
 class CascaderSelect extends Component {
   _isMounted = false;
   constructor(props) {
     super(props)
     this.state = {
+      searchValue: '',
       data: [],
+      searchInput: { label: (<Input />), value: 'stkd-cascader-search~', key: 'stkd-cascader-search~', text: ''},
       emptyOption: { label: (<div style={{minWidth: 176}}><Empty imageStyle={{ height: 20 }} /></div>), value: 'empty', key: 'empty', disabled: true, text: '' },
       addNewOption: {
         label: (
@@ -123,28 +125,52 @@ class CascaderSelect extends Component {
     this.setState({ value })
   }
 
-  filter = (inputValue, path) => {
+  filter = (inputValue = '') => {
     console.log({
-      inputValue, path
+      inputValue
     })
     //searches two levels deep for now
-    return this.state.data.filter(o=>o.text.toLowerCase() === inputValue.toLowerCase() || Array.isArray(o.children) && o.children.map(c=>c.text.toLowerCase()).includes(inputValue.toLowerCase()))
-    //return (path.some(option => option.text.toLowerCase().includes(inputValue.toLowerCase())));
-    // this.setState({
-    //   data: inputValue ? data : this.state.data
-    // })
+    return this.state.data.filter(option=>option.text.toLowerCase().includes(inputValue.toLowerCase()) || Array.isArray(option.children) && option.children.filter(child=>child.text.toLowerCase().includes(inputValue.toLowerCase())).length > 0)
   }
 
   render() {
     const domRef = this.props.domRef || 'cascader'
+    console.log({
+      data: this.state.data,
+      searchValue: this.state.searchValue
+    })
+    let data = this.state.searchValue ? this.filter(this.state.searchValue) : this.state.data
     return (
       <div id={domRef}>
         <Skeleton paragraph={false} loading={this.state.loading} active>
           <Cascader
-            onPopupVisibleChange={(popupVisible) => this.setState({ popupVisible})}
+            onPopupVisibleChange={async(popupVisible) => {
+              await this.setState({ popupVisible})
+              if (popupVisible) {
+                let dropdown = document.getElementsByClassName('cascader-popup '+domRef)
+                let div = document.createElement('div')
+                div.className = 'flex align-items-center half-pad ' + domRef
+                let input = document.createElement("input")
+                input.placeholder = 'Search'
+                input.className = 'ant-input ' + domRef
+                input.addEventListener('input', (e) => e.data ? this.setState({searchValue: this.state.searchValue + e.data}) : this.setState({searchValue: ''}) )
+                div.append(input)
+                dropdown[0].prepend(div)
+                console.log({
+                  dropdown
+                })
+              } else {
+                let div = document.getElementsByClassName('flex align-items-center half-pad ' + domRef)
+                let input = document.getElementsByClassName('ant-input ' + domRef)
+                setTimeout(()=>{
+                  input[0].remove()
+                  div[0].remove()
+                },150)
+              }
+            }}
             popupVisible={this.state.popupVisible}
             placement="bottomRight"
-            options={this.state.data.length > 0 ? this.props.showAddOption ? [...this.state.data, this.state.addNewOption] : this.state.data : [this.state.emptyOption, this.state.addNewOption]}
+            options={data.length > 0 ? this.props.showAddOption ? [...data, this.state.addNewOption] : data : [this.state.emptyOption, this.state.addNewOption]}
             onChange={this.onChange}
             placeholder={this.props.placeholder || "Please select"}
             //showSearch={this.filter}
@@ -162,6 +188,9 @@ class CascaderSelect extends Component {
             allowClear={Array.isArray(this.state.value) && this.state.value[0] !== undefined}
           />
         </Skeleton>
+        <div style={{display: 'none'}}>
+          <Input onClick={()=>this.setState({popupVisible: true})} id={"hidden-search-input"+domRef} onChange={(val)=>console.log({val})} />
+        </div>
       </div>
     );
   }

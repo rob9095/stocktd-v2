@@ -560,7 +560,7 @@ class ProductTable extends Component {
         }
         if (col.type === 'treeSelect') {
           return(
-            <td key={`${r._id}-${col.id}`} className="stkd-td no-wrap" style={this.state.data.length > 8 ? { position: 'relative' } : {}}>
+            <td key={`${r._id}-${col.id}`} className="stkd-td no-wrap" style={{minWidth: 200,...this.state.data.length > 8 && { position: 'relative' }}}>
               <Skeleton paragraph={false} loading={rowLoading} active>
                 <BasicTreeSelect
                   domRef={`${r._id}-${col.id}-tree-select`}
