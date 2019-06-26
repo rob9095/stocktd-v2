@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Cascader, Empty, Skeleton, Divider, Icon, Input } from 'antd';
+import { Cascader, Empty, Skeleton, Divider, Icon, Input, Button } from 'antd';
+import ReactDOM from "react-dom";
 
 class CascaderSelect extends Component {
   _isMounted = false;
@@ -8,14 +9,15 @@ class CascaderSelect extends Component {
     this.state = {
       searchValue: '',
       data: [],
-      searchInput: { label: (<Input />), value: 'stkd-cascader-search~', key: 'stkd-cascader-search~', text: ''},
       emptyOption: { label: (<div style={{minWidth: 176}}><Empty imageStyle={{ height: 20 }} /></div>), value: 'empty', key: 'empty', disabled: true, text: '' },
       addNewOption: {
         label: (
-          <div style={{width: '100%'}}>
-            <Divider style={{ margin: '-5px 0px 5px 0px' }} />
+          <div style={{width: '100%', padding: '5px 10px'}}>
+            <Divider className="no-margin" />
             <div className="flex align-items-center justify-content-center">
-              <Icon type="plus" style={{ marginRight: 5, fontSize: 'small' }} /> {this.props.addOptionText || 'Add'}
+              <Button onClick={() => this.props.onAddNewItem() || this.close()} block className="no-border no-margin no-bg">
+                <Icon type="plus" style={{ marginRight: 5, }} /> {this.props.addOptionText || 'Add'}
+              </Button>
             </div>
           </div>
         ), value: 'addNewItem', key: 'addNewItem', text: 'addNewItem',
@@ -29,6 +31,21 @@ class CascaderSelect extends Component {
         popupVisible: false,
       },)
     }
+  }
+
+  close = () => {
+    this.setState({
+      popupVisible: false
+    })
+    let {domRef} = this.props
+    let div = document.getElementsByClassName('flex align-items-center half-pad ' + domRef)[0]
+    let input = document.getElementById(domRef + 'search-input')
+    let addNew = document.getElementById('addNew' + domRef)
+    setTimeout(() => {
+      input && input.remove()
+      div && div.remove()
+      addNew && addNew.remove()
+    }, 100)
   }
 
   componentDidMount() {
@@ -77,7 +94,7 @@ class CascaderSelect extends Component {
 
     //reverse the data
     if (this.props.reverseData) {
-      data = data.map(option => option.children.length === 0 ? [{ label: 'N/A', value:'N/A-stkd~', key: 'N/A-stkd~'}] : [...option.children]).flat().map(option => ({
+      data = data.map(option => option.children.length === 0 ? [{ text: 'N/A', label: 'N/A', value:'N/A-stkd~', key: 'N/A-stkd~'}] : [...option.children]).flat().map(option => ({
         ...option,
         ...option.value === 'N/A-stkd~' && data.filter(parent => parent.children.length === 0 && parent.isDefault).length > 0 && {isDefault: true},
         children: 
@@ -135,10 +152,6 @@ class CascaderSelect extends Component {
 
   render() {
     const domRef = this.props.domRef || 'cascader'
-    console.log({
-      data: this.state.data,
-      searchValue: this.state.searchValue
-    })
     let data = this.state.searchValue ? this.filter(this.state.searchValue) : this.state.data
     return (
       <div id={domRef}>
@@ -146,34 +159,25 @@ class CascaderSelect extends Component {
           <Cascader
             onPopupVisibleChange={async(popupVisible) => {
               await this.setState({ popupVisible})
-              if (popupVisible) {
+              if (popupVisible && data.length > 0) {
                 let dropdown = document.getElementsByClassName('cascader-popup '+domRef)
                 let div = document.createElement('div')
+                let addNew = document.createElement('div')
+                addNew.setAttribute('id', 'addNew'+domRef)
                 div.className = 'flex align-items-center half-pad ' + domRef
-                let input = document.createElement("input")
-                input.placeholder = 'Search'
-                input.className = 'ant-input ' + domRef
-                input.addEventListener('input', (e) => e.data ? this.setState({searchValue: this.state.searchValue + e.data}) : this.setState({searchValue: ''}) )
-                div.append(input)
                 dropdown[0].prepend(div)
-                console.log({
-                  dropdown
-                })
+                dropdown[0].append(addNew)
+                !this.props.hideSearch && ReactDOM.render(<Input id={domRef+'search-input'} size="small" suffix={<Icon type="search" />} placeholder={'Search'}  onChange={(e)=>this.setState({searchValue: e.target.value})} />, div) && document.getElementById(domRef+'search-input').focus() 
+                this.props.showAddOption && ReactDOM.render(this.state.addNewOption.label,addNew)
               } else {
-                let div = document.getElementsByClassName('flex align-items-center half-pad ' + domRef)
-                let input = document.getElementsByClassName('ant-input ' + domRef)
-                setTimeout(()=>{
-                  input[0].remove()
-                  div[0].remove()
-                },150)
+                this.close()
               }
             }}
             popupVisible={this.state.popupVisible}
             placement="bottomRight"
-            options={data.length > 0 ? this.props.showAddOption ? [...data, this.state.addNewOption] : data : [this.state.emptyOption, this.state.addNewOption]}
+            options={data.length > 0 ? data : [this.state.emptyOption]}
             onChange={this.onChange}
             placeholder={this.props.placeholder || "Please select"}
-            //showSearch={this.filter}
             style={{ minWidth: 200 }}
             popupClassName={'cascader-popup '+domRef}
             notFoundContent={<Empty imageStyle={{ height: 20 }} />}
@@ -188,9 +192,6 @@ class CascaderSelect extends Component {
             allowClear={Array.isArray(this.state.value) && this.state.value[0] !== undefined}
           />
         </Skeleton>
-        <div style={{display: 'none'}}>
-          <Input onClick={()=>this.setState({popupVisible: true})} id={"hidden-search-input"+domRef} onChange={(val)=>console.log({val})} />
-        </div>
       </div>
     );
   }
