@@ -47,6 +47,10 @@ code {
   font-weight: 700 !important;
 }
 
+.ant-btn.ant-btn-link {
+  font-weight: 400 !important;
+}
+
 .center-a {
   text-align: center;
 }
@@ -1061,16 +1065,29 @@ table.fixed .ant-cascader-menus, table.fixed .ant-select-dropdown, table.fixed .
 }
 
 .table-footer {
-  height: 55px;
+  min-height: 55px;
   position: sticky;
-  bottom: 0;
-  right: 1px;
-  left: 1px;
+  bottom: 0px;
+  right: 0px;
+  left: 0px;
   z-index: 2;
   background: #fff;
   padding: 12px;
   box-shadow: -1px -1px 0 #dee3f2;
 }
+
+@media screen and (max-width: 440px) {
+  .table-footer > .flex {
+    font-size: small;
+    justify-content: center;
+  }
+  .table-footer > .flex .ant-select-selection__rendered {
+    font-size: small;
+  } 
+  .table-footer > .flex .ant-pagination {
+    font-size: small;
+  } 
+} 
 
 .table-footer .size-changer .ant-select-selection.ant-select-selection--single {
   border: 1px solid transparent;

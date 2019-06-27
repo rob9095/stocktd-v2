@@ -7,6 +7,7 @@ import { addBoxScan } from '../store/actions/boxScans';
 import { Button, Pagination, Select, Icon, Spin, Form, Dropdown, Menu, Modal, message, Empty, Skeleton, Input, Layout, PageHeader, Cascader } from 'antd';
 import WrappedFilterForm from './FilterForm';
 import SearchForm from './SearchForm';
+import ScanForm from './ScanFormNew';
 import EditItemDrawer from './EditItemDrawer';
 import ImportModal from './ImportModal';
 import InsertDataModal from './InsertDataModal';
@@ -694,14 +695,14 @@ class ProductTable extends Component {
               )}
             </div>
           </div>
-          <WrappedFilterForm
+          {/* <WrappedFilterForm
             inputs={[...this.props.headers.filter(h => h.noFilter !== true && h.noSort !== true), ...Array.isArray(this.props.additionalSearchInputs) && this.props.additionalSearchInputs]}
             onFilterSearch={this.handleFilterSearch}
             currentPOs={this.state.currentPOs}
             showScannerForm={this.props.showScannerForm}
             scanToPo={this.props.filters.find(f => f[0] === 'scanToPo') && this.props.filters.find(f => f[0] === 'scanToPo')[1]}
             onScan={this.handleScan}
-          />
+          /> */}
           {drawerItem._id && (
             <EditItemDrawer
               inputs={this.props.headers.filter(h => !h.noSort)}
@@ -818,7 +819,7 @@ class ProductTable extends Component {
                 </tbody>
               </table>
               <div className="table-footer flex justify-flex-end">
-                <div className="flex align-items-center">
+                <div className="flex align-items-center flex-wrap">
                   <span style={{ marginRight: 5, whiteSpace: 'nowrap' }}>Items per page:</span>
                   <Select
                     style={{minWidth: 75}}
@@ -848,7 +849,7 @@ class ProductTable extends Component {
             </div>
           </div>
         </div>
-          <Layout.Sider className="stkd-sidebar right" width={300} trigger={null} collapsedWidth={0} collapsible collapsed={this.state.siderClosed} onCollapse={() => this.setState({siderClosed: true})} style={{height: '100%', overflow: 'auto'}}>
+          <Layout.Sider className="stkd-sidebar right" width={300} trigger={null} collapsedWidth={0} collapsible collapsed={this.state.siderClosed} onCollapse={() => this.setState({siderClosed: true})} style={{height: '100%', overflow: 'auto', ...this.state.siderClosed && {border: 'none'}}}>
             <div className="half-pad">
               <PageHeader onBack={() => this.setState({ siderClosed: true })} {...this.state.siderConfig} />
               <SearchForm
@@ -857,6 +858,20 @@ class ProductTable extends Component {
                 populateQuery={this.state.populateQuery}
                 onSearch={this.handleFilterSearch}
               />
+            </div>
+          </Layout.Sider>
+          <Layout.Sider className={"stkd-sidebar right"} width={300} trigger={null} collapsedWidth={0} collapsible collapsed={this.state.scannerClosed} onCollapse={() => this.setState({scannerClosed: true})} style={{height: '100%', overflow: 'auto', ...this.state.scannerClosed && {border: 'none'}}}>
+            <div className="half-pad">
+              <PageHeader onBack={() => this.setState({ scannerClosed: true })} title="Scan Form" />
+                <ScanForm
+                  currentPOs={this.props.currentPOs}
+                  requirePO={true}
+                  poMode={'multiple'}
+                  onScan={this.handleScan}
+                  onCurrentPOUpdate={this.props.onCurrentPOUpdate}
+                  onAddQuantity={this.props.onAddQuantity}
+                  scanToPo={this.props.scanToPo}
+                />
             </div>
           </Layout.Sider>
         </Layout>
