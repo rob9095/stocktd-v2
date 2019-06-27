@@ -159,7 +159,7 @@ class CascaderSelect extends Component {
           <Cascader
             onPopupVisibleChange={async(popupVisible) => {
               await this.setState({ popupVisible})
-              if (popupVisible && data.length > 0) {
+              if (popupVisible) {
                 let dropdown = document.getElementsByClassName('cascader-popup '+domRef)
                 let div = document.createElement('div')
                 let addNew = document.createElement('div')
@@ -167,7 +167,7 @@ class CascaderSelect extends Component {
                 div.className = 'flex align-items-center half-pad ' + domRef
                 dropdown[0].prepend(div)
                 dropdown[0].append(addNew)
-                !this.props.hideSearch && ReactDOM.render(<Input id={domRef+'search-input'} size="small" suffix={<Icon type="search" />} placeholder={'Search'}  onChange={(e)=>this.setState({searchValue: e.target.value})} />, div) && document.getElementById(domRef+'search-input').focus() 
+                !this.props.hideSearch || this.state.data.length === 0 && ReactDOM.render(<Input id={domRef+'search-input'} size="small" suffix={<Icon type="search" />} placeholder={'Search'}  onChange={(e)=>this.setState({searchValue: e.target.value})} />, div) && document.getElementById(domRef+'search-input').focus() 
                 this.props.showAddOption && ReactDOM.render(this.state.addNewOption.label,addNew)
               } else {
                 this.close()
