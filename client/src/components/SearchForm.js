@@ -70,7 +70,7 @@ class BasicSearchForm extends Component {
     this.props.form.validateFields((err, values) => {
       console.log('Received values of form: ', values);
       // fitler out any empty entries
-      let query = Object.entries(values).filter(val => val[1] !== '' && val[1] !== undefined && val[1].length > 0).map(val => {
+      let query = Object.entries(values).filter(val => val[1]).map(val => {
         //check if we have a select for the query value, if we do add it to the third element in the query array
         if (this.props.inputs.find(i => i.type === 'number' && i.id === val[0])) {
           return [...val, this.state.selects[val[0] + "Select"] || "="]
@@ -104,10 +104,17 @@ class BasicSearchForm extends Component {
         }
       }
       //if there is no new queries and the old queries were empty, just return to avoid unneeded searches :)
-      if (!query.length && !this.props.query.length && !populateQuery.length && !this.props.populateQuery.length) {
-        return
+      if (query.length === this.props.query.length || populateQuery.length === this.props.populateQuery.length) {
+        let check = query.filter(val => {
+          let oldValue = [...this.props.query, ...this.props.populateQuery].find(q => q[0] === val[0] && q[1] == val[1] && val[2] == val[2])
+          if (!oldValue) {
+            return val
+          }
+        })
+        if (check.length === 0) return
       }
-        this.props.onSearch(query, populateArray, populateQuery)
+      console.log({query, oldQuery: this.props.query})
+      this.props.onSearch(query, populateArray, populateQuery)
     });
   }
 
@@ -195,7 +202,7 @@ class BasicSearchForm extends Component {
             <FormItem label={`${i.text}`}>
               {getFieldDecorator(id, {
               })(
-                <Select allowClear onChange={(value)=>this.props.form.setFieldsValue({[id]: value}) || this.handleSubmit()} key={`${id}Select`}>
+                <Select placeholder={i.text} allowClear onChange={(value)=>this.props.form.setFieldsValue({[id]: value}) || this.handleSubmit()} key={`${id}Select`}>
                   {i.options.map(val => (
                     <Option key={id + val.id + "Select"} value={val.id}>{val.text || val.id}</Option>
                   ))}
