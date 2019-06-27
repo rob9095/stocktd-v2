@@ -55,7 +55,7 @@ class BasicSearchForm extends Component {
     await this.setState({
       // adds local offset in minutes to second date so query works, I have no clue why
       //[id]: date.length > 0 ? [dateString[0], new Date(endDate).getTime() + offSet * 60000] : null,
-      [id]: date.length > 0 ? dateString : null,
+      [id]: date.length > 0 ? dateString : undefined,
     })
     this.handleSubmit()
   }
@@ -70,11 +70,11 @@ class BasicSearchForm extends Component {
     this.props.form.validateFields((err, values) => {
       console.log('Received values of form: ', values);
       // fitler out any empty entries
-      let query = Object.entries(values).filter(val => val[1]).map(val => {
+      let query = Object.entries(values).filter(val => val[1] && val[1].length > 0).map(val => {
         //check if we have a select for the query value, if we do add it to the third element in the query array
         if (this.props.inputs.find(i => i.type === 'number' && i.id === val[0])) {
           return [...val, this.state.selects[val[0] + "Select"] || "="]
-        } else if (Array.isArray(val[1])) {
+        } else if (Array.isArray(val[1]) && this.state[val[0]]) {
           return [[val[0]], this.state[val[0]]]
         } else {
           return [...val]
@@ -104,16 +104,9 @@ class BasicSearchForm extends Component {
         }
       }
       //if there is no new queries and the old queries were empty, just return to avoid unneeded searches :)
-      if (query.length === this.props.query.length || populateQuery.length === this.props.populateQuery.length) {
-        let check = query.filter(val => {
-          let oldValue = [...this.props.query, ...this.props.populateQuery].find(q => q[0] === val[0] && q[1] == val[1] && val[2] == val[2])
-          if (!oldValue) {
-            return val
-          }
-        })
-        if (check.length === 0) return
+      if (!query.length && !this.props.query.length && !populateQuery.length && !this.props.populateQuery.length) {
+        return
       }
-      console.log({query, oldQuery: this.props.query})
       this.props.onSearch(query, populateArray, populateQuery)
     });
   }

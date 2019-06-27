@@ -385,6 +385,21 @@ class ProductTable extends Component {
     }
 
     handleFilterSearch = async (query,populateArray,populateQuery) => {
+      let q = {
+        oldQuery: [...this.state.query,...this.state.populateQuery],
+        query: [...query, ...populateQuery]
+      }
+      //check the query values if new and old queries are same length
+      if (q.query.length === q.oldQuery.length) {
+        let check = q.query.filter(val=>{
+          let oldVal = q.oldQuery.find(v=>v[0] === val[0])
+          //if there is no oldVal or the newVal doesn't match the oldVal keep the query
+          if (!oldVal || oldVal[1] !== val[1] || oldVal[2] !== val[2]) {
+            return val
+          }
+        })
+        if (!check.length) return
+      }
       await this.setState({
         query,
         populateArray,
