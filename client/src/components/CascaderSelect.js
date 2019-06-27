@@ -165,10 +165,15 @@ class CascaderSelect extends Component {
                 let addNew = document.createElement('div')
                 addNew.setAttribute('id', 'addNew'+domRef)
                 div.className = 'flex align-items-center half-pad ' + domRef
-                dropdown[0].prepend(div)
-                dropdown[0].append(addNew)
-                !this.props.hideSearch || this.state.data.length === 0 && ReactDOM.render(<Input id={domRef+'search-input'} size="small" suffix={<Icon type="search" />} placeholder={'Search'}  onChange={(e)=>this.setState({searchValue: e.target.value})} />, div) && document.getElementById(domRef+'search-input').focus() 
-                this.props.showAddOption && ReactDOM.render(this.state.addNewOption.label,addNew)
+                if (!this.props.hideSearch && this.state.data.length > 0) {
+                  dropdown[0].prepend(div)
+                  ReactDOM.render(<Input id={domRef + 'search-input'} size="small" suffix={<Icon type="search" />} placeholder={'Search'} onChange={(e) => this.setState({ searchValue: e.target.value })} />, div)
+                  document.getElementById(domRef + 'search-input').focus()
+                }
+                if (this.props.showAddOption) {
+                  dropdown[0].append(addNew)
+                  ReactDOM.render(this.state.addNewOption.label, addNew)
+                }
               } else {
                 this.close()
               }

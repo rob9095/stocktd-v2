@@ -140,6 +140,7 @@ class DrawerForm extends Component {
         [i.parent.defaultKey]: parentValue,
         [i.child.defaultKey]: childValue
       }
+      console.log({ update, i, parentValue, childValue }, this.props.form.getFieldsValue())
       this.props.form.setFieldsValue(update)
       resolve('success')
     })
@@ -192,6 +193,14 @@ class DrawerForm extends Component {
                 </CascaderSelect>
               )}
             </FormItem>
+            <div style={{display: 'none'}}>
+              {getFieldDecorator(i.parent.defaultKey, { initialValue: item[i.parent.defaultKey] })(
+                <Input />
+              )}
+              {getFieldDecorator(i.child.defaultKey, { initialValue: item[i.child.defaultKey] })(
+                <Input />
+              )}
+            </div>
           </Col>
         )
       } else if (i.type === 'autoComplete') {
