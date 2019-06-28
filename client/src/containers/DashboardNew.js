@@ -174,7 +174,7 @@ class DashboardNew extends Component {
                 <Route exact path="/app/po-products-old" render={props => (
                   <PoProductTable showHeader {...props} />
                 )} />
-                <Route path="/app/po-products" render={props => (
+                <Route path="/app/po-products/:po" render={props => (
                   <PoProductTableNew {...props} />
                 )} />
                 <Route exact path="/app/purchase-orders-old" render={props => (

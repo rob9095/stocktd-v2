@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import StkdTable from './StkdTable';
 import { connect } from "react-redux";
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { Empty } from 'antd';
 import { importPurchaseOrder, updatePurchaseOrders, removePurchaseOrders } from '../store/actions/purchaseOrders';
 import { addBoxScan } from '../store/actions/boxScans';
@@ -240,7 +240,7 @@ class PoTableNew extends Component {
             { value: 'weight', type: 'number' },
           ]}
           bulkMenuOptions={[
-            { name: 'View', key: 'view' },
+            { name: 'View', key: 'view', handler: ({ selected }) => this.props.history.push('/app/po-products/'+selected.join())},
             { name: 'Scan', key: 'scan' },
             { name: 'Copy', key: 'copy' },
             { name: 'Print Labels', key: 'print-label' },
@@ -258,7 +258,7 @@ class PoTableNew extends Component {
               id: 'name', text: 'Name', width: 400, span: 6, className: 'no-wrap',
               render: (po) =>
                 <Link to={{
-                  pathname: '/app/po-products?po='+po._id,
+                  pathname: '/app/po-products/'+po._id,
                   poRefs: [{ ...po }],
                 }}
                 >

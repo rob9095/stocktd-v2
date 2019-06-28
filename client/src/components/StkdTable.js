@@ -202,12 +202,11 @@ class ProductTable extends Component {
     }
 
     handleBulkMenuClick = async ({ item, key, keyPath }) => {
-      console.log(key)
+      let foundOption = this.props.bulkMenuOptions.find(o => o.handler && o.key === key) || {}
       switch(key) {
         case 'delete':
           let items = await this.showConfirm(null,'Delete',this.state.selected)
           if (items !== 'cancel') {
-            let foundOption = this.props.bulkMenuOptions.find(o=>o.handler && o.key === key)
             let result = foundOption ? await foundOption.handler(items) : this.handleRowDelete(items);
             if (foundOption) {
               result.error ? console.log(result) : this.handleRowDelete(items)
@@ -227,7 +226,7 @@ class ProductTable extends Component {
           })
           break;
         default:
-          console.log('unknown menu option');
+          foundOption.handler && foundOption.handler(({item, key, keyPath, selected: this.state.selected}))
       }
     }
 

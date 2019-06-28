@@ -14,12 +14,31 @@ class PoProductTableNew extends Component {
     }
   }
 
-  async componentDidMount() {
+  updateAndFilter = (key,andQuery=[]) => {
+    let filters = this.state.filters || []
+    filters = [...andQuery, ...filters.filter(f => f[0] !== key)]
+    this.setState({filters})
+    console.log({filters, andQuery})
+  }
+
+  componentWillUpdate(prevProps) {
+    if (typeof this.props.match.params.po === 'string' && this.props.match.params.po !== prevProps.match.params.po) {
+      let andQuery = this.props.match.params.po.split(",").map(id=>['po',id,'='])
+      this.updateAndFilter('po',andQuery)
+    }
+  }
+
+  componentDidMount() {
+    console.log({ state: this.state, history: this.props.history, match: this.props.match })
+    if (typeof this.props.match.params.po === 'string') {
+      let andQuery = this.props.match.params.po.split(",").map(id => ['po', id, '='])
+      this.updateAndFilter('po', andQuery)
+    }
     if (Array.isArray(this.props.history.location.poRefs)) {
-      await this.setState({
+      this.setState({
         currentPOs: this.props.history.location.poRefs,
       })
-      console.log({state:this.state, history: this.props.history})
+      console.log({state:this.state, history: this.props.history, match: this.props.match})
     }
   }
 
@@ -71,6 +90,7 @@ class PoProductTableNew extends Component {
     }
     filters = value === "" ? filters : [[key, value, operator], ...filters]
     this.setState({ filters })
+    console.log({ filters })
   }
 
   render() {
