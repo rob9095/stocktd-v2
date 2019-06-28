@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import StkdTable from './StkdTable';
 import { connect } from "react-redux";
-import { Radio, Tooltip, Icon, Button } from 'antd'
+import { Radio, Tooltip, Icon, Button, Divider, Skeleton } from 'antd'
 import { updatePoProducts, removePoProducts } from '../store/actions/poProducts';
 import * as scanHandlers from "../store/actions/boxScans";
 
@@ -116,6 +116,27 @@ class PoProductTableNew extends Component {
           queryModel="PoProduct"
           editTitle={"PO Product"}
           populateArray={[{ path: 'po' }, { path: 'product' }]}
+          extraTopContent={({data=[]})=>{
+            if (this.props.match.params.po) {
+              let pos = this.props.match.params.po.split(',').map(id=>data.find(r=>r.po && r.po._id === id)).map(pop=>pop && pop.po ? pop.po : {})
+              console.log({pos})
+              return (
+                <div className="flex align-items-center half-pad flex-wrap" style={{ paddingTop: 12 }}>
+                  {pos.length + ' Open Purchase Order' + `${pos.length > 1 ? 's' : ''}`}
+                  <Divider type="vertical" />
+                  {pos.map((po,i) => (
+                    <Button className="table-tag" size="small" key={po._id || i} style={{ marginRight: 7, ...!po._id && {minWidth: 80} }}>
+                      <Skeleton paragraph={false} loading={!po._id} active>
+                        {po.name} <Icon type="close" />
+                      </Skeleton>
+                    </Button>
+                  )).concat(
+                    <Button size="small" key={"addPO"}><Icon type="plus" /></Button>
+                  )}
+                </div>
+              )
+            }
+          }}
           filters={this.state.filters}
           onRowEditSave={this.handleRowEditSave}
           onImport={this.handleImport}

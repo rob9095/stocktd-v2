@@ -1129,6 +1129,16 @@ table.fixed .ant-cascader-menus, table.fixed .ant-select-dropdown, table.fixed .
 }
 
 
+/* Table Tags */
+.ant-btn.table-tag h3.ant-skeleton-title {
+  margin: 0px;
+}
+
+.ant-btn-sm.table-tag h3.ant-skeleton-title {
+  height: 8px;
+}
+
+
 /* Sidebar */
 
 .stkd-sidebar.ant-layout-sider {

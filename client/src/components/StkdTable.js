@@ -698,6 +698,7 @@ class ProductTable extends Component {
               )}
             </div>
           </div>
+          {this.props.extraTopContent && this.props.extraTopContent(this.state)}
           {/* <WrappedFilterForm
             inputs={[...this.props.headers.filter(h => h.noFilter !== true && h.noSort !== true), ...Array.isArray(this.props.additionalSearchInputs) && this.props.additionalSearchInputs]}
             onFilterSearch={this.handleFilterSearch}
