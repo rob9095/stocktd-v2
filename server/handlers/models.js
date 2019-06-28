@@ -103,18 +103,18 @@ exports.queryModelData = async (req, res, next) => {
 		for (let popConfig of populateArray) {
 			//if we had to match in the populate config, remove any empty arrays or null values from data
 			delete popConfig.match.company
-			if (Object.keys(popConfig.match).length > 0) {
+			if (typeof popConfig.match === 'object' && Object.keys(popConfig.match).length > 0) {
 				console.log('removing null data for key '+ popConfig.path)
-				data = data.filter(doc => doc[popConfig.path] !== null && doc[popConfig.path].length !== 0)
+				data = data.filter(doc => doc[popConfig.path] && doc[popConfig.path].length !== 0)
 			}
 			//check nested populates
 			if (Array.isArray(popConfig.populate)) {
 				for (let nestedPop of popConfig.populate) {
 					delete nestedPop.match.company
-					if (Object.keys(nestedPop.match).length > 0) {
+					if (typeof popConfig.match === 'object' && Object.keys(nestedPop.match).length > 0) {
 						console.log('removing nested empty data for key ' + nestedPop.path)
 						data = data.filter(doc => {
-							if (Array.isArray(doc[popConfig.path]) && doc[popConfig.path].filter(nestedDoc=>nestedDoc[nestedPop.path] !== null && nestedDoc[nestedPop.path].length !== 0).length > 0){
+							if (Array.isArray(doc[popConfig.path]) && doc[popConfig.path].filter(nestedDoc=>nestedDoc[nestedPop.path] && nestedDoc[nestedPop.path].length !== 0).length > 0){
 								return doc
 							}
 						})
