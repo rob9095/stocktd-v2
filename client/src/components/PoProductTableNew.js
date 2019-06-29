@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import StkdTable from './StkdTable';
 import { connect } from "react-redux";
-import { Radio, Tooltip, Icon, Button, Divider, Skeleton } from 'antd'
+import { Radio, Tooltip, Icon, Button, Divider, Skeleton, Tag } from 'antd'
 import { updatePoProducts, removePoProducts } from '../store/actions/poProducts';
 import * as scanHandlers from "../store/actions/boxScans";
 
@@ -22,16 +22,19 @@ class PoProductTableNew extends Component {
   }
 
   componentWillUpdate(prevProps) {
-    if (typeof this.props.match.params.po === 'string' && this.props.match.params.po !== prevProps.match.params.po) {
-      let andQuery = this.props.match.params.po.split(",").map(id=>['po',id,'='])
-      this.updateAndFilter('po',andQuery)
+    if (this.props.match.params.po !== prevProps.match.params.po) {
+      setTimeout(() => {
+        let po = this.props.match.params.po || ''
+        let andQuery = po.split(",").filter(id=>id).map(id => ['po', id, '='])
+        this.updateAndFilter('po', andQuery)
+      }, 1);
     }
   }
 
   componentDidMount() {
     console.log({ state: this.state, history: this.props.history, match: this.props.match })
     if (typeof this.props.match.params.po === 'string') {
-      let andQuery = this.props.match.params.po.split(",").map(id => ['po', id, '='])
+      let andQuery = this.props.match.params.po.split(",").filter(id => id).map(id => ['po', id, '='])
       this.updateAndFilter('po', andQuery)
     }
     if (Array.isArray(this.props.history.location.poRefs)) {
@@ -125,11 +128,11 @@ class PoProductTableNew extends Component {
                   {pos.length + ' Open Purchase Order' + `${pos.length > 1 ? 's' : ''}`}
                   <Divider type="vertical" />
                   {pos.map((po,i) => (
-                    <Button className="table-tag" size="small" key={po._id || i} style={{ marginRight: 7, ...!po._id && {minWidth: 80} }}>
-                      <Skeleton paragraph={false} loading={!po._id} active>
-                        {po.name} <Icon type="close" />
-                      </Skeleton>
-                    </Button>
+                    <Tag onClose={()=>this.props.history.push('/app/po-products/'+pos.map((p={})=>p._id).filter(id => id !== po._id).join())} closable className="table-tag" key={po._id || i} style={{ background: '#fff', fontSize: 14, padding: '2px 7px', marginRight: 7, ...!po._id && {minWidth: 80} }}>
+                        <Skeleton paragraph={false} loading={!po._id} active>
+                        {po.name}
+                        </Skeleton>
+                    </Tag>
                   )).concat(
                     <Button size="small" key={"addPO"}><Icon type="plus" /></Button>
                   )}

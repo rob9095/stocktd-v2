@@ -1130,11 +1130,21 @@ table.fixed .ant-cascader-menus, table.fixed .ant-select-dropdown, table.fixed .
 
 
 /* Table Tags */
-.ant-btn.table-tag h3.ant-skeleton-title {
+.ant-tag.table-tag {
+  background:#fff;
+  font-size: 14px;
+  padding: 2px 7px;
+  margin-right: 7px;
+  display: flex;
+  height: 25px;
+  align-items: center;
+}
+
+.ant-tag.table-tag h3.ant-skeleton-title {
   margin: 0px;
 }
 
-.ant-btn-sm.table-tag h3.ant-skeleton-title {
+.ant-tag.table-tag h3.ant-skeleton-title {
   height: 8px;
 }
 
