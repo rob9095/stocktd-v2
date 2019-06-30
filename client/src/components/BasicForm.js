@@ -300,7 +300,6 @@ class BForm extends Component {
               })(
                 <Input
                   autoComplete={i.initialValue ? "off" : !!window.chrome ? "disabled" : "off"}
-                  size="small"
                   placeholder={i.text}
                   type={i.inputType || 'text'}
                   onBlur={() => this.handleBlur(i, id)}

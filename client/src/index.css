@@ -184,9 +184,9 @@ a:focus {
   margin-bottom: .5em !important;
 }
 
-.ant-input {
+.ant-input:not(.ant-input-sm) {
   font-family: 'Open Sans', sans-serif !important;
-  /*min-height: 35px !important; */
+  min-height: 30px !important;
 }
 
 .ant-input::placeholder {
