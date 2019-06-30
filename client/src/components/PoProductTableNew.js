@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom';
 import StkdTable from './StkdTable';
 import { connect } from "react-redux";
-import { Radio, Tooltip, Icon, Button, Divider, Skeleton, Tag, Input, Empty } from 'antd'
+import { Radio, Tooltip, Icon, Button, Divider, Skeleton, Tag, Input, Empty, Select } from 'antd'
 import { updatePoProducts, removePoProducts } from '../store/actions/poProducts';
 import * as scanHandlers from "../store/actions/boxScans";
 import AutoCompleteInput from './AutoCompleteInput';
@@ -123,7 +123,7 @@ class PoProductTableNew extends Component {
           populateArray={[{ path: 'po' }, { path: 'product' }]}
           extraTopContent={({data=[]})=>{
             if (this.props.match.params.po) {
-              let pos = this.props.match.params.po.split(',').map(id=>data.find(r=>r.po && r.po._id === id)).map(pop=>pop && pop.po ? pop.po : {})
+              let pos = this.props.match.params.po.split(',').filter(id=>id).map(id=>data.find(r=>r.po && r.po._id === id)).map(pop=>pop && pop.po ? pop.po : {})
               console.log({pos})
               return (
                 <div className="flex align-items-center half-pad flex-wrap" style={{ paddingTop: 12 }}>
@@ -136,19 +136,20 @@ class PoProductTableNew extends Component {
                         </Skeleton>
                     </Tag>
                   )).concat(
-                    <Button onClick={()=>this.setState({addNewPo: !this.state.addNewPo})} style={{marginRight: 7,}} size="small" key={"addPO"}>
-                      <Icon style={{ transition: 'transform .3s',...this.state.addNewPo && { transform: 'rotate(45deg)' }}} type="plus" />
+                    <Button key="addNewPoBtn" onClick={()=>this.setState({addNewPo: !this.state.addNewPo})} style={{marginRight: 7,}} size="small" key={"addPO"}>
+                      <Icon type={ this.state.addNewPo ? "close" : "plus"} />
                     </Button>
                   ).concat(
-                    <div style={{...this.state.addNewPo ? {opacity: 1}:{opacity:0}, transition: 'opacity .3s'}}>
-                      <AutoCompleteInput
-                        size="small"
-                        queryModel={"PurchaseOrder"}
-                        searchKey={"name"}
-                        placeholder={"Search by PO Name"}
-                        renderOption={item => (
-                          pos.find(po=>po && po._id !== item._id) && (
-                            <div style={{ maxHeight: 35, overflow: "hidden" }}>
+                    this.state.addNewPo && (
+                      <div key="addNewPoInput">
+                        <AutoCompleteInput
+                          filter={(arr)=>arr.filter(item => !this.props.match.params.po.split(',').filter(id=>id).includes(item._id.toString()))}
+                          size="small"
+                          queryModel={"PurchaseOrder"}
+                          searchKey={"name"}
+                          placeholder={"Search by PO Name"}
+                          renderOption={item => (
+                            <div style={{ maxHeight: 35, overflow: "hidden",}}>
                               <div style={{ fontSize: "small" }}>
                                 {item["name"]}
                               </div>
@@ -156,22 +157,25 @@ class PoProductTableNew extends Component {
                                 {item["type"]}
                               </div>
                             </div>
-                          )
-                        )}
-                        onUpdate={clicked => (console.log(clicked, "currentPOs"))}
-                        setFocus={this.state.poFocus || false}
-                        notFound={(
-                          <Empty
-                            imageStyle={{ height: 20 }}
-                            description={(
-                              <span>
-                                <Link to="/app/purchase-orders" style={{fontSize: 'small', opacity: '.8'}}>Add Purchase Order</Link>
-                              </span>
-                            )}
-                          />
-                        )}
-                      />
-                    </div>
+                          )}
+                          onUpdate={clicked => {
+                            this.props.history.push('/app/po-products/'+[...pos.map((p={})=>p._id),clicked.data._id || ""].join())
+                            this.setState({addNewPo: false})
+                            }}
+                          setFocus={this.state.poFocus || false}
+                          notFound={(
+                            <Empty
+                              imageStyle={{ height: 20 }}
+                              description={(
+                                <span>
+                                  <Link to="/app/purchase-orders" style={{fontSize: 'small', opacity: '.8'}}>Add Purchase Order</Link>
+                                </span>
+                              )}
+                            />
+                          )}
+                        />
+                      </div>
+                    )
                   )}
                 </div>
               )

@@ -13,6 +13,7 @@ class AutoCompleteInputForm extends Component {
     this.state = {
       data: [],
       addItem: false,
+      searchValue: '',
     }
   }
 
@@ -68,11 +69,11 @@ class AutoCompleteInputForm extends Component {
     }
   }
 
-  handleType = (value) => {
-    this.setState({ loading: true })
+  handleType = (searchValue) => {
+    this.setState({ loading: true, searchValue })
     if (this.timeout) clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
-      this.handleDataFetch(value)
+      this.handleDataFetch(searchValue)
     }, 300);
   }
 
@@ -121,16 +122,19 @@ class AutoCompleteInputForm extends Component {
     this.props.onUpdate({ id, data })
   }
 
-  handleVisibleChange = () => {
+  handleVisibleChange = (open) => {
+    if (open) {
     this.setState({
       loading: true,
     })
-    this.state.data.length === 0 && this.handleDataFetch()
+    !this.state.searchValue && this.handleDataFetch()
+    }
   }
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const children = this.state.data.map(item => (
+    let filter = this.props.filter || function(arr){ return arr}
+    const children = filter(this.state.data).map(item => (
       // use item._id as value if not in tags mode
       <Option key={item._id} value={this.props.mode === 'tags' ? item[this.props.searchKey] : item._id} data={{ ...item }}>
         {this.props.renderOption ? this.props.renderOption(item) : item[this.props.searchKey]}
