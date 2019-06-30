@@ -186,7 +186,7 @@ a:focus {
 
 .ant-input {
   font-family: 'Open Sans', sans-serif !important;
-  min-height: 35px !important;
+  /*min-height: 35px !important; */
 }
 
 .ant-input::placeholder {
@@ -376,6 +376,20 @@ ul.ant-menu.ant-menu-light.ant-menu-root.ant-menu-vertical .ant-menu-item a:hove
 
 .stkd-widget .widget-content .ant-skeleton-content ul {
   margin: 0 !important;
+}
+
+.widget-content .ant-skeleton-content {
+  padding: 12px;
+}
+
+.widget-content .skeleton-wrapper {
+  padding: 12px 24px;
+}
+
+@media screen and (max-width: 900px) {
+  .widget-content .skeleton-wrapper {
+    padding: 0px;  
+  }
 }
 
 /* Default Widget Scrollbar */
@@ -606,7 +620,7 @@ ul.ant-menu.ant-menu-light.ant-menu-root.ant-menu-vertical .ant-menu-item a:hove
 
 .ant-select-selection, .ant-select-selection--multiple, .ant-select-selection--single {
   padding: 1px 7px;
-  min-height: 35px !important;
+  /* min-height: 35px !important; */
   padding-bottom: 0px;
 }
 

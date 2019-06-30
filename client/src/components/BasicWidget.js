@@ -20,9 +20,10 @@ class BasicWidget extends Component {
           </Skeleton>
         </div>
         <div className="widget-content">
-          {this.props.contentLoading ? 
+          {true ? 
           Array(parseInt(contentRows)).fill({}).map((s,i)=>(
-            <div key={i} className="flex align-items-center" style={{ borderBottom: '1px solid #dee3f2', margin: 0, padding: '12px 24px', minHeight: 70, width: '100%', }}>
+            <div key={i} className="flex align-items-center skeleton-wrapper" style={{ borderBottom: '1px solid #dee3f2', margin: 0, minHeight: 70, width: '100%', }}>
+              <Skeleton paragraph={{ rows: 1, width: '100%' }} title={false} loading={true} active />
               <Skeleton paragraph={{ rows: 1, width: '100%' }} title={false} loading={true} active />
             </div>
           ))

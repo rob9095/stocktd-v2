@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
+import { Link } from 'react-router-dom';
 import StkdTable from './StkdTable';
 import { connect } from "react-redux";
-import { Radio, Tooltip, Icon, Button, Divider, Skeleton, Tag } from 'antd'
+import { Radio, Tooltip, Icon, Button, Divider, Skeleton, Tag, Input, Empty } from 'antd'
 import { updatePoProducts, removePoProducts } from '../store/actions/poProducts';
 import * as scanHandlers from "../store/actions/boxScans";
+import AutoCompleteInput from './AutoCompleteInput';
 
 
 class PoProductTableNew extends Component {
@@ -134,7 +136,42 @@ class PoProductTableNew extends Component {
                         </Skeleton>
                     </Tag>
                   )).concat(
-                    <Button size="small" key={"addPO"}><Icon type="plus" /></Button>
+                    <Button onClick={()=>this.setState({addNewPo: !this.state.addNewPo})} style={{marginRight: 7,}} size="small" key={"addPO"}>
+                      <Icon style={{ transition: 'transform .3s',...this.state.addNewPo && { transform: 'rotate(45deg)' }}} type="plus" />
+                    </Button>
+                  ).concat(
+                    <div style={{...this.state.addNewPo ? {opacity: 1}:{opacity:0}, transition: 'opacity .3s'}}>
+                      <AutoCompleteInput
+                        size="small"
+                        queryModel={"PurchaseOrder"}
+                        searchKey={"name"}
+                        placeholder={"Search by PO Name"}
+                        renderOption={item => (
+                          pos.find(po=>po && po._id !== item._id) && (
+                            <div style={{ maxHeight: 35, overflow: "hidden" }}>
+                              <div style={{ fontSize: "small" }}>
+                                {item["name"]}
+                              </div>
+                              <div style={{ marginTop: -5, fontSize: 10, color: "grey" }}>
+                                {item["type"]}
+                              </div>
+                            </div>
+                          )
+                        )}
+                        onUpdate={clicked => (console.log(clicked, "currentPOs"))}
+                        setFocus={this.state.poFocus || false}
+                        notFound={(
+                          <Empty
+                            imageStyle={{ height: 20 }}
+                            description={(
+                              <span>
+                                <Link to="/app/purchase-orders" style={{fontSize: 'small', opacity: '.8'}}>Add Purchase Order</Link>
+                              </span>
+                            )}
+                          />
+                        )}
+                      />
+                    </div>
                   )}
                 </div>
               )
