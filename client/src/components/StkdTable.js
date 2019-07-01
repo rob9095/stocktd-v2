@@ -864,20 +864,16 @@ class ProductTable extends Component {
               />
             </div>
           </Layout.Sider>
-          <Layout.Sider className={"stkd-sidebar right"} width={300} trigger={null} collapsedWidth={0} collapsible collapsed={this.state.scannerClosed} onCollapse={() => this.setState({scannerClosed: true})} style={{height: '100%', overflow: 'auto', ...this.state.scannerClosed && {border: 'none'}}}>
-            <div className="half-pad">
-              <PageHeader onBack={() => this.setState({ scannerClosed: true })} title="Scan Form" />
+          {this.props.scanFormConfig && (
+            <Layout.Sider className={"stkd-sidebar right"} width={300} trigger={null} collapsedWidth={0} collapsible collapsed={this.state.scannerClosed} onCollapse={() => this.setState({ scannerClosed: true })} style={{ height: '100%', overflow: 'auto', ...this.state.scannerClosed && { border: 'none' } }}>
+              <div className="half-pad">
+                <PageHeader onBack={() => this.setState({ scannerClosed: true })} title="Scan Form" />
                 <ScanForm
-                  currentPOs={this.props.currentPOs}
-                  requirePO={true}
-                  poMode={'multiple'}
-                  onScan={this.handleScan}
-                  onCurrentPOUpdate={this.props.onCurrentPOUpdate}
-                  onAddQuantity={this.props.onAddQuantity}
-                  scanToPo={this.props.scanToPo}
+                  {...this.props.scanFormConfig(this.state)}
                 />
-            </div>
-          </Layout.Sider>
+              </div>
+            </Layout.Sider>
+          )}
         </Layout>
       )
     }

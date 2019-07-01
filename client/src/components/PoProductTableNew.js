@@ -2,8 +2,9 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom';
 import StkdTable from './StkdTable';
 import { connect } from "react-redux";
-import { Radio, Tooltip, Icon, Button, Divider, Skeleton, Tag, Input, Empty, Select } from 'antd'
+import { Radio, Tooltip, Icon, Button, Divider, Skeleton, Tag, Input, Empty, Select } from 'antd';
 import { updatePoProducts, removePoProducts } from '../store/actions/poProducts';
+import { addBoxScan } from '../store/actions/boxScans';
 import * as scanHandlers from "../store/actions/boxScans";
 import AutoCompleteInput from './AutoCompleteInput';
 
@@ -87,6 +88,40 @@ class PoProductTableNew extends Component {
     })
   }
 
+  handleScan = (scan) => {
+    return new Promise((resolve, reject) => {
+      scan = {
+        ...scan,
+        user: this.props.currentUser.user.id,
+      }
+      let poRefs = this.state.currentPOs.sort((a, b) => (b.quantity - a.quantity))
+      addBoxScan(scan, this.props.currentUser.user.company)
+        .then(res => {
+          let data = this.state.data.map(p => {
+            if (p._id === res.updatedPoProduct._id) {
+              return {
+                ...res.updatedPoProduct,
+              }
+            } else {
+              return {
+                ...p,
+              }
+            }
+          })
+          this.setState({
+            data,
+          })
+          if (res.completedPoProducts && res.completedPoProducts.nMatched) {
+            this.handlePoComplete(res.updatedPoProduct)
+          }
+          resolve(res)
+        })
+        .catch(err => {
+          reject(err);
+        })
+    })
+  }
+
   updateFilters = (key, value, operator) => {
     let filters = this.state.filters || []
     let foundFilter = filters.find(f => f[0] === key)
@@ -117,6 +152,15 @@ class PoProductTableNew extends Component {
           </div>
         </div> */}
         <StkdTable
+          scanFormConfig={({data=[]})=>({
+            currentPOs: this.props.match.params.po ? this.props.match.params.po.split(',').filter(id => id).map(id => data.find(r => r.po && r.po._id === id)).filter(pop=>pop && pop.po).map(pop => pop.po) : [],
+            requirePO: true,
+            poMode: 'multiple',
+            onScan:this.handleScan,
+            onCurrentPOUpdate: (u)=>console.log({u}),
+            onAddQuantity: (a)=>console.log({a}),
+            scanToPo: false,
+          })}
           title={"Purchase Order Products"}
           queryModel="PoProduct"
           editTitle={"PO Product"}
@@ -124,7 +168,6 @@ class PoProductTableNew extends Component {
           extraTopContent={({data=[]})=>{
             if (this.props.match.params.po) {
               let pos = this.props.match.params.po.split(',').filter(id=>id).map(id=>data.find(r=>r.po && r.po._id === id)).map(pop=>pop && pop.po ? pop.po : {})
-              console.log({pos})
               return (
                 <div className="flex align-items-center half-pad flex-wrap" style={{ paddingTop: 12 }}>
                   {pos.length + ' Open Purchase Order' + `${pos.length > 1 ? 's' : ''}`}
@@ -136,7 +179,7 @@ class PoProductTableNew extends Component {
                         </Skeleton>
                     </Tag>
                   )).concat(
-                    <Button key="addNewPoBtn" onClick={()=>this.setState({addNewPo: !this.state.addNewPo})} style={{marginRight: 7,}} size="small" key={"addPO"}>
+                    <Button key="addNewPoBtn" onClick={()=>this.setState({addNewPo: !this.state.addNewPo})} style={{marginRight: 7,}} size="small">
                       <Icon type={ this.state.addNewPo ? "close" : "plus"} />
                     </Button>
                   ).concat(
@@ -161,9 +204,8 @@ class PoProductTableNew extends Component {
                           onUpdate={clicked => {
                             this.props.history.push('/app/po-products/'+[...pos.map((p={})=>p._id),clicked.data._id || ""].join())
                             this.setState({addNewPo: false})
-                            }}
-                          setFocus={this.state.poFocus || false}
-                          notFound={(
+                          }}
+                          notFound={
                             <Empty
                               imageStyle={{ height: 20 }}
                               description={(
@@ -172,7 +214,7 @@ class PoProductTableNew extends Component {
                                 </span>
                               )}
                             />
-                          )}
+                          }
                         />
                       </div>
                     )
@@ -184,7 +226,6 @@ class PoProductTableNew extends Component {
           filters={this.state.filters}
           onRowEditSave={this.handleRowEditSave}
           onImport={this.handleImport}
-          showScannerForm
           importHeaders={[
             { value: 'sku', required: true },
             { value: 'type', required: true },

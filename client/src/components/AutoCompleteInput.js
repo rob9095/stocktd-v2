@@ -19,6 +19,7 @@ class AutoCompleteInputForm extends Component {
 
   componentDidMount() {
     this._isMounted = true;
+    this.props.setFocus && this.setFocus()
     if (this.props.selected) {
       let selected = this.props.selected.map(item=>(
         {props: 
@@ -141,6 +142,7 @@ class AutoCompleteInputForm extends Component {
       </Option>
     ));
     const domRef = this.props.domRef || this.props.placeholder + 'auto-complete'
+    console.log(this.props.selected)
     return (
       <div id={domRef}>
         <Skeleton paragraph={false} loading={this.state.transition} active>

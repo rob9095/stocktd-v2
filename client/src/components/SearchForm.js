@@ -216,7 +216,6 @@ class BasicSearchForm extends Component {
               })(
                 <Input
                   suffix={<Icon style={{...!this.props.form.getFieldValue(id) && {display: 'none'}}} onClick={()=>this.handleClear(id)} type="close-circle" theme="filled" />}
-                  size="small"
                   placeholder={i.text}
                   onBlur={this.handleSubmit}
                 />
