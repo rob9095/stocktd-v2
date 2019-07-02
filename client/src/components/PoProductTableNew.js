@@ -35,7 +35,6 @@ class PoProductTableNew extends Component {
   }
 
   componentDidMount() {
-    console.log({ state: this.state, history: this.props.history, match: this.props.match })
     if (typeof this.props.match.params.po === 'string') {
       let andQuery = this.props.match.params.po.split(",").filter(id => id).map(id => ['po', id, '='])
       this.updateAndFilter('po', andQuery)
@@ -44,7 +43,6 @@ class PoProductTableNew extends Component {
       this.setState({
         currentPOs: this.props.history.location.poRefs,
       })
-      console.log({state:this.state, history: this.props.history, match: this.props.match})
     }
   }
 
@@ -157,7 +155,7 @@ class PoProductTableNew extends Component {
             requirePO: true,
             poMode: 'multiple',
             onScan:this.handleScan,
-            onCurrentPOUpdate: (u)=>console.log({u}),
+            onCurrentPOUpdate: (po={}) => this.props.match.params.po ? this.props.match.params.po.includes(po._id) ? console.log('remove '+po.name) : console.log('add '+po.name) : null,
             onAddQuantity: (a)=>console.log({a}),
             scanToPo: false,
           })}

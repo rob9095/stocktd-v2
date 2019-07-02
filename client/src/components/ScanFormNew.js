@@ -273,7 +273,6 @@ class BasicScanForm extends Component {
   }
 
   handleAutoUpdate = (clicked, valKey) => {
-    console.log(clicked)
     clicked.data = valKey === 'locations' ? [...clicked.id].map(l => l.id) : clicked.data
     clicked.data = Object.keys(clicked.data).length > 0 ? clicked.data : ''
     this.props.form.setFieldsValue({ [valKey]: clicked.data || '' })

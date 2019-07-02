@@ -17,22 +17,27 @@ class AutoCompleteInputForm extends Component {
     }
   }
 
+  updateSelected = () => {
+    let selected = this.props.selected.map(item => (
+      {
+        props:
+          { data: { ...item } },
+        ...this.props.mode === 'tags' ? { key: item[this.props.searchKey] } : { key: item._id },
+        label: item[this.props.searchKey]
+      }
+    ))
+    this.setState({ selected })
+    if (this.props.skipSelectedCallback !== true) {
+      selected = selected.length > 1 ? selected : selected[0]
+      this.handleChange(selected, selected);
+    }
+  }
+
   componentDidMount() {
     this._isMounted = true;
     this.props.setFocus && this.setFocus()
     if (this.props.selected) {
-      let selected = this.props.selected.map(item=>(
-        {props: 
-          {data: {...item}},
-          ...this.props.mode === 'tags' ? { key: item[this.props.searchKey] } : { key: item._id },
-          label: item[this.props.searchKey]
-        }
-        ))
-      this.setState({selected})
-      if (this.props.skipSelectedCallback !== true) {
-        selected = selected.length > 1 ? selected : selected[0]
-        this.handleChange(selected, selected);
-      }
+      this.updateSelected()
     }
   }
 
@@ -46,11 +51,13 @@ class AutoCompleteInputForm extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    // Typical usage (don't forget to compare props):
     if (this.props.setFocus === true && prevProps.setFocus === false) {
       console.log('setting focus!')
       this.handleDataFetch('')
       this.setFocus()
+    }
+    if (this.props.selected !== prevProps.selected) {
+      this.updateSelected()
     }
     //check if we are switching mode from multiple/tags to single/default, need to update select ui and handleChange
     if (['tags','multiple'].includes(prevProps.mode) && [undefined,'default'].includes(this.props.mode)) {
@@ -142,7 +149,6 @@ class AutoCompleteInputForm extends Component {
       </Option>
     ));
     const domRef = this.props.domRef || this.props.placeholder + 'auto-complete'
-    console.log(this.props.selected)
     return (
       <div id={domRef}>
         <Skeleton paragraph={false} loading={this.state.transition} active>
