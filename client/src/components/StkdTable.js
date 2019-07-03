@@ -786,9 +786,9 @@ class ProductTable extends Component {
             />
           )}
           <div className="ant-table flex flex-col">
-            <div className="flex flex-wrap align-items-center space-between">
+            <div className="flex flex-wrap align-items-center space-between" style={{padding: '14px 0px'}}>
               {bulkMenu && (
-                <div style={{ margin: '14px 0px' }}>
+                <div>
                   <Dropdown className="bulk-dropdown" overlay={bulkMenu} disabled={this.state.selected.length === 0}>
                     <Button>
                       {`Action on ${this.state.selected.length} selected`} <Icon type="down" />
@@ -796,7 +796,7 @@ class ProductTable extends Component {
                   </Dropdown>
                 </div>
               )}
-              <div style={{ margin: '14px 0px' }}>
+              <div>
                 <SingleInputFilter
                   onSearchBuilderToggle={()=>this.setState({siderClosed: false, siderConfig: {title: 'Advanced Search'}})}
                   onSearch={this.handleFilterSearch}

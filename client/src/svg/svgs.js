@@ -84,7 +84,7 @@ basketSvg: () => (
 </svg>
 ),
 
-tags: () => (
+upDown: () => (
 <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="-65 157.3 479.7 479.7">
 <g>
 	<g>

@@ -19,7 +19,7 @@ import DashboardHeader from '../components/DashboardHeader';
 import Svg from '../svg/svgs';
 
 
-const { homeSvg, basketSvg, tags, sliders, logoWhite, stocktdLogoWhite, arrowCircle } = Svg
+const { homeSvg, basketSvg, upDown, sliders, logoWhite, stocktdLogoWhite, arrowCircle } = Svg
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 
@@ -31,6 +31,25 @@ class DashboardNew extends Component {
       clientWidth: 0,
       loginRedirect: false,
       activeMenuItems: [],
+      openMenuKeys: [],
+      siderTopMenuOptions: [
+        { id: 'appHome', title: 'Home', to: "/app", icon: <Icon component={homeSvg} />, },
+        { title: 'Orders', icon: <Icon component={basketSvg} />, },
+        {
+          type: 'subMenu', title: 'Inventory', icon: <Icon component={upDown} />, children: [
+            { title: 'Products', },
+            { title: 'Scans', },
+            { title: 'Purchase Orders', },
+            { title: 'Receive Inventory', },
+            { title: 'PO Products', id: 'po-products', hidden: true},
+          ]
+        },
+        {
+          type: 'subMenu', title: 'Settings', icon: <Icon component={sliders} />, children: [
+            { title: 'Account', },
+          ]
+        },
+      ],
     }
   }
 
@@ -40,11 +59,20 @@ class DashboardNew extends Component {
       if (arg === 'app' && pathArr.length === 2) {
         return arg + 'Home';
       } else {
-        return arg
+        return arg.replace(' ','-').toLowerCase()
       }
     })
+    let openMenuKeys = []
+    for (let arg of activeMenuItems) {
+      let foundParent = this.state.siderTopMenuOptions.find(op => op.children && op.children.filter(c => c.title.toLowerCase().replace(' ', '-') === arg || c.id === arg).length)
+      console.log({ foundParent })
+      if (foundParent) {
+        openMenuKeys.push(foundParent.id || foundParent.title.toLowerCase().replace(' ', '-'))
+      }
+    }
     await this.setState({
       activeMenuItems,
+      openMenuKeys,
     })
   }
 
@@ -70,6 +98,7 @@ class DashboardNew extends Component {
     this.setState({
       clientWidth: document.documentElement.clientWidth,
     })
+    this.setActiveMenuItem(this.props.location.pathname)
   }
 
   componentDidUpdate(prevProps) {
@@ -117,6 +146,43 @@ class DashboardNew extends Component {
         <Redirect to={this.state.redirectPath} />
       )
     }
+    let siderTopMenuItems = this.state.siderTopMenuOptions.map((mi, i) => {
+      let to = mi.to || "/app/" + mi.title.toLowerCase().replace(' ','-')
+      let miKey = mi.id || mi.title.toLowerCase().replace(' ', '-') || i 
+      if (mi.type === 'subMenu') {
+        return (
+          <SubMenu
+            key={miKey}
+            title={<span>{mi.icon && mi.icon}<span>{mi.title}</span></span>}
+          >
+            {mi.children.map((c, ci) => {
+              let cTo = c.to || "/app/" + c.title.toLowerCase().replace(' ', '-')
+              let cKey = c.id || c.title.toLowerCase().replace(' ','-') || ci
+              return <Menu.Item
+                style={{...c.hidden && {display: 'none'}}}
+                key={cKey}
+              >
+                <Link to={cTo}>
+                  {c.icon && c.icon}
+                  {c.title}
+                </Link>
+              </Menu.Item>
+            })}
+          </SubMenu>
+        )
+      } else {
+        return (
+          <Menu.Item
+            key={miKey}
+          >
+            <Link to={to}>
+              {mi.icon && mi.icon}
+              {mi.title}
+            </Link>
+          </Menu.Item>
+        )
+      }
+    })
     return(
       <Layout style={{overflow: 'hidden'}}>
         {this.props.notifications.length > 0 && (
@@ -135,10 +201,13 @@ class DashboardNew extends Component {
             collapsed={this.state.collapsed}
           >
             <div className="flex space-between flex-col" style={{height: '99%'}}>
-              <Menu onClick={this.handleMenuClick} theme="light" mode="inline" selectedKeys={this.state.activeMenuItems}>
-                <Menu.Item key="appHome">
-                  <Icon component={homeSvg} />
-                  <span>Home</span>
+              <Menu onOpenChange={(openMenuKeys)=>this.setState({openMenuKeys})} forceSubMenuRender theme="light" mode="inline" openKeys={this.state.openMenuKeys} selectedKeys={this.state.activeMenuItems}>
+                {siderTopMenuItems}
+                {/* <Menu.Item key="appHome">
+                  <Link to="/app">
+                    <Icon component={homeSvg} />
+                    <span>Home</span>
+                  </Link>
                 </Menu.Item>
                 <Menu.Item key="orders">
                   <Icon component={basketSvg} />
@@ -146,10 +215,10 @@ class DashboardNew extends Component {
                 </Menu.Item>
                 <SubMenu
                   key="products"
-                  title={<span><Icon component={tags} /><span>Inventory</span></span>}
+                  title={<span><Icon component={upDown} /><span>Inventory</span></span>}
                 >
                   <Menu.Item key="products-new">Products</Menu.Item>
-                  <Menu.Item key="scan-table">Scans</Menu.Item>
+                  <Menu.Item key="scans">Scans</Menu.Item>
                   <Menu.Item key="purchase-orders">Purchase Orders</Menu.Item>
                   <Menu.Item key="receive-inventory">Receive Inventory</Menu.Item>
                 </SubMenu>
@@ -164,7 +233,7 @@ class DashboardNew extends Component {
                 <Menu.Item onClick={this.toggle}>
                   <Icon style={this.state.collapsed ? {transform: 'rotate(180deg)'} : {}} component={arrowCircle} />
                   <span>{this.state.collapsed ? 'Expand' : 'Collapse'}</span>
-                </Menu.Item>
+                </Menu.Item> */}
               </Menu>
             </div>
           </Sider>
@@ -186,16 +255,16 @@ class DashboardNew extends Component {
                 <Route exact path="/app/purchase-orders" render={props => (
                   <PoTableNew {...props} />
                 )} />
-                <Route exact path="/app/products" render={props => (
+                <Route exact path="/app/products-old" render={props => (
                   <ProductTable {...props} />
                 )} />
-                <Route exact path="/app/products-new" render={props => (
+                <Route exact path="/app/products" render={props => (
                   <ProductTableNew {...props} />
                 )} />
                 <Route exact path="/app/receive-inventory" render={props => (
                   <ReceiveInventory {...props} />
                 )} />
-                <Route exact path="/app/scan-table" render={props => (
+                <Route exact path="/app/scans" render={props => (
                   <ScanTable {...props} />
                 )} />
                 <Route exact path="/app/account" render={props => (

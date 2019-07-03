@@ -177,7 +177,7 @@ class PoProductTableNew extends Component {
             if (this.props.match.params.po) {
               let pos = this.props.match.params.po.split(',').filter(id=>id).map(id=>data.find(r=>r.po && r.po._id === id)).map(pop=>pop && pop.po ? pop.po : {})
               return (
-                <div className="flex align-items-center half-pad flex-wrap" style={{ paddingTop: 12 }}>
+                <div className="flex align-items-center flex-wrap" style={{ paddingTop: 12 }}>
                   {pos.length + ' Open Purchase Order' + `${pos.length > 1 ? 's' : ''}`}
                   <Divider type="vertical" />
                   {pos.map((po,i) => (
