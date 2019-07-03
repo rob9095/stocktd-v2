@@ -380,6 +380,7 @@ class BasicScanForm extends Component {
                       </div>
                     </div>
                   )}
+                  skipControlledUpdateCallback={this.props.skipControlledUpdateCallback}
                   mode={this.props.form.getFieldValue('scanToPo') ? 'default' : 'multiple'}
                   selected={this.props.currentPOs}
                   onUpdate={clicked =>

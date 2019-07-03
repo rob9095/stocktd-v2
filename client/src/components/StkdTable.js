@@ -864,7 +864,7 @@ class ProductTable extends Component {
               />
             </div>
           </Layout.Sider>
-          {this.props.scanFormConfig && (
+          {this.props.scanFormConfig && !this.state.scannerClosed && (
             <Layout.Sider className={"stkd-sidebar right"} width={300} trigger={null} collapsedWidth={0} collapsible collapsed={this.state.scannerClosed} onCollapse={() => this.setState({ scannerClosed: true })} style={{ height: '100%', overflow: 'auto', ...this.state.scannerClosed && { border: 'none' } }}>
               <div className="half-pad">
                 <PageHeader onBack={() => this.setState({ scannerClosed: true })} title="Scan Form" />

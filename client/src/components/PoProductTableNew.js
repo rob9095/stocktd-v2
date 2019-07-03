@@ -150,18 +150,19 @@ class PoProductTableNew extends Component {
           </div>
         </div> */}
         <StkdTable
-          scanFormConfig={({data=[],scannerClosed = true})=>({
+          scanFormConfig={({data=[], scannerClosed})=>({
             currentPOs: this.props.match.params.po ? this.props.match.params.po.split(',').filter(id => id).map(id => data.find(r => r.po && r.po._id === id)).filter(pop=>pop && pop.po).map(pop => pop.po) : [],
             requirePO: true,
             poMode: 'multiple',
             onScan:this.handleScan,
-            onCurrentPOUpdate: (pos=[]) => {
-              if (scannerClosed === false) {           
-                pos = Array.isArray(pos) ? pos : []
+            skipControlledUpdateCallback: true,
+            onCurrentPOUpdate: (pos) => {
+              if (scannerClosed === false) {
+                pos = Array.isArray(pos) ? pos : [pos]
                 let path = '/app/po-products/'+pos.map((p={})=>p._id).filter(id=>id).join()
-                console.log({pos,path, currentPath: this.props.history.location.pathname, history: this.props.history})                     
+                console.log({pos,path, currentPath: this.props.history.location.pathname, history: this.props.history})
                 if (path !== this.props.history.location.pathname) {
-                  //this.props.history.push(path)
+                  this.props.history.push(path)
                 }
               }
             },
