@@ -65,7 +65,6 @@ class DashboardNew extends Component {
     let openMenuKeys = []
     for (let arg of activeMenuItems) {
       let foundParent = this.state.siderTopMenuOptions.find(op => op.children && op.children.filter(c => c.title.toLowerCase().replace(' ', '-') === arg || c.id === arg).length)
-      console.log({ foundParent })
       if (foundParent) {
         openMenuKeys.push(foundParent.id || foundParent.title.toLowerCase().replace(' ', '-'))
       }

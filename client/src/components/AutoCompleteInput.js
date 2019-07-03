@@ -118,11 +118,11 @@ class AutoCompleteInputForm extends Component {
 
   handleChange = (id,e,skipCallback) => {
     if (!id) {
-      this.props.onUpdate({ id: '', data: {} })
+      !skipCallback && this.props.onUpdate({ id: '', data: {} })
       return
     }
     if (id.length === 0) {
-      this.props.onUpdate({id:'', data:{}})
+      !skipCallback && this.props.onUpdate({id:'', data:{}})
       return
     }
     let data = Array.isArray(e) ? e.map(d=>({...d.props.data})) : e.props.data
