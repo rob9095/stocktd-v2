@@ -210,7 +210,7 @@ class PoProductTableNew extends Component {
                             </div>
                           )}
                           onUpdate={clicked => {
-                            this.props.history.push('/app/po-products/'+[...pos.map((p={})=>p._id),clicked.data._id || ""].join())
+                            this.props.history.push('/app/po-products/'+[...pos.map((p={})=>p._id).filter(id=>id),clicked.data._id || ""].join())
                             this.setState({addNewPo: false})
                           }}
                           notFound={

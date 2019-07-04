@@ -295,6 +295,7 @@ class BasicScanForm extends Component {
         {preFixOptions}
       </Select>
     );
+    console.log({currentPOs: this.props.currentPOs})
     return (
       <div>
         {this.state.showBoxPrefixModal && (
