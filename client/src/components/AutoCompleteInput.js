@@ -164,7 +164,7 @@ class AutoCompleteInputForm extends Component {
               }
             />
             :
-            getFieldDecorator("selected", { initialValue: this.state.selected })(
+            getFieldDecorator("selected", {})(
               <Select
                 size={this.props.size}
                 allowClear

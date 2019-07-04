@@ -156,11 +156,11 @@ class PoProductTableNew extends Component {
             poMode: 'multiple',
             onScan:this.handleScan,
             skipControlledUpdateCallback: true,
-            onCurrentPOUpdate: (pos) => {
+            onCurrentPOUpdate: (pos,ids) => {
               if (scannerClosed === false) {
-                pos = Array.isArray(pos) ? pos : [pos]
-                let path = '/app/po-products/'+pos.map((p={})=>p._id).filter(id=>id).join()
-                console.log({pos,path, currentPath: this.props.history.location.pathname, history: this.props.history})
+                ids = Array.isArray(ids) ? ids : [ids]
+                let path = '/app/po-products/'+ids.filter(({id,key})=>id||key).map(({id,key})=>id||key).join()
+                console.log({ids,path, currentPath: this.props.history.location.pathname, history: this.props.history})
                 if (path !== this.props.history.location.pathname) {
                   this.props.history.push(path)
                 }

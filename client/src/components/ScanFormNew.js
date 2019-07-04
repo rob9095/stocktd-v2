@@ -56,6 +56,12 @@ class BasicScanForm extends Component {
     this._isMounted = false;
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.props.currentPOs.length > 1 && prevProps.currentPOs.length <= 1 && this.props.form.getFieldValue('scanToPo') === true) {
+      this.props.form.setFieldsValue({scanToPo: false})
+    }
+  }
+
   toggle = (prop) => {
     this.setState({
       [prop]: !this.state[prop],
@@ -273,6 +279,7 @@ class BasicScanForm extends Component {
   }
 
   handleAutoUpdate = (clicked, valKey) => {
+    console.log({clicked, valKey})
     clicked.data = valKey === 'locations' ? [...clicked.id].map(l => l.id) : clicked.data
     clicked.data = Object.keys(clicked.data).length > 0 ? clicked.data : ''
     this.props.form.setFieldsValue({ [valKey]: clicked.data || '' })
@@ -282,7 +289,7 @@ class BasicScanForm extends Component {
         [valKey]: clicked.data || '',
       }
     })
-    this.props.onCurrentPOUpdate && valKey === 'currentPOs' && this.props.onCurrentPOUpdate(clicked.data);
+    this.props.onCurrentPOUpdate && valKey === 'currentPOs' && this.props.onCurrentPOUpdate(clicked.data, clicked.id);
   }
 
   render() {
