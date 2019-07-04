@@ -176,7 +176,7 @@ class DashboardNew extends Component {
           >
             <Link to={to}>
               {mi.icon && mi.icon}
-              {mi.title}
+              <span>{mi.title}</span>
             </Link>
           </Menu.Item>
         )
@@ -200,7 +200,7 @@ class DashboardNew extends Component {
             collapsed={this.state.collapsed}
           >
             <div className="flex space-between flex-col" style={{height: '99%'}}>
-              <Menu onOpenChange={(openMenuKeys)=>this.setState({openMenuKeys})} forceSubMenuRender theme="light" mode="inline" openKeys={this.state.openMenuKeys} selectedKeys={this.state.activeMenuItems}>
+              <Menu onOpenChange={(openMenuKeys)=>this.setState({openMenuKeys})} theme="light" mode="inline" openKeys={this.state.collapsed ? [] : this.state.openMenuKeys} selectedKeys={this.state.activeMenuItems}>
                 {siderTopMenuItems}
                 {/* <Menu.Item key="appHome">
                   <Link to="/app">
@@ -227,12 +227,13 @@ class DashboardNew extends Component {
                 >
                   <Menu.Item className="stkd-dark sub-menu-item" key="account">Account</Menu.Item>
                 </SubMenu>
+              </Menu> */}
               </Menu>
               <Menu>
                 <Menu.Item onClick={this.toggle}>
-                  <Icon style={this.state.collapsed ? {transform: 'rotate(180deg)'} : {}} component={arrowCircle} />
+                  <Icon style={this.state.collapsed ? { transform: 'rotate(180deg)' } : {}} component={arrowCircle} />
                   <span>{this.state.collapsed ? 'Expand' : 'Collapse'}</span>
-                </Menu.Item> */}
+                </Menu.Item>
               </Menu>
             </div>
           </Sider>
