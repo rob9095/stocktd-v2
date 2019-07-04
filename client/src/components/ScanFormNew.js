@@ -378,6 +378,7 @@ class BasicScanForm extends Component {
                   queryModel={"PurchaseOrder"}
                   searchKey={"name"}
                   placeholder={"Search by PO Name"}
+                  loading={this.props.loading}
                   renderOption={item => (
                     <div style={{ maxHeight: 35, overflow: "hidden" }}>
                       <div style={{ fontSize: "small" }}>
@@ -388,7 +389,7 @@ class BasicScanForm extends Component {
                       </div>
                     </div>
                   )}
-                  skipControlledUpdateCallback={this.props.skipControlledUpdateCallback}
+                  //skipControlledUpdateCallback={this.props.skipControlledUpdateCallback}
                   mode={this.props.form.getFieldValue('scanToPo') ? 'default' : 'multiple'}
                   selected={this.props.currentPOs}
                   onUpdate={clicked =>

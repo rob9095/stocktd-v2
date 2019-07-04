@@ -59,7 +59,14 @@ class AutoCompleteInputForm extends Component {
       this.setFocus()
     }
     if (this.props.selected !== prevProps.selected) {
-      this.updateSelected()
+      //check the arrays
+    if (!this.props.selected.sort((a, b) => a._id > b._id).every(function (value, index) { return value === prevProps.selected.sort((a, b) => a._id > b._id)[index] })) {
+        this.updateSelected()
+        console.log({
+          oldS: prevProps.selected,
+          newS: this.props.selected
+        })
+      }
     }
     //check if we are switching mode from multiple/tags to single/default, need to update select ui and handleChange
     if (['tags','multiple'].includes(prevProps.mode) && [undefined,'default'].includes(this.props.mode)) {
@@ -119,6 +126,7 @@ class AutoCompleteInputForm extends Component {
   }
 
   handleChange = (id,e,skipCallback) => {
+    this.props.form.setFieldsValue({selected: id})
     if (!id) {
       !skipCallback && this.props.onUpdate({ id: '', data: {} })
       return

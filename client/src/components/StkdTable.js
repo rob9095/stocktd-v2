@@ -72,7 +72,7 @@ class ProductTable extends Component {
       this.handleDataFetch()
     }
     if (this.props.fetchData > prevProps.fetchData) {
-      this.handleDataFetch()
+      this.handleDataFetch(this.props.fetchDataConfig || {})
     }
   }
 

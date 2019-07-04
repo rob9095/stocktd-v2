@@ -13,7 +13,8 @@ class PoProductTableNew extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      filters: []
+      filters: [],
+      fetchData: 0,
     }
   }
 
@@ -92,23 +93,11 @@ class PoProductTableNew extends Component {
         ...scan,
         user: this.props.currentUser.user.id,
       }
-      let poRefs = this.state.currentPOs.sort((a, b) => (b.quantity - a.quantity))
+      scan.currentPOs = scan.currentPOs.sort((a, b) => (b.quantity - a.quantity))
       addBoxScan(scan, this.props.currentUser.user.company)
         .then(res => {
-          let data = this.state.data.map(p => {
-            if (p._id === res.updatedPoProduct._id) {
-              return {
-                ...res.updatedPoProduct,
-              }
-            } else {
-              return {
-                ...p,
-              }
-            }
-          })
-          this.setState({
-            data,
-          })
+          let updatedPoProduct = res.updatedPoProduct || {}
+          this.setState({fetchData: this.state.fetchData+1, fetchDataConfig: {rowIds: [updatedPoProduct._id]}})
           if (res.completedPoProducts && res.completedPoProducts.nMatched) {
             this.handlePoComplete(res.updatedPoProduct)
           }
@@ -118,6 +107,18 @@ class PoProductTableNew extends Component {
           reject(err);
         })
     })
+  }
+
+  handlePoComplete = (poProduct) => {
+    this.showConfirm('PO Completed', null, [], `All units for PO "${poProduct.name}" were scanned, remove it from current purchase orders?`)
+      .then((res) => {
+        if (res !== 'cancel') {
+          let path = this.props.history.location.pathname.split(',').filter(id=>id && id !== poProduct._id).join()
+          if (path !== this.props.history.location.pathname) {
+            this.props.history.push(path)
+          }
+        }
+      })
   }
 
   updateFilters = (key, value, operator) => {
@@ -150,6 +151,8 @@ class PoProductTableNew extends Component {
           </div>
         </div> */}
         <StkdTable
+          fetchData={this.state.fetchData}
+          fetchDataConfig={this.state.fetchDataConfig}
           scanFormConfig={({data=[], scannerClosed})=>({
             currentPOs: this.props.match.params.po ? this.props.match.params.po.split(',').filter(id => id).map(id => data.find(r => r.po && r.po._id === id)).filter(pop=>pop && pop.po).map(pop => pop.po) : [],
             requirePO: true,
@@ -210,7 +213,7 @@ class PoProductTableNew extends Component {
                             </div>
                           )}
                           onUpdate={clicked => {
-                            this.props.history.push('/app/po-products/'+[...pos.map((p={})=>p._id).filter(id=>id),clicked.data._id || ""].join())
+                            this.props.history.push('/app/po-products/'+[...pos.filter(id=>id).map((p={})=>p._id),clicked.data._id || ""].join())
                             this.setState({addNewPo: false})
                           }}
                           notFound={
