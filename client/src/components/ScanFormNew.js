@@ -282,7 +282,7 @@ class BasicScanForm extends Component {
     console.log({clicked, valKey})
     clicked.data = valKey === 'locations' ? [...clicked.id].map(l => l.id) : clicked.data
     clicked.data = Object.keys(clicked.data).length > 0 ? clicked.data : ''
-    this.props.form.setFieldsValue({ [valKey]: clicked.data || '' })
+    this.props.form.setFieldsValue({ [valKey]: Array.isArray(clicked.data) ? clicked.data : clicked.data ? [clicked.data] : '' })
     this.setState({
       values: {
         ...this.state.values,
