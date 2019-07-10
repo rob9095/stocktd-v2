@@ -52,7 +52,7 @@ const buildQuery = (queryArr) => {
 		}
 		return(query)
 	} catch(err) {
-		throw err.toString()
+		throw err ? err.toString() : err
 	}
 }
 
@@ -74,7 +74,7 @@ const buildPopulateArray = (popArray,company) => {
 			})
 		})
 	} catch(err) {
-		throw err.toString()
+		throw err ? err.toString() : err
 	}
 }
 
@@ -95,6 +95,9 @@ exports.queryModelData = async (req, res, next) => {
 			? buildPopulateArray(req.body.populateArray, req.body.company)
 			: []
 		console.log({populateArray})
+		//add check to make sure incoming query has defined values and set defaults
+		//add check here to make sure model exists
+		//add check here to make sure sortBy and sortDirection are defined
 		let count = await db[req.body.model].count(query)
 		const limit = parseInt(req.body.rowsPerPage)
 		const skip = (req.body.activePage * limit) - limit
@@ -177,7 +180,7 @@ updateModelDocumentsRefs = (config) => {
 			let updatedRefs = await db[refModel].bulkWrite(docRefUpdates)
 			resolve(updatedRefs)
 		} catch(err) {
-			reject({message: err.toString()})
+			reject({message: err ? err.toString() : err})
 		}
 	})
 }

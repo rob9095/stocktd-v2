@@ -4,6 +4,7 @@ import StkdTable from './StkdTable';
 import { connect } from "react-redux";
 import { Radio, Tooltip, Icon, Button, Divider, Skeleton, Tag, Input, Empty, Select } from 'antd';
 import { updatePoProducts, removePoProducts } from '../store/actions/poProducts';
+import { queryModelData } from '../store/actions/models';
 import { addBoxScan } from '../store/actions/boxScans';
 import * as scanHandlers from "../store/actions/boxScans";
 import AutoCompleteInput from './AutoCompleteInput';
@@ -15,14 +16,35 @@ class PoProductTableNew extends Component {
     this.state = {
       filters: [],
       fetchData: 0,
+      currentPOs: [],
     }
   }
 
-  updateAndFilter = (key,andQuery=[]) => {
+  updateAndFilter = async (key,andQuery=[]) => {
     let filters = this.state.filters || []
     filters = [...andQuery, ...filters.filter(f => f[0] !== key)]
-    this.setState({filters})
+    await this.setState({filters})
+    this.fetchCurrentPOs()
     console.log({filters, andQuery})
+  }
+
+  fetchCurrentPOs = () => {
+    //set skeleton pos 
+    this.setState({
+      currentPOs: this.state.filters.filter(q=>q[0] === 'po').map(q=>({isSkeleton: true}))
+    })
+    this.props.queryModelData('PurchaseOrder',this.state.filters.filter(q=>q[0] === 'po').map(([f,...q])=>['_id',...q]),'name','ascending',1,10,this.props.currentUser.user.company)
+    .then(({data})=>{
+      this.setState({
+        currentPOs: data,
+      })
+    })
+    .catch(err=>{
+      this.setState({
+        currentPOs: this.state.data.filter(r=> !r.isSkeleton),
+      })
+      console.log({err})
+    })
   }
 
   componentWillUpdate(prevProps) {
@@ -133,6 +155,7 @@ class PoProductTableNew extends Component {
   }
 
   render() {
+    const { currentPOs = [] } = this.state
     return (
       <div style={{ height: '100%' }}>
         {/* <div className="flex align-items-center space-between">
@@ -154,7 +177,8 @@ class PoProductTableNew extends Component {
           fetchData={this.state.fetchData}
           fetchDataConfig={this.state.fetchDataConfig}
           scanFormConfig={({data=[], scannerClosed})=>({
-            currentPOs: this.props.match.params.po ? this.props.match.params.po.split(',').filter(id => id).map(id => data.find(r => r.po && r.po._id === id)).filter(pop=>pop && pop.po).map(pop => pop.po) : [],
+            // currentPOs: this.props.match.params.po ? this.props.match.params.po.split(',').filter(id => id).map(id => data.find(r => r.po && r.po._id === id)).filter(pop=>pop && pop.po).map(pop => pop.po) : [],
+            currentPOs,
             requirePO: true,
             poMode: 'multiple',
             onScan:this.handleScan,
@@ -178,18 +202,32 @@ class PoProductTableNew extends Component {
           populateArray={[{ path: 'po' }, { path: 'product' }]}
           extraTopContent={({data=[]})=>{
             if (this.props.match.params.po) {
-              let pos = this.props.match.params.po.split(',').filter(id=>id).map(id=>data.find(r=>r.po && r.po._id === id)).map(pop=>pop && pop.po ? pop.po : {})
+              // let pos = this.props.match.params.po.split(',').filter(id=>id).map(id=>data.find(r=>r.po && r.po._id === id) || {po: {idNotFound: id}}).map(pop=>pop && pop.po ? pop.po : {})
+              let pos = currentPOs
               return (
                 <div className="flex align-items-center flex-wrap" style={{ paddingTop: 12 }}>
                   {pos.length + ' Open Purchase Order' + `${pos.length > 1 ? 's' : ''}`}
                   <Divider type="vertical" />
-                  {pos.map((po,i) => (
-                    <Tag onClose={()=>this.props.history.push('/app/po-products/'+pos.map((p={})=>p._id).filter(id => id !== po._id).join())} closable className="table-tag" key={po._id || i} style={{ background: '#fff', fontSize: 14, padding: '2px 7px', marginRight: 7, ...!po._id && {minWidth: 80} }}>
-                        <Skeleton paragraph={false} loading={!po._id} active>
-                        {po.name}
-                        </Skeleton>
-                    </Tag>
-                  )).concat(
+                  {pos.map((po,i) => {
+                    let foundPo = data.find(r=>r.po && r.po._id === po._id)
+                    return(
+                    <Tooltip key={po._id || i} title={!foundPo ? 'Hidden by Query' : false}>
+                      <Tag
+                        onClose={()=>this.props.history.push('/app/po-products/'+pos.map((p={})=>p._id).filter(id => id !== po._id).join())}
+                        closable
+                        className="table-tag"
+                        key={po._id || i}
+                        style={{ background: '#fff', fontSize: 14, padding: '2px 7px', marginRight: 7,
+                          ...po.isSkeleton && {minWidth: 80},
+                          ...!foundPo && !po.isSkeleton && {opacity: .6}
+                          }
+                        }>
+                          <Skeleton paragraph={false} loading={po.isSkeleton} active>
+                            {po.name}
+                          </Skeleton>
+                      </Tag>                    
+                    </Tooltip>
+                  )}).concat(
                     <Button key="addNewPoBtn" onClick={()=>this.setState({addNewPo: !this.state.addNewPo})} style={{marginRight: 7,}} size="small">
                       <Icon type={ this.state.addNewPo ? "close" : "plus"} />
                     </Button>
@@ -299,4 +337,4 @@ function mapStateToProps(state) {
 }
 
 
-export default connect(mapStateToProps, { updatePoProducts, removePoProducts })(PoProductTableNew);
+export default connect(mapStateToProps, { updatePoProducts, removePoProducts, queryModelData })(PoProductTableNew);

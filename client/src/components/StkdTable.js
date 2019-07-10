@@ -84,7 +84,7 @@ class ProductTable extends Component {
     })
     //if the table is empty add some empty rows
     if (this.state.data.length === 0) {
-      let data = [1, 2, 3, 4, 5].map(n => ({ ...this.props.headers.map(h => ({ [h.id]: '' })), _id: n, }))
+      let data = [1, 2, 3, 4, 5].map(n => ({ ...this.props.headers.map(h => ({ [h.id]: '' })), _id: n, isSkeleton: true }))
       this.setState({
         data,
       })
@@ -123,6 +123,9 @@ class ProductTable extends Component {
     })
     .catch(err=>{
       console.log(err)
+      this.setState({
+        data: this.state.data.filter(r=>!r.isSkeleton),
+      })
     })
       await this.setState({
         ...rowId ? { loadingRows: [] } : { loading: false }
