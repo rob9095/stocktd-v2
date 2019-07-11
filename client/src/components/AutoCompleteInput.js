@@ -27,8 +27,7 @@ class AutoCompleteInputForm extends Component {
       }
     ))
     console.log('updated select', {selected})
-    //this.props.form.setFieldsValue({selected})
-    // this.setState({ selected })
+    this.setState({ selected })
     if (!this.props.skipSelectedCallback) {
       selected = selected.length > 1 ? selected : selected[0]
       this.handleChange(selected, selected, true);
@@ -172,7 +171,7 @@ class AutoCompleteInputForm extends Component {
               }
             />
             :
-            getFieldDecorator("selected", {})(
+            getFieldDecorator("selected", {initialValue: this.state.selected && this.state.selected})(
               <Select
                 size={this.props.size}
                 allowClear
@@ -184,7 +183,7 @@ class AutoCompleteInputForm extends Component {
                 onDropdownVisibleChange={this.handleVisibleChange}
                 filterOption={false}
                 onSearch={this.handleType}
-                onChange={(a,b)=>this.handleChange(a,b,false)}
+                onChange={this.handleChange}
                 mode={this.props.mode || "default"}
                 labelInValue
                 ref={node => (this.selectRef = node)}

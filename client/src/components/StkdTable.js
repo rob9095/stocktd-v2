@@ -431,13 +431,21 @@ class ProductTable extends Component {
     }
 
     handleAutoCompleteUpdate = async (data) => {
-      data.handler || data.upsert && this.setState({
-        loadingRows: [...this.state.loadingRows, data.rowId]
+      this.setState({
+        ...data.rowId ? {
+          loadingRows: [...this.state.loadingRows, data.rowId]
+        } : {
+          loading: true,
+        }
       })
       //use custom handler if provided
       if (data.handler) {
-        await data.handler(data).then(res=>console.log(res)).catch(err=>console.log(err))
-        this.handleDataFetch({ rowIds: [data.rowId] });
+        data.handler(data)
+        .then(res=>{
+          console.log(res)
+          this.handleDataFetch({ rowIds: [data.rowId] });
+        })
+        .catch(err=>console.log(err));
         return
       }
       //upsert if upsert on change is true
@@ -837,7 +845,7 @@ class ProductTable extends Component {
                   >
                     {this.state.pageSizeOptions.map(op => (
                       <Select.Option key={op} value={op} className="flex-i align-items-center justify-content-center">
-                        <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.length} active>
+                        <Skeleton paragraph={false} loading={this.state.loading} active>
                           {this.state.pagination.pageSize === op &&
                             <Icon style={{ marginRight: 2, marginLeft: -10 }} type="check" />
                           }
@@ -847,7 +855,7 @@ class ProductTable extends Component {
                     ))}
                   </Select>
                   <div className="pagination-simple">
-                      <Skeleton paragraph={false} loading={this.state.loading || this.state.loadingRows.length} active>
+                      <Skeleton paragraph={false} loading={this.state.loading} active>
                       <Pagination simple className="flex align-items-center" {...this.state.pagination} />
                     </Skeleton>
                   </div>
