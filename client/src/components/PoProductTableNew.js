@@ -7,7 +7,10 @@ import { updatePoProducts, removePoProducts } from '../store/actions/poProducts'
 import { queryModelData } from '../store/actions/models';
 import { addBoxScan } from '../store/actions/boxScans';
 import * as scanHandlers from "../store/actions/boxScans";
+import { addNotification, removeNotification } from '../store/actions/notifications';
 import AutoCompleteInput from './AutoCompleteInput';
+
+const moment = require('moment');
 
 
 class PoProductTableNew extends Component {
@@ -154,6 +157,36 @@ class PoProductTableNew extends Component {
     console.log({ filters })
   }
 
+  handleCurrentPoTagClick = (data) => {
+    if (typeof data !== 'object') {
+      return
+    }
+    let values = ['name', 'quantity', 'type', 'status', 'createdOn']
+    this.props.addNotification({
+      nType: 'modal',
+      visible: true,
+      footer: null,
+      content: (
+        Object.entries(data).filter(([field, value])=>values.includes(field)).map(([field, value],i)=>
+          <div>
+            {field === 'createdOn' ? 
+              <div key={field + i}>
+                <span style={{fontWeight: 600}}>Date Created: </span>{new moment(Date(value).toLocaleString()).format('M/D/YY') }
+              </div>
+            :
+              <div key={field + i}>
+                <span style={{fontWeight: 600}}>{field}: </span>{value}
+              </div>
+            }
+          </div>
+        )
+      ),
+      title: data.name,
+      id: data._id || 'unknown',
+      onCancel: () => this.props.removeNotification({id: data._id || 'unknown'}),
+    })
+  }
+
   render() {
     const { currentPOs = [] } = this.state
     return (
@@ -213,11 +246,16 @@ class PoProductTableNew extends Component {
                     return(
                     <Tooltip key={po._id || i} title={!foundPo ? 'Hidden by Query' : false}>
                       <Tag
-                        onClose={()=>this.props.history.push('/app/po-products/'+pos.map((p={})=>p._id).filter(id => id !== po._id).join())}
+                        onClick={()=>!po.isSkeleton && this.handleCurrentPoTagClick(po)}
+                        onClose={(e)=>{
+                          e.stopPropagation()
+                          this.props.history.push('/app/po-products/'+pos.map((p={})=>p._id).filter(id => id !== po._id).join())
+                        }}
                         closable
                         className="table-tag"
                         key={po._id || i}
                         style={{ background: '#fff', fontSize: 14, padding: '2px 7px', marginRight: 7,
+                          ...!po.isSkeleton && {cursor: 'pointer'},
                           ...po.isSkeleton && {minWidth: 80},
                           ...!foundPo && !po.isSkeleton && {opacity: .6}
                           }
@@ -337,4 +375,4 @@ function mapStateToProps(state) {
 }
 
 
-export default connect(mapStateToProps, { updatePoProducts, removePoProducts, queryModelData })(PoProductTableNew);
+export default connect(mapStateToProps, { updatePoProducts, removePoProducts, queryModelData, addNotification, removeNotification })(PoProductTableNew);

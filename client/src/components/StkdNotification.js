@@ -8,6 +8,7 @@ class StkdNotification extends Component {
 
     }
   }
+
   render() {
     const { config, nType } = this.props
     switch (nType) {
@@ -19,8 +20,8 @@ class StkdNotification extends Component {
       case 'message':
         message.open(config)
         return <div />
-      case 'model':
-        return <Modal {...config} />
+      case 'modal':
+        return <Modal {...config}>{config.content}</Modal>
       case 'drawer':
         return <Drawer {...config}>
                 {config.content}
