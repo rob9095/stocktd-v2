@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { List, message, Avatar, Spin, Skeleton } from 'antd';
 import { connect } from 'react-redux';
 import { queryModelData } from '../store/actions/models';
+import { addNotification, removeNotification } from '../store/actions/notifications';
 
 import InfiniteScroll from 'react-infinite-scroller';
 
@@ -110,10 +111,16 @@ class InfiniteListExample extends Component {
       activePage: this.state.activePage + 1,
     });
     if (!this.state.hasMore) {
-      this.props.id && message.config({
-        getContainer: () => document.getElementById(this.props.id),
-      });
-      message.warning(this.props.noMoreText || 'All records loaded',8000);
+      // this.props.id && message.config({
+      //   getContainer: () => document.getElementById(this.props.id),
+      // });
+      // message.warning(this.props.noMoreText || 'All records loaded',8000);
+      this.props.addNotification({
+        nType: 'notification',
+        id: 'scan-log-no-more',
+        message: this.props.noMoreText || 'All records loaded',
+        onClose: ()=>this.props.removeNotification({id: 'scan-log-no-more',})
+      })
       this.setState({
         loading: false,
       });
@@ -124,7 +131,7 @@ class InfiniteListExample extends Component {
 
   render() {
     return (
-      <div className="contain" style={{height: 300,}}>
+      <div className="contain" style={{height: this.props.height || 300,}}>
         <InfiniteScroll
           initialLoad={false}
           pageStart={0}
@@ -173,4 +180,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, { queryModelData })(InfiniteListExample);
+export default connect(mapStateToProps, { queryModelData, addNotification, removeNotification })(InfiniteListExample);

@@ -9,26 +9,38 @@ class StkdNotification extends Component {
     }
   }
 
-  render() {
+  componentDidMount(){
     const { config, nType } = this.props
     switch (nType) {
       case 'alert':
-        return <Alert {...config} />
+        this.setState({stkdNote: <Alert {...config} />})
+        break;
       case 'notification':
         notification.open(config)
-        return <div />
+        this.setState({stkdNote: <div />})
+        break;
       case 'message':
         message.open(config)
-        return <div />
+        this.setState({ stkdNote: <div /> })
+        break;
       case 'modal':
-        return <Modal {...config}>{config.content}</Modal>
+        this.setState({ stkdNote:<Modal {...config}>{config.content}</Modal>})
+        break;
       case 'drawer':
-        return <Drawer {...config}>
-                {config.content}
-              </Drawer>
+        this.setState({
+          stkdNote:<Drawer {...config}>
+            {config.content}
+          </Drawer>
+        })
+        break;
       default:
-        return <Alert {...config} banner />
+        this.setState({stkdNote:<Alert {...config} banner />})
     }
+  }
+
+  render() {
+    let { stkdNote = <div /> } = this.state
+    return stkdNote
   }
 }
 

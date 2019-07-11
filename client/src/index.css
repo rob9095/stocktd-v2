@@ -482,6 +482,11 @@ ul.ant-menu.ant-menu-light.ant-menu-root.ant-menu-vertical .ant-menu-item a:hove
   }
 } */
 
+/* Scan log infinite List */
+.scan-log .ant-collapse > .ant-collapse-item > .ant-collapse-header {
+  padding: 6px 6px 6px 35px !important;
+}
+
 /* Upload Form */
 .file-list {
   border-radius: 5px;
