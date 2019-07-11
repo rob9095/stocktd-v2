@@ -872,7 +872,8 @@ class ProductTable extends Component {
               <div className="half-pad">
                 <PageHeader onBack={() => this.setState({ scannerClosed: true })} title="Scan Form" />
                 <ScanForm
-                  {...this.props.scanFormConfig(this.state)}
+                  {...this.props.scanFormConfig}
+                  onCurrentPOUpdate={(a,b)=>this.props.onCurrentPOUpdate(a,b,this.state.scannerClosed)}
                 />
               </div>
             </Layout.Sider>

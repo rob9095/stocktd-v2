@@ -27,11 +27,11 @@ class AutoCompleteInputForm extends Component {
       }
     ))
     console.log('updated select', {selected})
-    this.props.form.setFieldsValue({selected})
+    //this.props.form.setFieldsValue({selected})
     // this.setState({ selected })
     if (!this.props.skipSelectedCallback) {
       selected = selected.length > 1 ? selected : selected[0]
-      this.handleChange(selected, selected, this.props.skipControlledUpdateCallback);
+      this.handleChange(selected, selected, true);
     }
   }
 
@@ -128,16 +128,16 @@ class AutoCompleteInputForm extends Component {
   handleChange = (id,e,skipCallback) => {
     this.props.form.setFieldsValue({selected: id})
     if (!id) {
-      !skipCallback && this.props.onUpdate({ id: '', data: {} })
+      this.props.onUpdate({ id: '', data: {}, skipCallback })
       return
     }
     if (id.length === 0) {
-      !skipCallback && this.props.onUpdate({id:'', data:{}})
+      this.props.onUpdate({id:'', data:{}, skipCallback})
       return
     }
     let data = Array.isArray(e) ? e.map(d=>({...d.props.data})) : e.props.data
     id = Array.isArray(id) ? id.map(i=>({id:i.key})) : id
-    !skipCallback && this.props.onUpdate({ id, data })
+    this.props.onUpdate({ id, data, skipCallback })
   }
 
   handleVisibleChange = (open) => {
@@ -184,7 +184,7 @@ class AutoCompleteInputForm extends Component {
                 onDropdownVisibleChange={this.handleVisibleChange}
                 filterOption={false}
                 onSearch={this.handleType}
-                onChange={this.handleChange}
+                onChange={(a,b)=>this.handleChange(a,b,false)}
                 mode={this.props.mode || "default"}
                 labelInValue
                 ref={node => (this.selectRef = node)}

@@ -49,7 +49,7 @@ class InfiniteListExample extends Component {
   componentDidUpdate(prevProps) {
     if (!Object.is(prevProps.lastItem, this.props.lastItem)) {
       console.log('last item changed!')
-      this.handleDataFetch()
+      this.handleDataFetch({requestedPage: 1})
     }
   }
 
@@ -77,7 +77,7 @@ class InfiniteListExample extends Component {
     let query = this.props.filters ? [...this.state.query, ...this.props.filters] : this.state.query
     await this.props.queryModelData(this.props.queryModel, query, this.state.column, this.state.direction, requestedPage, requestedRowsPerPage, this.props.currentUser.user.company, populateArray)
       .then(({ data, activePage, totalPages, rowsPerPage, skip }) => {
-        data = [...this.state.data.filter(d=>d.docType !== 'skeleton'), ...data].reduce((acc,cv)=>acc.map(doc=>doc._id).indexOf(cv._id) !== -1 ? [...acc] : [...acc,cv],[])
+        data = activePage === 1 ? data : [...this.state.data.filter(d=>d.docType !== 'skeleton'), ...data].reduce((acc,cv)=>acc.map(doc=>doc._id).indexOf(cv._id) !== -1 ? [...acc] : [...acc,cv],[])
         const hasMore = data.length >= rowsPerPage * totalPages ? false : true
         this.setState({
           skip,
@@ -113,7 +113,7 @@ class InfiniteListExample extends Component {
       this.props.id && message.config({
         getContainer: () => document.getElementById(this.props.id),
       });
-      message.warning(this.props.noMoreText || 'All records loaded');
+      message.warning(this.props.noMoreText || 'All records loaded',8000);
       this.setState({
         loading: false,
       });

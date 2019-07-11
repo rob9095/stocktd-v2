@@ -209,26 +209,47 @@ class PoProductTableNew extends Component {
         <StkdTable
           fetchData={this.state.fetchData}
           fetchDataConfig={this.state.fetchDataConfig}
-          scanFormConfig={({data=[], scannerClosed})=>({
+          // scanFormConfig={({data=[], scannerClosed})=>({
+          //   // currentPOs: this.props.match.params.po ? this.props.match.params.po.split(',').filter(id => id).map(id => data.find(r => r.po && r.po._id === id)).filter(pop=>pop && pop.po).map(pop => pop.po) : [],
+          //   currentPOs,
+          //   requirePO: true,
+          //   poMode: 'multiple',
+          //   onScan: this.handleScan,
+          //   skipControlledUpdateCallback: true,
+          //   onCurrentPOUpdate: (pos,ids) => {
+          //     if (scannerClosed === false) {
+          //       ids = Array.isArray(ids) ? ids : [ids]
+          //       let path = '/app/po-products/'+ids.filter(({id,key})=>id||key).map(({id,key})=>id||key).join()
+          //       console.log({ids,path, currentPath: this.props.history.location.pathname, history: this.props.history})
+          //       if (path !== this.props.history.location.pathname) {
+          //         this.props.history.push(path)
+          //       }
+          //     }
+          //   },
+          //   onAddQuantity: (a)=>console.log({a}),
+          //   scanToPo: false,
+          // })}
+          scanFormConfig={{
             // currentPOs: this.props.match.params.po ? this.props.match.params.po.split(',').filter(id => id).map(id => data.find(r => r.po && r.po._id === id)).filter(pop=>pop && pop.po).map(pop => pop.po) : [],
-            currentPOs,
+            currentPOs: this.state.currentPOs.filter(p=>!p.isSkeleton),
             requirePO: true,
             poMode: 'multiple',
-            onScan:this.handleScan,
+            onScan: this.handleScan,
             skipControlledUpdateCallback: true,
-            onCurrentPOUpdate: (pos,ids) => {
-              if (scannerClosed === false) {
-                ids = Array.isArray(ids) ? ids : [ids]
-                let path = '/app/po-products/'+ids.filter(({id,key})=>id||key).map(({id,key})=>id||key).join()
-                console.log({ids,path, currentPath: this.props.history.location.pathname, history: this.props.history})
-                if (path !== this.props.history.location.pathname) {
-                  this.props.history.push(path)
-                }
-              }
-            },
             onAddQuantity: (a)=>console.log({a}),
             scanToPo: false,
-          })}
+          }}
+          onCurrentPOUpdate={(pos,ids,scannerClosed) => {
+            if (scannerClosed === false) {
+              ids = Array.isArray(ids) ? ids : [ids]
+              let path = '/app/po-products/'+ids.filter(({id,key})=>id||key).map(({id,key})=>id||key).join()
+              console.log({ids,path, currentPath: this.props.history.location.pathname, history: this.props.history})
+              if (path !== this.props.history.location.pathname) {
+                this.props.history.push(path)
+              }
+            }
+            console.log({pos,ids,scannerClosed})
+          }}
           title={"Purchase Order Products"}
           queryModel="PoProduct"
           editTitle={"PO Product"}

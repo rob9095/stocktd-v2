@@ -245,7 +245,7 @@ class BasicScanForm extends Component {
       case 'Product not found on provided POs':
         result = await this.showInfoModal({
           list: error.message,
-          buttons: error.options.map(text => ({ text, size: "small", })) || [],
+          //buttons: error.options.map(text => ({ text, size: "small", })) || [],
           error,
         })
         this.setState({ infoModalConfig: null })
@@ -289,7 +289,7 @@ class BasicScanForm extends Component {
         [valKey]: clicked.data || '',
       }
     })
-    this.props.onCurrentPOUpdate && valKey === 'currentPOs' && this.props.onCurrentPOUpdate(clicked.data, clicked.id);
+    this.props.onCurrentPOUpdate && valKey === 'currentPOs' && !clicked.skipCallback && this.props.onCurrentPOUpdate(clicked.data, clicked.id);
   }
 
   render() {
@@ -302,7 +302,7 @@ class BasicScanForm extends Component {
         {preFixOptions}
       </Select>
     );
-    console.log({currentPOs: this.props.currentPOs})
+    console.log({scanFormCurrentPOs: this.props.form.getFieldValue('currentPOs')})
     return (
       <div>
         {this.state.showBoxPrefixModal && (
