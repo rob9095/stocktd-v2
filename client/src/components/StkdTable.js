@@ -574,7 +574,7 @@ class ProductTable extends Component {
           return (
             <td key={`${r._id}-${col.id}`} id={`${r._id}-${col.id}-dropdown`} className="stkd-td actions center-a no-wrap" style={this.state.data.length>8?{position: 'relative'}:{}}>
               <Skeleton paragraph={false} loading={rowLoading} active>
-                <Dropdown getPopupContainer={()=>document.getElementById(`${r._id}-${col.id}-dropdown`)} overlay={menu} placement="bottomRight">
+                <Dropdown trigger={['click']} getPopupContainer={()=>document.getElementById(`${r._id}-${col.id}-dropdown`)} overlay={menu} placement="bottomRight">
                     <Button className="no-border no-bg">
                       <Icon type="ellipsis" style={{ color: '#a6aece', fontSize: 25, cursor: 'pointer' }} />
                     </Button>
@@ -712,7 +712,7 @@ class ProductTable extends Component {
           /> */}
           {drawerItem._id && (
             <EditItemDrawer
-              inputs={this.props.headers.filter(h => !h.noSort)}
+              inputs={this.props.headers.filter(h => !h.noSort).sort(h=>h.noEdit ? 1 : -1)}
               item={drawerItem}
               title={`${drawerItem._id ? 'Edit '+this.props.editTitle || '' : 'Create Item'} `}
               onClose={() => this.setState({ drawerItem: null })}

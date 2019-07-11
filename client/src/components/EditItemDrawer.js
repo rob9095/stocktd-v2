@@ -165,7 +165,7 @@ class DrawerForm extends Component {
                   <Input.TextArea
                    rows={i.textRows}
                    placeholder={i.text}
-                   disabled={i.disabled}
+                   disabled={i.noEdit}
                   />
                )}
             </FormItem>
@@ -239,24 +239,25 @@ class DrawerForm extends Component {
                    message: i.message,
                  }],
                })(
-                  <DatePicker onChange={this.handleDateChange} className={i.className} disabled={i.disabled} />
+                 <DatePicker locale={{dateFormat: "M/D/YYYY"}} onChange={this.handleDateChange} className={i.className} disabled={i.noEdit} />
                )}
             </FormItem>
           </Col>
         )
-      } else if (i.type === 'dropdown') {
+      } else if (i.type === 'select') {
+        let foundOption = initialValue.length ? i.options.find(({id}) => id.toLowerCase() === initialValue.toLowerCase()) : initialValue
         return (
           <Col xs={i.span*3} sm={i.span} key={id}>
             <FormItem label={`${i.text}`}>
-              {getFieldDecorator(id, { initialValue }, {
+              {getFieldDecorator(id, { initialValue: foundOption.text || foundOption.id }, {
                  rules: [{
                    required: i.required,
                    message: i.message,
                  }],
                })(
-                 <Select key={`${id}Select`} onChange={this.handleSelect} size="large" disabled={i.disabled}>
-                   {i.values.map(val => (
-                     <Option id={`${id}Select`} key={val.id} value={val.id}>{val.text}</Option>
+                 <Select key={`${id}Select`} onChange={this.handleSelect} disabled={i.noEdit}>
+                   {i.options.map(val => (
+                     <Option id={`${id}Select`} key={val.id} value={val.id}>{val.text || val.id}</Option>
                    ))}
                  </Select>
                )}
@@ -276,7 +277,7 @@ class DrawerForm extends Component {
                   <Input
                    type={i.type}
                    placeholder={i.text}
-                   disabled={i.disabled}
+                   disabled={i.noEdit}
                   />
                )}
             </FormItem>
@@ -286,8 +287,9 @@ class DrawerForm extends Component {
     })
     return (
         <Drawer
+          className="stkd-drawer"
           title={this.props.title}
-          width={document.documentElement.clientWidth < 720 ? '100%' : 720}
+          width={document.documentElement.clientWidth < 620 ? '100%' : 620}
           placement="right"
           onClose={this.toggle}
           maskClosable={false}
@@ -303,32 +305,19 @@ class DrawerForm extends Component {
           )}
 
           <Form layout="vertical" onSubmit={this.handleSubmit}>
-            <Row gutter={24}>{formInputs}</Row>
-            <div
-              style={{
-                position: 'absolute',
-                bottom: 0,
-                width: '100%',
-                borderTop: '1px solid #e8e8e8',
-                padding: '10px 16px',
-                textAlign: 'right',
-                left: 0,
-                background: '#fff',
-                borderRadius: '0 0 4px 4px',
-              }}
-            >
-              <Button
-                style={{
-                  marginRight: 8,
-                }}
-                onClick={this.toggle}
-                icon="close"
-              >
-                Cancel
-              </Button>
-              <Button htmlType="submit" onClick={this.handleSubmit} type="primary" icon="save">Save</Button>
-            </div>
+            <Row gutter={6}>{formInputs}</Row>
           </Form>
+          <div className="drawer-footer">
+            <Button
+              style={{
+                marginRight: 8,
+              }}
+              onClick={this.toggle}
+            >
+              Cancel
+                </Button>
+            <Button htmlType="submit" onClick={this.handleSubmit} type="primary">Save</Button>
+          </div>
         </Drawer>
     );
   }

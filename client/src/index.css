@@ -856,6 +856,31 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
 }
 
 
+/* Drawer */
+.stkd-drawer .ant-drawer-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100% - 55px);
+  padding-bottom: 0px;
+  overflow: auto;
+}
+
+.drawer-footer {
+  text-align: right;
+  position: -webkit-sticky;
+  position: sticky;
+  bottom: 0px;
+  right: 0px;
+  left: 0px;
+  z-index: 2;
+  background: #fff;
+  padding: 12px 0px;
+  -webkit-box-shadow: -1px -1px 0 #dee3f2;
+  box-shadow: 0px -1px 0 #dee3f2;
+}
+
+
 /* Right Menu Drawer */
 .right-drawer .ant-drawer-wrapper-body {
   background: #2c2e3e;
