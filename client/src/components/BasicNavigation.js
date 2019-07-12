@@ -12,17 +12,17 @@ class BasicNavigation extends Component {
     let menuItems = items.map((mi, i) => {
       if (mi.type === 'itemGroup') {
         return (
-          <Menu.ItemGroup title={mi.title} key={mi.id || mi.title || i}>
+          <Menu.SubMenu title={<span>{mi.icon}<span>{mi.title}</span></span>} key={mi.id || mi.title || i}>
             {mi.children.map((c, ci) => (
               <Menu.Item
                 style={{paddingRight: 24}}
                 key={c.id || c.title || ci}
               >
-                {c.icon && c.icon}
+                {c.icon}
                 {c.title}
               </Menu.Item>
             ))}
-          </Menu.ItemGroup>
+          </Menu.SubMenu>
         )
       } else {
         return (
@@ -30,8 +30,8 @@ class BasicNavigation extends Component {
             key={mi.id || mi.title || i}
             style={{ paddingRight: 24 }}
           >
-            {mi.icon && mi.icon}
-            {mi.title}
+            {mi.icon}
+            <span>{mi.title}</span>
           </Menu.Item>
         )
       }
@@ -45,6 +45,7 @@ class BasicNavigation extends Component {
           defaultOpenKeys={this.props.defaultSelectedKeys}
           mode={this.props.mode || 'inline'}
           theme={this.props.theme || 'light'}
+          inlineCollapsed={this.props.collapsed}
         >
           {menuItems}
         </Menu>

@@ -132,10 +132,11 @@ class AccountPage extends Component {
   render() {
     const account = this.state.account || {}
     return (
-      <div style={{ background: '#fff', flexDirection: 'column', height: '100%'}} className="flex">
+      <div style={{ background: '#fff', flexDirection: 'column', height: '100%'}} className="flex full-pad">
         <div className="flex space-between" style={{height: '100%'}}>
-          <div style={{ minWidth: 220,}}>
+          <div style={{...this.props.clientWidth <= 600 && {display: 'none'}}}>
             <BasicNavigation
+              collapsed={this.state.collapsed}
               defaultSelectedKeys={this.state.selected.selectedKeys}
               onSelect={this.handleNavigationUpdate}
               data={[
@@ -148,7 +149,7 @@ class AccountPage extends Component {
           <div className="flex full-pad" style={{ width: '100%', paddingTop: 0}}>
             <div style={{width: '100%', maxWidth: 1200}}>
               <h2 style={{marginBottom: 0}}>{this.state.selected.key}</h2>
-              <Tabs animated={false} renderTabBar={()=><div />} activeKey={this.state.selected.key} tabPosition={'top'}>
+              <Tabs animated={false} {...this.props.clientWidth > 600 && {renderTabBar: ()=><div />}} onChange={(key) => this.setState({ selected: { key } })} activeKey={this.state.selected.key} tabPosition={'top'}>
                 <TabPane tab="General" key="General">
                   <BasicWidget
                     style={{margin: '12px 0px'}}

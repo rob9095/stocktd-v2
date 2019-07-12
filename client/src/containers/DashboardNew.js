@@ -268,7 +268,7 @@ class DashboardNew extends Component {
                   <ScanTable {...props} />
                 )} />
                 <Route exact path="/app/account" render={props => (
-                  <AccountPage {...props} />
+                  <AccountPage clientWidth={this.state.clientWidth} {...props} />
                 )} />
                 <Route exact path="/app" render={props => (
                   <div>
