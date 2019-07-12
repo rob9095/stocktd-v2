@@ -167,7 +167,7 @@ class CascaderSelect extends Component {
                 div.className = 'flex align-items-center half-pad ' + domRef
                 if (!this.props.hideSearch && this.state.data.length > 0) {
                   dropdown[0].prepend(div)
-                  ReactDOM.render(<Input id={domRef + 'search-input'} size="small" suffix={<Icon type="search" />} placeholder={'Search'} onChange={(e) => this.setState({ searchValue: e.target.value })} />, div)
+                  ReactDOM.render(<Input id={domRef + 'search-input'} size="small" suffix={<Icon type={"search"} />} placeholder={'Search'} onChange={(e) => this.setState({ searchValue: e.target.value })} />, div)
                   document.getElementById(domRef + 'search-input').focus()
                 }
                 if (this.props.showAddOption) {
