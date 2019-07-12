@@ -168,13 +168,13 @@ class PoProductTableNew extends Component {
       footer: null,
       content: (
         Object.entries(data).filter(([field, value])=>values.includes(field)).map(([field, value],i)=>
-          <div>
+          <div key={field + i}>
             {field === 'createdOn' ? 
-              <div key={field + i}>
+              <div>
                 <span style={{fontWeight: 600}}>Date Created: </span>{new moment(Date(value).toLocaleString()).format('M/D/YY') }
               </div>
             :
-              <div key={field + i}>
+              <div>
                 <span style={{fontWeight: 600}}>{field}: </span>{value}
               </div>
             }

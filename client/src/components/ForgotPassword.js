@@ -22,7 +22,7 @@ class ForgotPassword extends Component {
     getAllModelDocuments({ model: 'UserToken', documentRef: { _id, tokenType: 'reset-pw' }, populateArray: [{path: 'user'}] })
     .then(res => {
       const [token,...rest] = res.data
-      if (!token._id) throw new Error
+      if (!token._id) throw new Error()
       this.setState({token, fetching: false})
     })
     .catch(err => {
@@ -131,7 +131,7 @@ class ForgotPassword extends Component {
               <Button loading={this.state.loading} type="primary" htmlType="submit" block>
                 {this.state.loading ? btnLoadingText || 'loading...' : this.state.actionComplete || this.state.tokenError ? btnCompleteText || 'Close' : btnText || 'Submit'}
               </Button>
-              {!this.state.actionComplete || this.state.tokenError && (
+              {(!this.state.actionComplete || this.state.tokenError) && (
                 <Link to="/signin">Back to Log in</Link>
               )}
             </div>
