@@ -14,10 +14,10 @@ exports.updatePoProducts = async (req, res, next) => {
         message: ['Request to large'],
       })      
     }
-    if (!Array.isArray(req.body.updates) || req.body.updates.filter(p=>!p.id || !p.quantity).length > 0) {
+    if (!Array.isArray(req.body.updates) || req.body.updates.filter(p=>!p.id).length > 0) {
       return next({
         status: 404,
-        message: ['Please provide update array with id and quantity']
+        message: ['Please provide update array with id']
       })
     }
     let data = await db.PoProduct.find({ company: req.body.company, $and: [{ $or: req.body.updates.map(p => ({ _id: p.id })) }]})

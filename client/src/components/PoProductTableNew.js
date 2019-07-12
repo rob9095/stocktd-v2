@@ -4,6 +4,7 @@ import StkdTable from './StkdTable';
 import { connect } from "react-redux";
 import { Radio, Tooltip, Icon, Button, Divider, Skeleton, Tag, Input, Empty, Select } from 'antd';
 import { updatePoProducts, removePoProducts } from '../store/actions/poProducts';
+import { importPurchaseOrder } from '../store/actions/purchaseOrders';
 import { queryModelData } from '../store/actions/models';
 import { addBoxScan } from '../store/actions/boxScans';
 import * as scanHandlers from "../store/actions/boxScans";
@@ -88,7 +89,7 @@ class PoProductTableNew extends Component {
 
   handleRowEditSave = (updates, id) => {
     return new Promise(async (resolve, reject) => {
-      await scanHandlers.updateBoxScans(updates, this.props.currentUser.user)
+      await this.props.updatePoProducts(updates, this.props.currentUser)
         .then(res => {
           console.log(res)
           resolve(res)
@@ -101,8 +102,8 @@ class PoProductTableNew extends Component {
   }
 
   handleImport = (data) => {
-    return new Promise(async (resolve, reject) => {
-      await scanHandlers.importBoxScans(data, this.props.currentUser.user)
+    return new Promise((resolve, reject) => {
+      this.props.importPurchaseOrder(data, this.props.currentUser)
         .then(res => {
           resolve(res)
         })
@@ -373,7 +374,7 @@ class PoProductTableNew extends Component {
           headers={[
             { id: 'select-all', text: '', width: 75, noSort: true },
             { id: 'sku', text: 'SKU', width: 175, span: 8, className: 'no-wrap', noEdit: true },
-            { id: 'product', nestedKey: 'barcode', text: 'Barcode', width: 175, span: 8, className: 'no-wrap'},
+            { id: 'product', nestedKey: 'barcode', text: 'Barcode', width: 175, span: 8, className: 'no-wrap', noBulkEdit: true},
             { id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 8, className: 'no-wrap' },
             { id: 'scannedQuantity', text: 'Scanned', width: 175, type: 'number', span: 8, className: 'no-wrap' },
             { id: 'po', nestedKey: 'name', text: 'PO Name', width: 400, span: 8, className: 'no-wrap', noEdit: true },
@@ -396,4 +397,4 @@ function mapStateToProps(state) {
 }
 
 
-export default connect(mapStateToProps, { updatePoProducts, removePoProducts, queryModelData, addNotification, removeNotification })(PoProductTableNew);
+export default connect(mapStateToProps, { importPurchaseOrder, updatePoProducts, removePoProducts, queryModelData, addNotification, removeNotification })(PoProductTableNew);

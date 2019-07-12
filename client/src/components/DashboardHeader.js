@@ -23,7 +23,7 @@ class DashboardHeader extends Component {
           <Icon component={()=>queRocketLogoSvg({color: '#fff'})} style={{width: 105}} />
         </div> */}
         <div style={{ width: 140, height: 30, backgroundColor: 'rgba(255,255,255,.35)' }}></div>
-        <Popover onVisibleChange={(profilePopover)=>this.setState({profilePopover})} className="Test" placement="bottomRight" content={
+        <Popover overlayClassName={'popover-no-arrow'} onVisibleChange={(profilePopover)=>this.setState({profilePopover})} className="Test" placement="bottomRight" content={
           <div style={{ minWidth: 150, maxWidth: 300, margin: '0px -12px' }}>
             <div className="flex align-items-center" style={{padding: '0px 12px 8px 12px'}}>
               <Avatar size={40} shape={"square"} style={{ backgroundColor: '#a6aed8', marginRight: 10 }}>

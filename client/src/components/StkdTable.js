@@ -221,7 +221,7 @@ class ProductTable extends Component {
           this.setState({
             insertDataModal: {
               title: "Bulk Edit",
-              inputs: this.props.headers.filter(h => !h.noSort && !h.disabled).map(h => ({ ...h, required: false })),
+              inputs: this.props.headers.filter(h => !h.noSort && !h.noEdit && !h.noBulkEdit).map(h => ({ ...h, required: false })),
               okText: "Save",
               cancelText: "Cancel",
               onSave: this.handleInsertDataSave,
@@ -348,9 +348,14 @@ class ProductTable extends Component {
           this.setState({
             loadingRows: [...this.state.loadingRows, ...updates.map(u=>u.id)]
           })
-          let result = await this.props.onRowEditSave(updates)
+          await this.props.onRowEditSave(updates)
+          .then(res=>{
+            resolve(res)
+          })
+          .catch(err=>{
+            reject(err)
+          })
           this.handleDataFetch({ rowIds: updates.map(u => u.id) })
-          resolve(result)
           return
         }
         let data = this.state.data.map(r => {

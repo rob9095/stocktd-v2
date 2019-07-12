@@ -292,7 +292,7 @@ a.no-color {
   margin-top: -10px !important;
 }
 
-.ant-popover-content > .ant-popover-arrow {
+.popover-no-arrow .ant-popover-content > .ant-popover-arrow {
   display: none;
 }
 
@@ -650,6 +650,12 @@ input.ant-input.no-border {
   cursor: pointer;
 }
 
+/* Selects */
+.ant-col .ant-select-selection--multiple {
+  padding-bottom: 2px;
+  padding-top: 0px;
+}
+
 /* Not Found (404) page */
 .not-found h1 {
   font-size: 3em;
@@ -875,7 +881,7 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
   text-align: right;
   position: -webkit-sticky;
   position: sticky;
-  bottom: 0px;
+  bottom: -1px;
   right: 0px;
   left: 0px;
   z-index: 2;
@@ -1111,7 +1117,7 @@ table.fixed .ant-cascader-menus, table.fixed .ant-select-dropdown, table.fixed .
 .table-footer {
   min-height: 55px;
   position: sticky;
-  bottom: 0px;
+  bottom: -1px;
   right: 0px;
   left: 0px;
   z-index: 2;

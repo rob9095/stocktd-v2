@@ -175,7 +175,7 @@ class AutoCompleteInputForm extends Component {
               <Select
                 size={this.props.size}
                 allowClear
-                style={{ minWidth: 200 }}
+                style={{ minWidth: 180 }}
                 showSearch
                 showArrow
                 placeholder={this.props.placeholder}

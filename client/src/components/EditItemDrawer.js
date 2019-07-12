@@ -268,7 +268,7 @@ class DrawerForm extends Component {
         return (
           <Col xs={i.span*3} sm={i.span} key={id}>
             <FormItem label={`${i.text}`}>
-              {getFieldDecorator(id, { initialValue }, {
+              {getFieldDecorator(id, { initialValue: i.render ? i.render(initialValue) : initialValue }, {
                  rules: [{
                    required: i.required,
                    message: i.message,
@@ -300,13 +300,14 @@ class DrawerForm extends Component {
             paddingBottom: 53,
           }}
         >
-          {this.state.showAlert && (
-            <Alert style={{margin: '-10px 0px 10px 0px'}} closable afterClose={this.hideAlert} message={this.state.alertText} type={this.state.alertType} showIcon />
-          )}
-
-          <Form layout="vertical" onSubmit={this.handleSubmit}>
-            <Row gutter={6}>{formInputs}</Row>
-          </Form>
+          <div>
+            {this.state.showAlert && (
+              <Alert style={{ margin: '-10px 0px 10px 0px' }} closable afterClose={this.hideAlert} message={this.state.alertText} type={this.state.alertType} showIcon />
+            )}
+            <Form layout="vertical" onSubmit={this.handleSubmit}>
+              <Row gutter={6}>{formInputs}</Row>
+            </Form>
+          </div>
           <div className="drawer-footer">
             <Button
               style={{
