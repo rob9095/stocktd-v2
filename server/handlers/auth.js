@@ -2,6 +2,7 @@ require('dotenv').load();
 const db = require('../models');
 const jwt = require('jsonwebtoken');
 const { sendUserEmailVerification } = require('./account');
+const { validateSchema } = require('../middleware/validator');
 
 
 const createUserToken = (signature) => {
@@ -97,6 +98,8 @@ exports.signin = async function(req, res, next) {
 
 exports.signup = async function(req, res, next) {
 	try {
+		//validate
+		let validUser = validateSchema({data:req.body, schema:'user'})
 		// first check for empty values
 		let reqValues = ['email', 'password', 'company']
 		let values = Object.entries(req.body)

@@ -33,10 +33,10 @@ class DashboardNew extends Component {
       activeMenuItems: [],
       openMenuKeys: [],
       siderTopMenuOptions: [
-        { id: 'appHome', title: 'Home', to: "/app", icon: <Icon component={homeSvg} />, },
-        { title: 'Orders', icon: <Icon component={basketSvg} />, },
+        { id: 'appHome', title: 'Home', to: "/app", icon: <Icon style={{width: 14}} component={homeSvg} />, },
+        { title: 'Orders', icon: <Icon style={{width: 14}} component={basketSvg} />, },
         {
-          type: 'subMenu', title: 'Inventory', icon: <Icon component={upDown} />, children: [
+          type: 'subMenu', title: 'Inventory', icon: <Icon style={{width: 14}} component={upDown} />, children: [
             { title: 'Products', },
             { title: 'Scans', },
             { title: 'Purchase Orders', },
@@ -45,7 +45,7 @@ class DashboardNew extends Component {
           ]
         },
         {
-          type: 'subMenu', title: 'Settings', icon: <Icon component={sliders} />, children: [
+          type: 'subMenu', title: 'Settings', icon: <Icon style={{width: 14}} component={sliders} />, children: [
             { title: 'Account', },
           ]
         },
@@ -231,7 +231,7 @@ class DashboardNew extends Component {
               </Menu>
               <Menu>
                 <Menu.Item onClick={this.toggle}>
-                  <Icon style={this.state.collapsed ? { transform: 'rotate(180deg)' } : {}} component={arrowCircle} />
+                  <Icon style={{width: 12,...this.state.collapsed && { transform: 'rotate(180deg)' }}} component={arrowCircle} />
                   <span>{this.state.collapsed ? 'Expand' : 'Collapse'}</span>
                 </Menu.Item>
               </Menu>
