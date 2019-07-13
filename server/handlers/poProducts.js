@@ -1,5 +1,6 @@
 const db = require('../models');
 const { upsertPurchaseOrders } = require('./purchaseOrders')
+const { validateSchema } = require('../middleware/validator');
 
 /*
 * UPDATE PoProducts and associated Purchase Order and Products
@@ -20,7 +21,15 @@ exports.updatePoProducts = async (req, res, next) => {
         message: ['Please provide update array with id']
       })
     }
-    let data = await db.PoProduct.find({ company: req.body.company, $and: [{ $or: req.body.updates.map(p => ({ _id: p.id })) }]})
+    //validate updates
+    let validUpdates = validateSchema({data: req.body.updates, schema: 'updatePoProduct'})
+    if (validUpdates.error) {
+      return next({
+        status: 404,
+        message: validUpdates.error.details.map(d=>d.message),
+      })
+    }
+    let data = await db.PoProduct.find({ company: req.body.company, $and: [{ $or: validUpdates.value.map(p => ({ _id: p.id })) }]})
     data = data.map(doc=>{
       let update = req.body.updates.find(u=>u.id == doc._id)
       return({
@@ -31,7 +40,7 @@ exports.updatePoProducts = async (req, res, next) => {
         name: doc.name,
         type: doc.type,
         poRef: doc.poRef,
-        sku: doc.sku,        
+        sku: doc.sku,
       })
     })
 

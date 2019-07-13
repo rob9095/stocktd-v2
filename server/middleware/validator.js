@@ -12,18 +12,27 @@ const userSchema = Joi.object().keys({
 
 const userWriteSchemas =  Joi.array().items(userSchema)
 
+const updatePoProductSchema = Joi.array().max(7000).items(Joi.object().keys({
+  id: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid id provided`),
+  quantity: Joi.number().integer().error(() => `Quantity must be whole a number`),
+  scannedQuantity: Joi.number().integer().error(() => `Scanned Quantity must be whole a number`),
+}))
+
+//const updatePoProductSchemas = Joi.array().items(updatePoProductSchema)
+
 exports.validateSchema = function (config) {
   try {
     let { data, schema } = config
     switch(schema) {
       case 'user':
-        return userSchema.validate(data);
+        return userSchema.validate(data,{stripUnknown: true});
+      case 'updatePoProduct':
+        return updatePoProductSchema.validate(data,{stripUnknown: true})
       default :
       throw 'Invalid Schema'
     }
   } catch (message) {
     return {error: {
-        status: 400,
         message,
       }
     };
