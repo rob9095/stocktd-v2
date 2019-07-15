@@ -183,7 +183,7 @@ class CascaderSelect extends Component {
             options={data.length > 0 ? data : [this.state.emptyOption]}
             onChange={this.onChange}
             placeholder={this.props.placeholder || "Please select"}
-            style={{ minWidth: 200 }}
+            style={{ minWidth: 180 }}
             popupClassName={'cascader-popup '+domRef}
             notFoundContent={<Empty imageStyle={{ height: 20 }} />}
             getPopupContainer={() => document.getElementById(domRef)}

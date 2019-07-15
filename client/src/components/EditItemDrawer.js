@@ -123,6 +123,10 @@ class DrawerForm extends Component {
       .catch(err=>{
         console.log(err)
         this.handleAlert(err.message[0],'error')
+        //reset form values
+        setTimeout(()=>{
+          this.props.form.resetFields()
+        },250)
       })
     });
   }

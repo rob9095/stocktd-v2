@@ -273,12 +273,13 @@ class ProductTableNew extends Component {
           ]}
           headers={[
             { id: 'select-all', text: '', width: 75, noSort: true },
-            { id: 'sku', text: 'SKU', width: 175, span: 8, className: 'no-wrap' },
+            { id: 'sku', text: 'SKU', width: 175, span: 8, className: 'no-wrap', noBulkEdit: true, },
+            { id: 'barcode', text: 'Barcode', width: 175, span: 8, className: 'no-wrap', noBulkEdit: true, },
             { id: 'title', text: 'Title', width: 800, span: 8, className: 'lg-cell' },
-            { id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 4, className: 'no-wrap' },
-            { id: 'quantityToShip', text: 'To Ship', width: 175, type: 'number', span: 4, className: 'no-wrap' },
-            { id: 'price', text: 'Price', width: 75, type: 'number', span: 4, className: 'no-wrap' },
-            { id: 'weight', text: 'Weight', width: 75, type: 'number', span: 4, className: 'no-wrap' },
+            { id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 4, className: 'no-wrap', render: (p)=>p.quantity || 0, },
+            { id: 'quantityToShip', text: 'To Ship', width: 175, type: 'number', span: 4, className: 'no-wrap', render: (p) => p.quantityToShip || 0, },
+            { id: 'price', text: 'Price', width: 75, type: 'number', span: 4, className: 'no-wrap', render: (p) =>  (p && p.price)|| 0, },
+            { id: 'weight', text: 'Weight', width: 75, type: 'number', span: 4, className: 'no-wrap', render: (p) => (p && p.weight)|| 0, },
             { id: 'brand', text: 'Brand', width: 100, span: 8 },
             { id: 'supplier', text: 'Supplier', width: 100, span: 8 },
             // { id: 'scanToPo', text: 'Scan Type', width: 175, span: 6, className: 'no-wrap', disabled: true, render: (val)=>(val === true ? 'Scan To' : 'Scan From'), noFilter: true},
@@ -319,6 +320,7 @@ class ProductTableNew extends Component {
               reverseData: true,
               nestedKey: 'name',
               noFilter: true,
+              noBulkEdit: true,
               filter: (arr)=>arr.filter(item=>item.scanToPo === true),
               parent: {
                 label: 'name',
