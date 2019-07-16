@@ -230,7 +230,7 @@ class ProductTableNew extends Component {
               defaultQuery: [['scanToPo', 'true', '=']],
             }
           ]}
-          title={"Products New"}
+          title={"Products"}
           fetchData={this.state.fetchData}
           onRowEditSave={this.handleRowEditSave}
           onImport={this.handleImport}

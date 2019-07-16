@@ -9,6 +9,10 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
+    index: {
+      unique: true,
+      collation: { locale: 'en', strength: 2 }
+    },
   },
   barcode: {
     type: String,
@@ -16,6 +20,10 @@ const productSchema = new mongoose.Schema({
   barcodeCompany: {
     type: String,
     unique: true,
+    index: {
+      unique: true,
+      collation: { locale: 'en', strength: 2 }
+    },
   },
   title: {
     type: String,

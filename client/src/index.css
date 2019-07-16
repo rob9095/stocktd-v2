@@ -193,6 +193,18 @@ a:focus {
   font-family: 'Open Sans', sans-serif !important;
 }
 
+span.header {
+  margin-bottom: 0.5em;
+  color: #2d225f;
+  font-weight: 600;
+  display: block;
+  font-size: 1.17em;
+}
+
+h3, h4, h5 {
+  font-weight: 600 !important;
+}
+
 h1 {
   font-size: 20px;
 }
@@ -1070,6 +1082,14 @@ input:checked + .stkd-slider:before {
 .ant-table-tbody > tr > td {
   padding: 12px !important;
   border-bottom: 1px solid #dee3f2 !important; 
+}
+
+.ant-table-tbody tr.no-hover:hover {
+  background: transparent !important;
+}
+
+.ant-table-tbody > tr.no-hover:hover:not(.ant-table-expanded-row) > td {
+  background: transparent !important;
 }
 
 .ant-table table th {

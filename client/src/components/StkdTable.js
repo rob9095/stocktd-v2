@@ -835,7 +835,26 @@ class ProductTable extends Component {
                   </tr>
                 </thead>
                 <tbody className="ant-table-tbody">
-                  {rows}
+                  {rows.length ? rows : 
+                    this.props.emptyRender ? this.props.emptyRender() : 
+                      <tr className="no-hover">
+                        <td colSpan={headers.length || 99}>
+                            <div style={{padding: '5% 0px'}}>
+                              <Empty
+                                imageStyle={{
+                                  height: 140,
+                                }}
+                                description={
+                                  <span>
+                                    <span className="header">You have no {this.props.title.toLowerCase()}</span>
+                                    <span>Use the <a onClick={() => this.handleOptionsMenuClick({key: 'import'})}>Import</a> or <a onClick={() => this.handleOptionsMenuClick({key:'add'})}>Add One</a> options to get started</span>
+                                  </span>
+                                }
+                              />
+                            </div>
+                        </td>
+                      </tr>
+                  }
                 </tbody>
               </table>
               <div className="table-footer flex justify-flex-end">
