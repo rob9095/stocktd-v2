@@ -12,6 +12,7 @@ exports.processProductImport = async (req, res, next) => {
 		}
 		//should add check inside map if no sku or id, throw error
 		let company = req.body.company;
+		//validate products
 		let updates = req.body.products.map(p => {
 			let _id = p.id
 			delete p.id
@@ -32,13 +33,14 @@ exports.processProductImport = async (req, res, next) => {
 							company
 						},
 						upsert: true,
+						collation: { locale: 'en', strength: 1 },
 						$setOnInsert: {createdOn: new Date(), quantityToShip: 0, ...p.sku && {skuCompany: p.sku +"-"+company, barcodeCompany: p.barcode || p.sku + "-" + company}},
 					}
 				}
 			}
 		})
-		await db.Product.bulkWrite(updates)
-		return res.status(200).json({status: 'success'})
+		let importResult = await db.Product.bulkWrite(updates)
+		return res.status(200).json({status: 'success', importResult})
 		//let importStatus = await createImportStatus('Product',req.body.company,updates)
 		// let updateProducts = [];
 		// if (updates.length > 7000)  {

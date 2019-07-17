@@ -5,6 +5,7 @@ import { queryModelData, deleteModelDocuments } from '../store/actions/models';
 import { upsertModelDocuments } from '../store/actions/models';
 import { addBoxScan } from '../store/actions/boxScans';
 import { Button, Pagination, Select, Icon, Spin, Form, Dropdown, Menu, Modal, message, Empty, Skeleton, Input, Layout, PageHeader, Cascader } from 'antd';
+import { addNotification, removeNotification } from '../store/actions/notifications';
 import WrappedFilterForm from './FilterForm';
 import SearchForm from './SearchForm';
 import ScanForm from './ScanFormNew';
@@ -123,9 +124,17 @@ class ProductTable extends Component {
     })
     .catch(err=>{
       console.log(err)
+      this.props.addNotification({
+        nType: 'notification',
+        id: 'fetch-error',
+        icon: <Icon type="close-circle" style={{color: 'red'}} />,
+        message: err ? err.message : 'Something went wrong',
+        onClose: () => this.props.removeNotification({ id: 'fetch-error', })
+      })
       this.setState({
         data: this.state.data.filter(r=>!r.isSkeleton),
       })
+
     })
       await this.setState({
         ...rowId ? { loadingRows: [] } : { loading: false }
@@ -922,4 +931,4 @@ class ProductTable extends Component {
    };
   }
 
-  export default connect(mapStateToProps, {fetchAllProducts, updateProducts, importProducts, queryModelData, deleteModelDocuments, addBoxScan})(ProductTable);
+export default connect(mapStateToProps, { fetchAllProducts, updateProducts, importProducts, queryModelData, deleteModelDocuments, addBoxScan, addNotification, removeNotification})(ProductTable);

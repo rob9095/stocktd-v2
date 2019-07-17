@@ -207,7 +207,7 @@ class PoTableNew extends Component {
           queryModel="PurchaseOrder"
           editTitle="Purchase Order"
           filters={this.state.filters}
-          title={"Purchase Order"}
+          title={"Purchase Orders"}
           fetchData={this.state.fetchData}
           onRowEditSave={this.handleRowEditSave}
           onImport={this.handleImport}
