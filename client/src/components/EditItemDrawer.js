@@ -308,7 +308,7 @@ class DrawerForm extends Component {
             {this.state.showAlert && (
               <Alert style={{ margin: '-10px 0px 10px 0px' }} closable afterClose={this.hideAlert} message={this.state.alertText} type={this.state.alertType} showIcon />
             )}
-            <Form layout="vertical" onSubmit={this.handleSubmit}>
+            <Form onKeyDown={(e)=>e.key === 'Enter' && this.handleSubmit(e)} layout="vertical" onSubmit={this.handleSubmit}>
               <Row gutter={6}>{formInputs}</Row>
             </Form>
           </div>
@@ -318,9 +318,10 @@ class DrawerForm extends Component {
                 marginRight: 8,
               }}
               onClick={this.toggle}
+              className="no-bg no-border"
             >
               Cancel
-                </Button>
+            </Button>
             <Button htmlType="submit" onClick={this.handleSubmit} type="primary">Save</Button>
           </div>
         </Drawer>

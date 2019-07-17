@@ -246,11 +246,11 @@ class ProductTable extends Component {
       this.setState({
         tableOptionsMenuOpen: false,
       })
-      let option = this.props.tableMenuOptions.find(o => o.handler && o.key === key) || {}
+      //let option = this.props.tableMenuOptions.find(o => o.handler && o.key === key) || {}
       switch(key) {
         case 'add':
           this.setState({
-            showCreateItemDrawer: true,
+            drawerItem: true,
           })
           break;
         case 'import':
@@ -354,17 +354,17 @@ class ProductTable extends Component {
     handleRowEditSave = (updates,id) => {
       return new Promise(async (resolve, reject) => {
         if (this.props.onRowEditSave) {
-          this.setState({
-            loadingRows: [...this.state.loadingRows, ...updates.map(u=>u.id)]
-          })
+          // this.setState({
+          //   loadingRows: [...this.state.loadingRows, ...updates.map(u=>u.id)]
+          // })
           await this.props.onRowEditSave(updates)
           .then(res=>{
             resolve(res)
+            this.handleDataFetch({ rowIds: updates.map(u => u.id) })
           })
           .catch(err=>{
             reject(err)
           })
-          this.handleDataFetch({ rowIds: updates.map(u => u.id) })
           return
         }
         let data = this.state.data.map(r => {
@@ -398,6 +398,7 @@ class ProductTable extends Component {
         await this.props.onImport(json)
         .then(res => {
           resolve(res)
+          this.handleDataFetch()
         })
         .catch(err => {
           reject(err)
@@ -506,7 +507,7 @@ class ProductTable extends Component {
     }
 
     render() {
-      let drawerItem = this.state.data.find(item=>item._id === this.state.drawerItem) || {}
+      let drawerItem = this.state.drawerItem === true ? true : this.state.data.find(item=>item._id === this.state.drawerItem) || {}
       const bulkMenu = this.props.bulkMenuOptions && (
         <Menu onClick={this.handleBulkMenuClick}>
           {this.props.bulkMenuOptions.map(o=>(
@@ -732,11 +733,11 @@ class ProductTable extends Component {
             scanToPo={this.props.filters.find(f => f[0] === 'scanToPo') && this.props.filters.find(f => f[0] === 'scanToPo')[1]}
             onScan={this.handleScan}
           /> */}
-          {drawerItem._id && (
+          {(drawerItem === true || drawerItem._id) && (
             <EditItemDrawer
-              inputs={this.props.headers.filter(h => !h.noSort).sort(h=>h.noEdit ? 1 : -1)}
-              item={drawerItem}
-              title={`${drawerItem._id ? 'Edit '+this.props.editTitle || '' : 'Create Item'} `}
+              inputs={this.props.headers.filter(h => !h.noSort && h.noEdit !== 'hide').sort((a,b)=>a.editOrder > b.editOrder)}
+              item={drawerItem === true ? {} : drawerItem}
+              title={`${drawerItem._id ? 'Edit' : 'Create'} ${this.props.editTitle || ''}`}
               onClose={() => this.setState({ drawerItem: null })}
               onSave={(data, id) => id ? this.handleRowEditSave(data, id) : this.handleImport(data)}
               create={drawerItem._id ? false : true}
