@@ -33,7 +33,7 @@ exports.processProductImport = async (req, res, next) => {
 							company
 						},
 						upsert: true,
-						collation: { locale: 'en', strength: 1 },
+						collation: { locale: 'en', strength: 2 },
 						$setOnInsert: {createdOn: new Date(), quantityToShip: 0, ...p.sku && {skuCompany: p.sku +"-"+company, barcodeCompany: p.barcode || p.sku + "-" + company}},
 					}
 				}

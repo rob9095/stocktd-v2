@@ -8,14 +8,12 @@ const productSchema = new mongoose.Schema({
   skuCompany: {
     type: String,
     required: true,
-    unique: true,
   },
   barcode: {
     type: String,
   },
   barcodeCompany: {
     type: String,
-    unique: true,
   },
   title: {
     type: String,
@@ -69,8 +67,8 @@ const productSchema = new mongoose.Schema({
 },{ toJSON: { virtuals: true } })
 
 productSchema.index({ company: 1, sku: 1, }, { unique: true });
-productSchema.index({ barcodeCompany: 1 }, { collation: { locale: 'en', strength: 1 } });
-productSchema.index({ skuCompany: 1 }, { collation: { locale: 'en', strength: 1 } });
+productSchema.index({ barcodeCompany: 1 }, {unique: true, collation: { locale: 'en', strength: 2 } });
+productSchema.index({ skuCompany: 1 },{unique: true, collation: { locale: 'en', strength: 2 } });
 
 productSchema.virtual('boxscans', {
   ref: 'BoxScan', // The model to use
