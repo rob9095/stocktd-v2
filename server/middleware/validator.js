@@ -21,6 +21,22 @@ const updatePoProductSchema = Joi.array().max(7000).items(Joi.object().keys({
 
 //const updatePoProductSchemas = Joi.array().items(updatePoProductSchema)
 
+const productUpdateSchema = Joi.array().max(7000).items(Joi.object().keys({
+  id: Joi.string().regex(/^[a-f\d]{24}$/i).error(() => `Invalid id provided`),
+  companyId: Joi.string().regex(/^[a-f\d]{24}$/i).error(() => `Invalid Company ID provided`),
+  defaultBox: Joi.string().regex(/^[a-f\d]{24}$/i).error(() => `Invalid Default Box ID provided`),
+  defaultLocation: Joi.string().regex(/^[a-f\d]{24}$/i).error(() => `Invalid Default Location ID provided`),
+  quantity: Joi.number().integer().error(() => `Quantity must be whole a number`),
+  barcode: Joi.string().error(() => `Barcode must be a string`),
+  sku: Joi.string().error(() => `Sku must be a string`),
+  title: Joi.string().empty('').error(() => `Title must be a string`),
+  supplier: Joi.string().empty('').error(() => `Supplier must be a string`),
+  brand: Joi.string().empty('').error(() => `Brand must be a string`),
+  asin: Joi.string().empty('').error(() => `ASIN must be a string`),
+  weight: Joi.number().empty('').precision(2).error(() => `Weight must be a number with max of 2 decimals`),
+  price: Joi.number().empty('').precision(2).error(() => `Price must be a number with max of 2 decimals`),
+}))
+
 exports.validateSchema = function (config) {
   try {
     let { data, schema } = config
@@ -29,12 +45,15 @@ exports.validateSchema = function (config) {
         return userSchema.validate(data,{stripUnknown: true});
       case 'updatePoProduct':
         return updatePoProductSchema.validate(data,{stripUnknown: true})
+      case 'productUpdate':
+        return productUpdateSchema.validate(data,{stripUnknown: true})
       default :
-      throw 'Invalid Schema'
+        throw 'Invalid Schema'
     }
   } catch (message) {
-    return {error: {
-        message,
+    return {
+      error: {
+        details: [{message}],
       }
     };
   }

@@ -1,6 +1,7 @@
 const db = require('../models');
 const { createImportStatus } = require('../handlers/importStatus');
 const upsertBarcode = require('./barcode')
+const { validateSchema } = require('../middleware/validator');
 
 exports.processProductImport = async (req, res, next) => {
 	try {
@@ -13,7 +14,14 @@ exports.processProductImport = async (req, res, next) => {
 		//should add check inside map if no sku or id, throw error
 		let company = req.body.company;
 		//validate products
-		let updates = req.body.products.map(p => {
+		let validUpdates = validateSchema({data:req.body.products, schema: 'productUpdate'})
+		if (validUpdates.error) {
+			return next({
+				status: 404,
+				message: validUpdates.error.details.map(d => d.message),
+			})
+		}
+		let updates = validUpdates.value.map(p => {
 			let _id = p.id
 			delete p.id
 			if(p.action === 'delete') {
@@ -98,9 +106,13 @@ exports.processProductImport = async (req, res, next) => {
 		// return res.status(200).json({updatedProducts})
 	} catch(err) {
 		if(err.code === 11000) {
+			let barcode = err.errmsg.includes('barcodeCompany_1 dup key') && 'barcode'
+			let sku = err.errmsg.includes('skuCompany_1 dup key') && 'sku'
+			let message = barcode && sku ? 'Duplicate barcode and sku found' : barcode ? 'Duplicate barcode found' : sku ? 'Duplicate sku found' : 'Duplicates found'
 			return next({
 				status: 404,
-				message: ['Duplicate SKUs or barcodes found.']
+				//message: ['Duplicate SKUs or barcodes found.'],
+				message,
 			})
 		}
 		return next(err);
