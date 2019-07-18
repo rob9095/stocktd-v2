@@ -807,6 +807,10 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
 }
 
 /* Basic Form */
+.basic-form .has-feedback .ant-input-password-icon {
+  margin-right: 18px;
+}
+
 .basic-form .ant-form-item-label label {
   display: flex;
   font-weight: 600;

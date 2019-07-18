@@ -298,12 +298,20 @@ class BForm extends Component {
                   }
                 }],
               })(
-                <Input
-                  autoComplete={i.initialValue ? "off" : !!window.chrome ? "disabled" : "off"}
-                  placeholder={i.text}
-                  type={i.inputType || 'text'}
-                  onBlur={() => this.handleBlur(i, id)}
-                />
+                i.inputType === 'password' ?
+                  <Input.Password
+                    autoComplete={i.initialValue ? "off" : !!window.chrome ? "disabled" : "off"}
+                    placeholder={i.text}
+                    type={i.inputType || 'text'}
+                    onBlur={() => this.handleBlur(i, id)}
+                  />
+                :
+                  <Input
+                    autoComplete={i.initialValue ? "off" : !!window.chrome ? "disabled" : "off"}
+                    placeholder={i.text}
+                    type={i.inputType || 'text'}
+                    onBlur={() => this.handleBlur(i, id)}
+                  />
               )}
               {i.extra && (
                 <div>

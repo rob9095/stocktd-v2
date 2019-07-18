@@ -11,7 +11,6 @@ exports.processProductImport = async (req, res, next) => {
 				message: ['Request to large']
 			})
 		}
-		//should add check inside map if no sku or id, throw error
 		let company = req.body.company;
 		//validate products
 		let validUpdates = validateSchema({data:req.body.products, schema: 'productUpdate'})
@@ -109,9 +108,6 @@ exports.processProductImport = async (req, res, next) => {
 			let barcode = err.errmsg.includes('barcodeCompany_1 dup key')
 			let sku = err.errmsg.includes('skuCompany_1 dup key')
 			let message = barcode ? 'Duplicate barcode found' : sku ? 'Duplicate sku found' : 'Duplicate barcode or sku found'
-			// return res.status(200).json({
-			// 	err
-			// })
 			return next({
 				status: 404,
 				//message: ['Duplicate SKUs or barcodes found.'],
