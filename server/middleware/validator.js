@@ -39,8 +39,8 @@ const productUpdateSchema = Joi.array().max(7000).items(Joi.object().keys({
 
 const poUpdateSchema = Joi.array().max(7000).items(Joi.object().keys({
   name: Joi.string().required().error(() => `PO Name must be a string`),
-  type: Joi.string().lowercase().allowed(['inbound','outbound']).required().error(() => `PO Type must be either "inbound" or "outbound"`),
-  status: Joi.string().lowercase().allowed(['complete', 'processing']).required().error(() => `PO Status must be either "processing" or "complete"`),
+  type: Joi.string().lowercase().allow(['inbound','outbound']).required().error(() => `PO Type must be either "inbound" or "outbound"`),
+  status: Joi.string().lowercase().allow(['complete', 'processing']).required().error(() => `PO Status must be either "processing" or "complete"`),
   sku: Joi.string().required().error(() => `Sku must be a string`),
   quantity: Joi.number().integer().error(() => `Quantity must be whole a number`),
   scannedQuantity: Joi.number().integer().error(() => `Quantity must be whole a number`),

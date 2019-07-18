@@ -1,4 +1,5 @@
 const db = require('../models');
+const { validateSchema } = require('../middleware/validator');
 
 function groupBy(objectArray, property) {
  return objectArray.reduce(function (acc, obj) {
@@ -32,7 +33,14 @@ const upsertPurchaseOrders = (config) => {
         skuCompany: `${po['sku']}-${company}`,
         ...po.poRef ? {poRef: po.poRef} : {poRef: `${company}-${po['name']}-${po['type']}`},
       }))
-      let groupedPOs = groupBy(poData, 'poRef');
+      let validPoData = validateSchema({data: poData, schema: 'poUpdate'})
+      if (validPoData.error) {
+        reject({
+          status: 404,
+          message: validPoData.error.details.map(d => d.message),
+        })
+      }
+      let groupedPOs = groupBy(validPoData.value, 'poRef');
       let poUpdates = [];
       let poProductUpdates = [];
       let productUpdates = [];
