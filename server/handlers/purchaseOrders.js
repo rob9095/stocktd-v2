@@ -18,7 +18,7 @@ const upsertPurchaseOrders = (config) => {
     try {
       if (data.length > 7000) {
         reject({
-          status: 404,
+          status: 400,
           message: ['Request to large']
         })
         return
@@ -37,7 +37,7 @@ const upsertPurchaseOrders = (config) => {
       let validPoData = validateSchema({data: poData, schema: 'poUpdate'})
       if (validPoData.error) {
         reject({
-          status: 404,
+          status: 400,
           message: validPoData.error.details.map(d => d.message),
         })
         return

@@ -107,7 +107,7 @@ class ProductTable extends Component {
     })
     let query = this.props.filters ? [...this.state.query, ...this.props.filters] : this.state.query
     await this.props.queryModelData(this.props.queryModel,query,this.state.column, this.state.direction, requestedPage, requestedRowsPerPage,this.props.currentUser.user.company,populateArray)
-    .then(({data, activePage, totalPages, rowsPerPage, skip})=>{
+    .then(({data = [], activePage, totalPages, rowsPerPage, skip})=>{
       this.setState({
         skip,
         data,
@@ -128,7 +128,7 @@ class ProductTable extends Component {
         nType: 'notification',
         id: 'fetch-error',
         icon: <Icon type="close-circle" style={{color: 'red'}} />,
-        message: err ? err.message : 'Something went wrong',
+        message: err ? err.message || 'Something went wrong' : 'Something went wrong',
         onClose: () => this.props.removeNotification({ id: 'fetch-error', })
       })
       this.setState({
