@@ -21,6 +21,7 @@ const upsertPurchaseOrders = (config) => {
           status: 404,
           message: ['Request to large']
         })
+        return
       }
       let poData = data.map((po, i) => ({
         name: po['name'],
@@ -39,6 +40,7 @@ const upsertPurchaseOrders = (config) => {
           status: 404,
           message: validPoData.error.details.map(d => d.message),
         })
+        return
       }
       let groupedPOs = groupBy(validPoData.value, 'poRef');
       let poUpdates = [];

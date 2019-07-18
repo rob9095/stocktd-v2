@@ -256,14 +256,17 @@ class PoTableNew extends Component {
             { id: 'select-all', text: '', width: 75, noSort: true },
             {
               id: 'name', text: 'Name', width: 400, span: 6, className: 'no-wrap',
-              render: (po) =>
-                <Link to={{
-                  pathname: '/app/po-products/'+po._id,
-                  poRefs: [{ ...po }],
-                }}
-                >
-                  {po.name}
-                </Link>,
+              render: (po={},action) =>
+                action === 'edit' ? 
+                  po.name
+                :
+                  <Link to={{
+                    pathname: '/app/po-products/'+po._id,
+                    poRefs: [{ ...po }],
+                  }}
+                  >
+                    {po.name}
+                  </Link>,
             },
             { id: 'type', text: 'Type', type: 'select', options: [{id: 'Inbound'},{id: 'Outbound'}], width: 250, span: 6, className: 'no-wrap' },
             { id: 'status', text: 'Status', width: 250, span: 6, className: 'no-wrap', options: [{ id: 'Complete' }, { id: 'Processing' }], type: 'select', },

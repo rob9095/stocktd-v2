@@ -266,7 +266,7 @@ class PoProductTableNew extends Component {
                   {pos.map((po,i) => {
                     let foundPo = data.find(r=>r.po && r.po._id === po._id)
                     return(
-                    <Tooltip key={po._id || i} title={!foundPo ? 'Hidden by Query' : false}>
+                    <Tooltip key={po._id || i} title={!foundPo ? 'No Results Found' : false}>
                       <Tag
                         onClick={()=>!po.isSkeleton && this.handleCurrentPoTagClick(po)}
                         onClose={(e)=>{
@@ -375,8 +375,8 @@ class PoProductTableNew extends Component {
             { id: 'select-all', text: '', width: 75, noSort: true },
             { id: 'sku', text: 'SKU', width: 175, span: 8, className: 'no-wrap', noEdit: true },
             { id: 'product', nestedKey: 'barcode', text: 'Barcode', width: 175, span: 8, className: 'no-wrap', noBulkEdit: true},
-            { id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 8, className: 'no-wrap', render: (pop)=> pop.quantity || 0, },
-            { id: 'scannedQuantity', text: 'Scanned', width: 175, type: 'number', span: 8, className: 'no-wrap', render: (pop)=> pop.scannedQuantity || 0, },
+            { id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 8, className: 'no-wrap', render: (pop={})=> pop.quantity || 0, },
+            { id: 'scannedQuantity', text: 'Scanned', width: 175, type: 'number', span: 8, className: 'no-wrap', render: (pop={})=> pop.scannedQuantity || 0, },
             { id: 'po', nestedKey: 'name', text: 'PO Name', width: 400, span: 8, className: 'no-wrap', noEdit: true },
             { id: 'po', nestedKey: 'type', text: 'PO Type', width: 250, span: 8, className: 'no-wrap', options: [{ id: 'Inbound' }, { id: 'Outbound' }], type: 'select', noEdit: true},
             { id: 'status', text: 'PO Status', width: 250, span: 8, className: 'no-wrap', options: [{ id: 'Complete' }, { id: 'Processing' }], type: 'select', noEdit: true},

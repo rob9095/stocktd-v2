@@ -856,8 +856,8 @@ class ProductTable extends Component {
                                 }}
                                 description={
                                   <span>
-                                    <span className="header">You have no {this.props.title.toLowerCase()}</span>
-                                    <span>Use the <a onClick={() => this.handleOptionsMenuClick({key: 'import'})}>Import</a> or <a onClick={() => this.handleOptionsMenuClick({key:'add'})}>Add One</a> options to get started</span>
+                                    <span className="header">{this.state.query.length ? "We didn't find anything..." : "We didn't find any "+this.props.title}</span>
+                                    <span>You can <a onClick={() => this.handleOptionsMenuClick({key: 'import'})}>import</a> or <a onClick={() => this.handleOptionsMenuClick({key:'add'})}>add one</a> to get started</span>
                                   </span>
                                 }
                               />

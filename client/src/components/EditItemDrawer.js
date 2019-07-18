@@ -125,7 +125,7 @@ class DrawerForm extends Component {
         this.handleAlert(err.message[0],'error')
         //reset form values
         setTimeout(()=>{
-          this.props.form.resetFields()
+          !this.props.create && this.props.form.resetFields()
         },250)
       })
     });
@@ -243,13 +243,13 @@ class DrawerForm extends Component {
                    message: i.message,
                  }],
                })(
-                 <DatePicker locale={{dateFormat: "M/D/YYYY"}} onChange={this.handleDateChange} className={i.className} disabled={i.noEdit} />
+                 <DatePicker locale={{dateFormat: "M-D-YY"}} disabledDate={(current) => current > moment().endOf('day')} onChange={this.handleDateChange} className={i.className} disabled={i.noEdit} />
                )}
             </FormItem>
           </Col>
         )
       } else if (i.type === 'select') {
-        let foundOption = initialValue.length ? i.options.find(({id}) => id.toLowerCase() === initialValue.toLowerCase()) : initialValue
+        let foundOption = initialValue ? i.options.find(({id}) => id.toLowerCase() === initialValue.toLowerCase()) : i.options[0]
         return (
           <Col xs={i.span*3} sm={i.span} key={id}>
             <FormItem label={`${i.text}`}>
@@ -272,7 +272,7 @@ class DrawerForm extends Component {
         return (
           <Col xs={i.span*3} sm={i.span} key={id}>
             <FormItem label={`${i.text}`}>
-              {getFieldDecorator(id, { initialValue: i.render ? i.render(initialValue) : initialValue }, {
+              {getFieldDecorator(id, { initialValue: i.render ? i.render(initialValue,'edit') : initialValue }, {
                  rules: [{
                    required: i.required,
                    message: i.message,
