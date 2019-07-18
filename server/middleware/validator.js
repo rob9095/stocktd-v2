@@ -1,6 +1,7 @@
 const Joi = require('joi');
 
 const validSchemas = {
+  //auth routes
   '/api/auth/signup': Joi.object().keys({
     email: Joi.string().email().required().error(() => `Invalid email provided`),
     password: Joi.string().regex(/^[a-zA-Z0-9]{6,30}$/).required().error(() => `Invalid password provided`),
@@ -11,6 +12,7 @@ const validSchemas = {
     remember: Joi.boolean().error(() => `Remember must be boolean`),
   }).error(err => err.toString()),
 
+  //po product routes
   '/api/po-products/update': Joi.object().keys({
     company: Joi.string().required().error(() => `Company must be a string`),
     updates: Joi.array().max(7000).items(Joi.object().keys({
@@ -31,6 +33,7 @@ const validSchemas = {
     })).error(err => err.toString()),
   }).error(err => err.toString()),
 
+  //model routes
   '/api/models/query': Joi.object().keys({
     model: Joi.string().allow(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']).required().error(err => err.toString()),
     company: Joi.string().required().error(() => `Company must be a string`),
@@ -71,6 +74,7 @@ const validSchemas = {
     data: Joi.array().max(7000).items(Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid id provided`),).error(err => err.toString()),
   }).error(err => err.toString()),
 
+  //product routes
   '/api/products/import-csv': Joi.object().keys({
     company: Joi.string().required().error(() => `Company must be a string`),
     data: Joi.array().max(7000).items(Joi.object().keys({
@@ -89,7 +93,8 @@ const validSchemas = {
       price: Joi.number().empty('').precision(2).error(() => `Price must be a number with max of 2 decimals`),
     })).error(err => err.toString()),
   }).error(err => err.toString()),
-
+  
+  //purchase order routes
   '/api/purchase-orders/import-csv': Joi.object().keys({
     company: Joi.string().required().error(() => `Company must be a string`),
     json: Joi.array().max(7000).items(Joi.object().keys({

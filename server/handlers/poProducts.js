@@ -45,10 +45,12 @@ exports.updatePoProducts = async (req, res, next) => {
     })
 
     //upsert the pos, also upserts poProducts & products
-    let poResult = await upsertPurchaseOrders({
+    let schemaData = {
       company: req.body.company,
       data,
-    })
+    }
+    let validData = validateSchema({data: schemaData, schema: '/api/purchase-orders/import-csv'})
+    let poResult = await upsertPurchaseOrders(validData.value)
 
     //old update approach
     // let poProductUpdates = req.body.updates.map(p=>{

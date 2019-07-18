@@ -1,6 +1,7 @@
 const db = require('../models');
 const { validateHeaders, validateInputs } = require('../services/validateArray')
 const { upsertPurchaseOrders } = require('./purchaseOrders')
+const { validateSchema } = require('../middleware/validator');
 
 const boxImportHeaders = [
   { value: 'sku', required: true },
@@ -677,7 +678,7 @@ exports.importBoxScans = async (req, res, next) => {
     //validate inputs will go here
 
     //upsert the pos, also upserts poProducts & products
-    let poResult = await upsertPurchaseOrders({
+    let upsertData = {
       company: req.body.company,
       data: data.map(row => ({
         name: row.poName,
@@ -687,8 +688,16 @@ exports.importBoxScans = async (req, res, next) => {
         quantity: row.quantity,
         ...row.scannedQuantity && { scannedQuantity: row.scannedQuantity }
       }))
-    })
-
+    }
+    let validData = validateSchema({data: upsertData, schema: '/api/purchase-orders/import-csv'})
+    if (validData.error) {
+      return next({
+        status: 400,
+        message: validData.error.details.map(d=>d.message),
+      })
+    }
+    let poResult = await upsertPurchaseOrders(validData.value)
+    
     //upsert the boxScans
     let boxScanResult = await bulkUpsertBoxScans({
       data,
