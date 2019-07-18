@@ -25,7 +25,7 @@ const buildQuery = (queryArr) => {
 				let endDate = val[1][1]
 				query = {
 					...query,
-					[val[0]]: { $gte: startDate, $lt: endDate }
+					[val[0]]: { $gte: startDate, $lt: endDate || new Date(startDate).setHours(24,59,59) }
 				}
 				// numbers, query array has thrid array element for numbers and we use it as $lte,$gte,$gt,$lt, or strict equal to
 			} else if (val[2]) {

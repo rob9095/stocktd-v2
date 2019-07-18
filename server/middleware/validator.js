@@ -37,6 +37,18 @@ const productUpdateSchema = Joi.array().max(7000).items(Joi.object().keys({
   price: Joi.number().empty('').precision(2).error(() => `Price must be a number with max of 2 decimals`),
 }))
 
+const poUpdateSchema = Joi.array().max(7000).items(Joi.object().keys({
+  name: Joi.string().required().error(() => `PO Name must be a string`),
+  type: Joi.string().lowercase().allowed(['inbound','outbound']).required().error(() => `PO Type must be either "inbound" or "outbound"`),
+  status: Joi.string().lowercase().allowed(['complete', 'processing']).required().error(() => `PO Status must be either "processing" or "complete"`),
+  sku: Joi.string().required().error(() => `Sku must be a string`),
+  quantity: Joi.number().integer().error(() => `Quantity must be whole a number`),
+  scannedQuantity: Joi.number().integer().error(() => `Quantity must be whole a number`),
+  company: Joi.string().required().error(() => `Company must be a string`),
+  skuCompany: Joi.string().required().error(() => `Sku Company must be a string`),
+  poRef: Joi.string().required().error(() => `PO Ref must be a string`),
+}))
+
 exports.validateSchema = function (config) {
   try {
     let { data, schema } = config
@@ -47,6 +59,8 @@ exports.validateSchema = function (config) {
         return updatePoProductSchema.validate(data,{stripUnknown: true})
       case 'productUpdate':
         return productUpdateSchema.validate(data,{stripUnknown: true})
+      case 'poUpdate':
+        return poUpdateSchema.validate(data,{stripUnknown: true})
       default :
         throw 'Invalid Schema'
     }
