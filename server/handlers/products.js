@@ -5,12 +5,6 @@ const { validateSchema } = require('../middleware/validator');
 
 exports.processProductImport = async (req, res, next) => {
 	try {
-		if (req.body.data.length > 7000) {
-			return next({
-				status: 404,
-				message: ['Request to large']
-			})
-		}
 		let company = req.body.company;
 		let updates = req.body.data.map(p => {
 			let _id = p.id

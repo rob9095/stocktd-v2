@@ -22,14 +22,14 @@ exports.updatePoProducts = async (req, res, next) => {
       })
     }
     //validate updates
-    let validUpdates = validateSchema({data: req.body.updates, schema: 'updatePoProduct'})
-    if (validUpdates.error) {
-      return next({
-        status: 404,
-        message: validUpdates.error.details.map(d=>d.message),
-      })
-    }
-    let data = await db.PoProduct.find({ company: req.body.company, $and: [{ $or: validUpdates.value.map(p => ({ _id: p.id })) }]})
+    // let validUpdates = validateSchema({data: req.body.updates, schema: 'updatePoProduct'})
+    // if (validUpdates.error) {
+    //   return next({
+    //     status: 404,
+    //     message: validUpdates.error.details.map(d=>d.message),
+    //   })
+    // }
+    let data = await db.PoProduct.find({ company: req.body.company, $and: [{ $or: req.body.updates.map(p => ({ _id: p.id })) }]})
     data = data.map(doc=>{
       let update = req.body.updates.find(u=>u.id == doc._id)
       return({

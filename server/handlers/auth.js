@@ -99,7 +99,7 @@ exports.signin = async function(req, res, next) {
 exports.signup = async function(req, res, next) {
 	try {
 		//validate
-		let validUser = validateSchema({data:req.body, schema:'user'})
+		//let validUser = validateSchema({data:req.body, schema:'user'})
 		// first check for empty values
 		let reqValues = ['email', 'password', 'company']
 		let values = Object.entries(req.body)

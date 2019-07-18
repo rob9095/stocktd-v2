@@ -34,15 +34,15 @@ const upsertPurchaseOrders = (config) => {
         skuCompany: `${po['sku']}-${company}`,
         ...po.poRef ? {poRef: po.poRef} : {poRef: `${company}-${po['name']}-${po['type']}`},
       }))
-      let validPoData = validateSchema({data: poData, schema: 'poUpdate'})
-      if (validPoData.error) {
-        reject({
-          status: 400,
-          message: validPoData.error.details.map(d => d.message),
-        })
-        return
-      }
-      let groupedPOs = groupBy(validPoData.value, 'poRef');
+      // let validPoData = validateSchema({data: poData, schema: 'poUpdate'})
+      // if (validPoData.error) {
+      //   reject({
+      //     status: 400,
+      //     message: validPoData.error.details.map(d => d.message),
+      //   })
+      //   return
+      // }
+      let groupedPOs = groupBy(poData, 'poRef');
       let poUpdates = [];
       let poProductUpdates = [];
       let productUpdates = [];
