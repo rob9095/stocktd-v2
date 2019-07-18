@@ -14,6 +14,7 @@ const poProductRoutes = require('./routes/poProducts');
 const boxScanRoutes = require('./routes/boxScans');
 const db = require("./models");
 const { loginRequired, ensureCorrectUser } = require('./middleware/auth');
+const { validator } = require('./middleware/validator');
 const PORT = 8080;
 
 app.use(fileUpload());
@@ -23,25 +24,25 @@ app.use(bodyParser.json({limit: '50mb'}));
 // all routes here
 
 // auth routes
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', validator, authRoutes);
 
 // account routes
-app.use('/api/account', accountRoutes);
+app.use('/api/account', validator, accountRoutes);
 
 //product routes
-app.use('/api/products', productRoutes);
+app.use('/api/products', validator, productRoutes);
 
 //purchase order routes
-app.use('/api/purchase-orders', poRoutes);
+app.use('/api/purchase-orders', validator, poRoutes);
 
-//purchase order routes
-app.use('/api/models', modelRoutes);
-
-//po products routes
-app.use('/api/po-products', poProductRoutes);
+//generic model routes
+app.use('/api/models', validator, modelRoutes);
 
 //po products routes
-app.use('/api/scans', boxScanRoutes);
+app.use('/api/po-products', validator, poProductRoutes);
+
+//po products routes
+app.use('/api/scans', validator, boxScanRoutes);
 
 
 app.use(errorHandler);

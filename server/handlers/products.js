@@ -5,22 +5,14 @@ const { validateSchema } = require('../middleware/validator');
 
 exports.processProductImport = async (req, res, next) => {
 	try {
-		if (req.body.products.length > 7000) {
+		if (req.body.data.length > 7000) {
 			return next({
 				status: 404,
 				message: ['Request to large']
 			})
 		}
 		let company = req.body.company;
-		//validate products
-		let validUpdates = validateSchema({data:req.body.products, schema: 'productUpdate'})
-		if (validUpdates.error) {
-			return next({
-				status: 404,
-				message: validUpdates.error.details.map(d => d.message),
-			})
-		}
-		let updates = validUpdates.value.map(p => {
+		let updates = req.body.data.map(p => {
 			let _id = p.id
 			delete p.id
 			if(p.action === 'delete') {

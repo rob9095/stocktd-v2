@@ -16,10 +16,10 @@ export function fetchAllProducts(query, sortBy, sortDirection, activePage, rowsP
 	}
 }
 
-export function importProducts(products, currentUser, update){
+export function importProducts(data, currentUser, update){
   return dispatch => {
 		return new Promise((resolve,reject) => {
-			return apiCall('post', '/api/products/import-csv', {products, update, company: currentUser.user.company})
+			return apiCall('post', '/api/products/import-csv', {data, update, company: currentUser.user.company})
 			.then((res) => {
 				resolve(res);
 			})

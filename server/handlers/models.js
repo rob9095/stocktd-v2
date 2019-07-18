@@ -89,16 +89,16 @@ exports.queryModelData = async (req, res, next) => {
 		//add check to make sure incoming query has defined values and set defaults
 		//add check here to make sure model exists
 		//add check here to make sure sortBy and sortDirection are defined
-		let validReq = validateSchema({data: req.body, schema: 'modelQuery'})
-		if (validReq.error) {
-			return res.status(200).json({
-				error: validReq
-			})
-			return next({
-				status: 400,
-				message: validReq.error.details.map(d => d.message),
-			})
-		}
+		// let validReq = validateSchema({data: req.body, schema: 'modelQuery'})
+		// if (validReq.error) {
+		// 	return res.status(200).json({
+		// 		error: validReq
+		// 	})
+		// 	return next({
+		// 		status: 400,
+		// 		message: validReq.error.details.map(d => d.message),
+		// 	})
+		// }
 		let query = Array.isArray(req.body.query) && req.body.query.length > 0 && buildQuery(req.body.query) || {}
 		query = {
 			...query,

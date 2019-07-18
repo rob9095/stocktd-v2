@@ -18,7 +18,7 @@ const validSchemas = {
     scannedQuantity: Joi.number().integer().error(() => `Scanned Quantity must be whole a number`),
   })),
 
-  modelQuery: Joi.object().keys({
+  '/api/models/query/': Joi.object().keys({
     model: Joi.string().required().error(() => `Model must be a string`),
     company: Joi.string().required().error(() => `Company must be a string`),
     sortBy: Joi.string().error(() => `Sort by must be a string`),
@@ -34,7 +34,7 @@ const validSchemas = {
   }),
   //const updatePoProductSchemas = Joi.array().items(updatePoProductSchema)
 
-  productUpdateSchema: Joi.array().max(7000).items(Joi.object().keys({
+  '/api/products/import-csv/': Joi.array().max(7000).items(Joi.object().keys({
     id: Joi.string().regex(/^[a-f\d]{24}$/i).error(() => `Invalid id provided`),
     companyId: Joi.string().regex(/^[a-f\d]{24}$/i).error(() => `Invalid Company ID provided`),
     defaultBox: Joi.string().regex(/^[a-f\d]{24}$/i).error(() => `Invalid Default Box ID provided`),
@@ -95,5 +95,34 @@ exports.validateSchema = function (config) {
         details: [{message}],
       }
     };
+  }
+};
+
+exports.validator = function (req, res, next) {
+  try {
+    let schema = req.originalUrl
+    let { data } = req.body
+    let options = {
+      stripUnknown: true,
+    }
+    if (!validSchemas[schema]) {
+      //maybe throw err?
+      //throw 'Invalid Schema'
+      return next();
+    }
+    let result = validSchemas[schema].validate(data, options)
+    if (result.error){
+      return next({
+        status: 400,
+        message: result.error.details.map(d => d.message),
+      })
+    }
+    req.body.data = result.value
+    return next();
+  } catch (message) {
+    return next({
+      status: 400,
+      message: 'Invalid Schema',
+    });
   }
 };
