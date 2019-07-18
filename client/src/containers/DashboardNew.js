@@ -53,7 +53,7 @@ class DashboardNew extends Component {
     }
   }
 
-  setActiveMenuItem = async (pathname) => {
+  setActiveMenuItem = (pathname) => {
     let pathArr = pathname.split('/');
     let activeMenuItems = pathArr.map(arg => {
       if (arg === 'app' && pathArr.length === 2) {
@@ -62,14 +62,16 @@ class DashboardNew extends Component {
         return arg.replace(' ','-').toLowerCase()
       }
     })
-    let openMenuKeys = []
+    let openMenuKeys = this.state.openMenuKeys
     for (let arg of activeMenuItems) {
       let foundParent = this.state.siderTopMenuOptions.find(op => op.children && op.children.filter(c => c.title.toLowerCase().replace(' ', '-') === arg || c.id === arg).length)
       if (foundParent) {
-        openMenuKeys.push(foundParent.id || foundParent.title.toLowerCase().replace(' ', '-'))
+        let key = foundParent.id || foundParent.title.toLowerCase().replace(' ', '-')
+        //openMenuKeys.push(foundParent.id || foundParent.title.toLowerCase().replace(' ', '-'))
+        openMenuKeys = [...openMenuKeys.filter(k => k !== key), key]
       }
     }
-    await this.setState({
+    this.setState({
       activeMenuItems,
       openMenuKeys,
     })
