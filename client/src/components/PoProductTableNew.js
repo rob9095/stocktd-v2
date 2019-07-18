@@ -45,7 +45,7 @@ class PoProductTableNew extends Component {
     })
     .catch(err=>{
       this.setState({
-        currentPOs: this.state.data.filter(r=> !r.isSkeleton),
+        currentPOs: this.state.currentPOs.filter(r=> !r.isSkeleton),
       })
       console.log({err})
     })
