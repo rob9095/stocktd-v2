@@ -59,7 +59,7 @@ const upsertPurchaseOrders = (config) => {
               name: poArr[0].name,
               type: poArr[0].type,
               ...poArr[0].status && {status: poArr[0].status},
-              poRef,
+              //poRef,
               company: poArr[0].company,
               $inc: { quantity: parseInt(sum) },
               $setOnInsert: { createdOn: new Date(), ...!poArr[0].status && {status: 'processing'} }

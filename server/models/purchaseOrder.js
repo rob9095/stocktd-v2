@@ -20,10 +20,18 @@ const purchaseOrderSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  poRef: {
-    type: 'String',
-    required: true,
-    unique: true,
+  // poRef: {
+  //   type: 'String',
+  //   required: true,
+  //   unique: true,
+  // },
+  defaultInbound: {
+    type: Boolean,
+    default: false,
+  },
+  defaultOutbound: {
+    type: Boolean,
+    default: false,
   },
   createdOn: {
     type: Date,
@@ -53,6 +61,10 @@ purchaseOrderSchema.virtual('boxscans', {
   foreignField: 'po', // is equal to `foreignField`
   options: {} // Query options, see http://bit.ly/mongoose-query-options
 });
+
+purchaseOrderSchema.virtual('poRef').get(function(){
+  return `${this.company}-${this.name}-${this.type}`
+})
 
 const PurchaseOrder = mongoose.model("PurchaseOrder", purchaseOrderSchema);
 

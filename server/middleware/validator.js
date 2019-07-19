@@ -96,7 +96,6 @@ const validSchemas = {
   '/api/scans/delete': Joi.object().keys({
     company: Joi.string().required(),
     data: Joi.array().max(7000).items(Joi.string().regex(/^[a-f\d]{24}$/i).required()),
-    user: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid user id provided`),
   }),
 
   '/api/scans/update': Joi.object().keys({

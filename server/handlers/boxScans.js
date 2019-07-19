@@ -45,12 +45,16 @@ const scanToPO = (boxScan,scanQty) => {
         updatedProduct,
         updatedPo,
         updatedBoxScan = {};
-      const genericInboundPo = await db.PurchaseOrder.findOne({ poRef: `${boxScan.company}-genericInbound` }) || {
-        name: 'Generic Inbound',
-        type: 'inbound',
-        status: 'processing',
-        poRef: `${boxScan.company}-genericInbound`,
-        company: boxScan.company,
+      let genericInboundPo = await db.PurchaseOrder.findOne({ defaultInbound: true });
+      if (!genericInboundPo) {
+        //create it
+        genericInboundPo = await db.PurchaseOrder.create({
+          name: 'Generic Inbound',
+          type: 'inbound',
+          status: 'processing',
+          defaultInbound: true,
+          company: boxScan.company,
+        })
       }
       //upsert the locations if neccessary
       if (boxScan.locations && boxScan.locations.length > 0) {
@@ -60,7 +64,7 @@ const scanToPO = (boxScan,scanQty) => {
       //define the current po, first array item if array, otherwise set to generic inbound po if currentPOs is falsy
       const currentPO = Array.isArray(boxScan.currentPOs) ? boxScan.currentPOs[0] : boxScan.currentPOs || genericInboundPo
       // find the po, otherwise set it to generic inbound defaults above to upsert
-      let foundPo = await db.PurchaseOrder.findOne({ poRef: currentPO.poRef }) || genericInboundPo
+      let foundPo = await db.PurchaseOrder.findOne({ poRef: currentPO.poRef })
       //upsert poProduct, update Product, upsert Purchase Order, upsert boxScan
       await db.PoProduct.update({ poRef: foundPo.poRef, skuCompany: boxScan.skuCompany }, {
         $setOnInsert: {
@@ -71,23 +75,24 @@ const scanToPO = (boxScan,scanQty) => {
           skuCompany: boxScan.skuCompany,
           type: foundPo.type,
           status: foundPo.status,
-          poRef: foundPo.poRef,
+          //poRef: foundPo.poRef,
+          po: foundPo._id,
           company: boxScan.company,
         },
         $inc: { quantity: scanQty },
       }, { upsert: true });
-      updatedPoProduct = await db.PoProduct.findOne({ poRef: foundPo.poRef, skuCompany: boxScan.skuCompany })
+      updatedPoProduct = await db.PoProduct.findOne({ po: foundPo._id, skuCompany: boxScan.skuCompany })
 
       updatedProduct = await db.Product.findOneAndUpdate({ skuCompany: boxScan.skuCompany, _id: boxScan.product }, {
         $inc: { quantity: scanQty }
       });
-      updatedPo = await db.PurchaseOrder.update({ poRef: foundPo.poRef }, {
+      updatedPo = await db.PurchaseOrder.update({ _id: foundPo._id }, {
         $setOnInsert: {
           createdOn: new Date(),
           name: foundPo.name,
           type: foundPo.type,
           status: foundPo.status,
-          poRef: foundPo.poRef,
+          // poRef: foundPo.poRef,
           company: boxScan.company,
         },
         $inc: { quantity: scanQty },
@@ -145,13 +150,13 @@ const scanFromPO = (scan, scanQty, product) => {
       let updatedBoxScan = {};
       let completedPoProducts = {};
       let updatedPo = {};
-      let andQuery = scan.currentPOs.map(p => ({ poRef: p.poRef, company: scan.company }))
+      let andQuery = scan.currentPOs.map(p => ({ po: p._id, company: scan.company }))
       let poProducts = await db.PoProduct.find({
         $and: [{ $or: andQuery }],
       })
       let poIndex = 0
       for (let po of scan.currentPOs) {
-        let poProduct = poProducts.find(p => p.skuCompany === product.skuCompany && po.poRef === p.poRef)
+        let poProduct = poProducts.find(p => p.skuCompany === product.skuCompany && po._id == p.po)
         if (poProduct) {
           // product found
           updatedPo = po
@@ -182,14 +187,14 @@ const scanFromPO = (scan, scanQty, product) => {
           updatedPoProduct.save()
           let markComplete = updatedPoProduct.scannedQuantity >= updatedPoProduct.quantity
           if (markComplete) {
-            let notComplete = poProducts.filter(p => p.poRef === po.poRef && p.quantity > p.scannedQuantity && p.skuCompany !== updatedPoProduct.skuCompany)
+            let notComplete = poProducts.filter(p => p.po == po._id && p.quantity > p.scannedQuantity && p.skuCompany !== updatedPoProduct.skuCompany)
             if (notComplete.length === 0) {
               // find and update the po status
-              updatedPo = await db.PurchaseOrder.findOne({ poRef: po.poRef })
+              updatedPo = await db.PurchaseOrder.findOne({ _id: po._id })
               updatedPo.status = 'complete'
               updatedPo.save()
               // update all poProducts
-              let poProductUpdates = poProducts.filter(p => p.poRef === po.poRef).map(p => ({
+              let poProductUpdates = poProducts.filter(p => p.po === po._id).map(p => ({
                 updateOne: {
                   filter: { _id: p._id },
                   update: { status: 'complete' }
@@ -200,7 +205,7 @@ const scanFromPO = (scan, scanQty, product) => {
           }
           let boxScan = {
             ...scan,
-            poRef: po.poRef,
+            //poRef: po.poRef,
             po: po._id,
             createdOn: new Date(),
             poProduct: updatedPoProduct._id,
@@ -533,7 +538,7 @@ exports.upsertBoxScan = async (req, res, next) => {
 exports.deleteBoxScans = async (req, res, next) => {
   try {
     let result = await updateBoxScans({
-      boxes: req.body.data.map(id => ({ id, deleteDoc: true })),
+      boxes: req.body.data.map(id => ({ _id: id, deleteDoc: true })),
       company: req.body.company,
       user: req.body.user,
     })
@@ -562,8 +567,9 @@ const bulkUpsertBoxScans = (config) => {
   return new Promise(async (resolve,reject) =>{
     try {
       //get existing values
-      let purchaseOrders = await db.PurchaseOrder.find({ $and: [{ $or: data.map(row => ({ company: row.company, poRef: row.poRef })) }] })
-      let poProducts = await db.PoProduct.find({ $and: [{ $or: data.map(row => ({ company: row.company, poRef: row.poRef, sku: row.sku })) }] })
+
+      let purchaseOrders = await db.PurchaseOrder.find({ $and: [{ $or: data.map(row => ({ company: row.company, ...row.poRef ? {poRef: row.poRef} : {defaultInbound: true} })) }] })
+      let poProducts = await db.PoProduct.find({ $and: [{ $or: purchaseOrders.map(po => ({ company: row.company, po: po._id, sku: row.sku })) }] })
       let products = await db.Product.find({ $and: [{ $or: data.map(row => ({ company: row.company, sku: row.sku })) }] })
       //get the first user's prefix for now
       let [prefix, ...others] = await db.BoxPrefix.find(({user: user}))
@@ -573,7 +579,7 @@ const bulkUpsertBoxScans = (config) => {
         locations = await upsertScanLocation({ locations, company, filterRef: 'name' })
       }
       let boxUpserts = data.map(box => {
-        let po = purchaseOrders.find(po => po.poRef === box.poRef)
+        let po = box.poRef ? purchaseOrders.find(po => po.poRef === box.poRef) : purchaseOrders.find(po=>po.defaultInbound === true)
         let poProduct = poProducts.find(p => p.poRef === box.poRef && p.sku === box.sku)
         let product = products.find(p => p.sku === box.sku)
         if (!po || !poProduct || !product) {
@@ -600,7 +606,7 @@ const bulkUpsertBoxScans = (config) => {
                 skuCompany: product.skuCompany,
                 company,
                 scanToPo: box.scanToPo,
-                poRef: po.poRef,
+                //poRef: po.poRef,
                 po: po._id,
                 poProduct: poProduct._id,
                 product: product._id,
@@ -650,12 +656,10 @@ exports.importBoxScans = async (req, res, next) => {
         ...inputs,
         //if scan from value in row is yes use quantity as scannedQuantity and set scanToPo to false
         ...row['scan from'] === 'yes' ? {scannedQuantity: quantity, scanToPo: false} : {scanToPo: true},
-        //if we got didn't get a po name and po type set to generic inbound
-        ...row['po name'] && row['po type'] ?
-          { poRef: req.body.company + "-" + row['po name'] + "-" + row['po type'], poName: row['po name'], poType: row['po type'] }
-          :
-          { poRef: req.body.company +'-genericInbound', poName: 'Generic Inbound', poType: 'inbound'},
-        name: row['box name'],
+        // if we got a po name and po type set the poRef
+        ...row['po name'] && row['po type'] &&
+          { poRef: req.body.company + "-" + row['po name'] + "-" + row['po type'], poName: row['po name'], poType: row['po type'] },
+        //name: row['box name'],
         company: req.body.company,
       })
     })
@@ -666,7 +670,7 @@ exports.importBoxScans = async (req, res, next) => {
       data: data.map(row => ({
         name: row.poName,
         type: row.poType,
-        poRef: row.poRef,
+        ...row.poRef && { poRef: row.poRef },
         sku: row.sku,
         quantity: row.quantity,
         ...row.scannedQuantity && { scannedQuantity: row.scannedQuantity }
