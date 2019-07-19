@@ -3,112 +3,127 @@ const Joi = require('joi');
 const validSchemas = {
   //auth routes
   '/api/auth/signup': Joi.object().keys({
-    email: Joi.string().email().required().error(() => `Invalid email provided`),
+    email: Joi.string().email().required(),
     password: Joi.string().regex(/^[a-zA-Z0-9]{6,30}$/).required().error(() => `Invalid password provided`),
-    company: Joi.string().required().error(()=>`Company must be a string`),
-    firstName: Joi.string().empty("").error(() => `First Name must be a string`),
-    lastName: Joi.string().empty("").error(() => `Last Name must be a string`),
-    profileImageUrl: Joi.string().empty("").error(() => `Profile Image Url must be a string`),
-    remember: Joi.boolean().error(() => `Remember must be boolean`),
+    company: Joi.string().required(),
+    firstName: Joi.string().empty(""),
+    lastName: Joi.string().empty(""),
+    profileImageUrl: Joi.string().empty(""),
+    remember: Joi.boolean(),
   }).error(err => err.toString()),
 
   //po product routes
   '/api/po-products/update': Joi.object().keys({
-    company: Joi.string().required().error(() => `Company must be a string`),
+    company: Joi.string().required(),
     updates: Joi.array().max(7000).items(Joi.object().keys({
-      id: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid id provided`),
-      quantity: Joi.number().integer().error(() => `Quantity must be whole a number`),
-      barcode: Joi.string().error(() => `Barcode must be a string`),
-      scannedQuantity: Joi.number().integer().error(() => `Scanned Quantity must be whole a number`),
-    })).error(err => err.toString()),
+      id: Joi.string().regex(/^[a-f\d]{24}$/i).required(),
+      quantity: Joi.number().integer(),
+      barcode: Joi.string(),
+      scannedQuantity: Joi.number().integer(),
+    })),
   }).error(err => err.toString()),
 
   '/api/po-products/delete': Joi.object().keys({
-    company: Joi.string().required().error(() => `Company must be a string`),
+    company: Joi.string().required(),
     updates: Joi.array().max(7000).items(Joi.object().keys({
-      id: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid id provided`),
-      quantity: Joi.number().integer().error(() => `Quantity must be whole a number`),
-      barcode: Joi.string().error(() => `Barcode must be a string`),
-      scannedQuantity: Joi.number().integer().error(() => `Scanned Quantity must be whole a number`),
-    })).error(err => err.toString()),
+      id: Joi.string().regex(/^[a-f\d]{24}$/i).required(),
+      quantity: Joi.number().integer(),
+      barcode: Joi.string(),
+      scannedQuantity: Joi.number().integer(),
+    })),
   }).error(err => err.toString()),
 
   //model routes
   '/api/models/query': Joi.object().keys({
-    model: Joi.string().allow(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']).required().error(err => err.toString()),
-    company: Joi.string().required().error(() => `Company must be a string`),
-    sortBy: Joi.string().error(() => `Sort by must be a string`),
-    sortDirection: Joi.string().lowercase().allow(['asc', 'desc', 'ascending', 'descending', '1', '-1']).default('asc').error((err) => err.toString()),
-    activePage: Joi.number().integer().default(1).error(err => err.toString()),
-    rowsPerPage: Joi.number().integer().default(10).error(err => err.toString()),
+    model: Joi.string().allow(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']).required(),
+    company: Joi.string().required(),
+    sortBy: Joi.string(),
+    sortDirection: Joi.string().lowercase().allow(['asc', 'desc', 'ascending', 'descending', '1', '-1']).default('asc'),
+    activePage: Joi.number().integer().default(1),
+    rowsPerPage: Joi.number().integer().default(10),
     query: Joi.array().items(
       Joi.string().empty(""),
       Joi.boolean(),
       Joi.number(),
       Joi.array().items(Joi.string().empty(""),Joi.boolean(),Joi.array()),
-    ).max(1000).default([]).error(err => err.toString()),
-    populateArray: Joi.array().max(1000).default([]).error(err => err.toString()),
+    ).max(1000).default([]),
+    populateArray: Joi.array().max(1000).default([]),
   }).error(err => err.toString()),
 
   '/api/models/get-all': Joi.object().keys({
-    company: Joi.string().required().error(() => `Company must be a string`),
-    limit: Joi.number().integer().default(10).max(100).error(err => err.toString()),
-    documentRef: Joi.object().error(err=>err.toString()),
-    regex: Joi.boolean().default(false).error(() => `regex must be boolean`),
-    populateArray: Joi.array().max(1000).default([]).error(err => err.toString()),
-    model: Joi.string().allow(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']).required().error(err => err.toString()),
+    company: Joi.string().required(),
+    limit: Joi.number().integer().default(10).max(100),
+    documentRef: Joi.object(),
+    regex: Joi.boolean().default(false),
+    populateArray: Joi.array().max(1000).default([]),
+    model: Joi.string().allow(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']).required(),
   }).error(err=>err.toString()),
 
   '/api/models/upsert': Joi.object().keys({
-    company: Joi.string().required().error(() => `Company must be a string`),
-    model: Joi.string().allow(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']).required().error(err=> err.toString()),
-    filterRef: Joi.string().required().error(() => `Sort by must be a string`),
-    refModel: Joi.string().allow(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']).error((err) => err.toString()),
-    refUpdates: Joi.array().max(7000).error((err) => err.toString()),
-    data: Joi.array().max(7000).default([]).items(Joi.object(),).error(err=>err.toString()),
+    company: Joi.string().required(),
+    model: Joi.string().allow(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']).required(),
+    filterRef: Joi.string().required(),
+    refModel: Joi.string().allow(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']),
+    refUpdates: Joi.array().max(7000),
+    data: Joi.array().max(7000).default([]).items(Joi.object()).required(),
   }).error(err => err.toString()),
 
   '/api/models/delete': Joi.object().keys({
-    company: Joi.string().required().error(() => `Company must be a string`),
-    model: Joi.string().allow(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']).required().error(err => err.toString()),
-    data: Joi.array().max(7000).items(Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid id provided`),).error(err => err.toString()),
+    company: Joi.string().required(),
+    model: Joi.string().allow(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']).required(),
+    data: Joi.array().max(7000).items(Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid id provided`)).required(),
   }).error(err => err.toString()),
 
   //product routes
   '/api/products/import-csv': Joi.object().keys({
-    company: Joi.string().required().error(() => `Company must be a string`),
+    company: Joi.string().required(),
     data: Joi.array().max(7000).items(Joi.object().keys({
       id: Joi.string().regex(/^[a-f\d]{24}$/i).error(() => `Invalid id provided`),
       companyId: Joi.string().regex(/^[a-f\d]{24}$/i).error(() => `Invalid Company ID provided`),
       defaultBox: Joi.string().regex(/^[a-f\d]{24}$/i).error(() => `Invalid Default Box ID provided`),
       defaultLocation: Joi.string().regex(/^[a-f\d]{24}$/i).error(() => `Invalid Default Location ID provided`),
-      quantity: Joi.number().integer().error(() => `Quantity must be whole a number`),
-      barcode: Joi.string().error(() => `Barcode must be a string`),
-      sku: Joi.string().error(() => `Sku must be a string`),
-      title: Joi.string().empty('').error(() => `Title must be a string`),
-      supplier: Joi.string().empty('').error(() => `Supplier must be a string`),
-      brand: Joi.string().empty('').error(() => `Brand must be a string`),
-      asin: Joi.string().empty('').error(() => `ASIN must be a string`),
-      weight: Joi.number().empty('').precision(2).error(() => `Weight must be a number with max of 2 decimals`),
-      price: Joi.number().empty('').precision(2).error(() => `Price must be a number with max of 2 decimals`),
-    })).error(err => err.toString()),
+      quantity: Joi.number().integer(),
+      barcode: Joi.string(),
+      sku: Joi.string(),
+      title: Joi.string().empty(''),
+      supplier: Joi.string().empty(''),
+      brand: Joi.string().empty(''),
+      asin: Joi.string().empty(''),
+      weight: Joi.number().empty('').precision(2),
+      price: Joi.number().empty('').precision(2),
+    })),
   }).error(err => err.toString()),
   
   //purchase order routes
   '/api/purchase-orders/import-csv': Joi.object().keys({
-    company: Joi.string().required().error(() => `Company must be a string`),
+    company: Joi.string().required(),
     json: Joi.array().max(7000).items(Joi.object().keys({
-      name: Joi.string().required().error(() => `PO Name must be a string`),
-      type: Joi.string().lowercase().allow(['inbound', 'outbound']).required().error(() => `PO Type must be either "inbound" or "outbound"`),
-      status: Joi.string().lowercase().allow(['complete', 'processing']).required().error(() => `PO Status must be either "processing" or "complete"`),
-      sku: Joi.string().required().error(() => `Sku must be a string`),
-      quantity: Joi.number().integer().error(() => `Quantity must be whole a number`),
-      scannedQuantity: Joi.number().integer().error(() => `Quantity must be whole a number`),
-      company: Joi.string().required().error(() => `Company must be a string`),
-      skuCompany: Joi.string().required().error(() => `Sku Company must be a string`),
-      poRef: Joi.string().required().error(() => `PO Ref must be a string`),
-    })).error(err => err.toString()),
+      name: Joi.string().required(),
+      type: Joi.string().lowercase().allow(['inbound', 'outbound']).required(),
+      status: Joi.string().lowercase().allow(['complete', 'processing']).required(),
+      sku: Joi.string().required(),
+      quantity: Joi.number().integer(),
+      scannedQuantity: Joi.number().integer(),
+    })),
   }).error(err => err.toString()),
+
+  '/api/purchase-orders/update': Joi.object().keys({
+    company: Joi.string().required(),
+    updates: Joi.array().max(3000).items(Joi.object().keys({
+      id: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid id provided`),
+      name: Joi.string(),
+      type: Joi.string().lowercase().allow(['inbound', 'outbound']),
+      status: Joi.string().lowercase().allow(['complete', 'processing']),
+      createdOn: Joi.date().max('now'),      
+    })),
+  }).error(err => err.toString()),
+
+  '/api/purchase-orders/delete': Joi.object().keys({
+    company: Joi.string().required(),
+    data: Joi.array().max(3000).items(Joi.object().keys({
+      id: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid id provided`),
+    })),
+  }).error(err=>err.toString()),
 }
 
 exports.validateSchema = function (config) {
@@ -149,7 +164,7 @@ exports.validateSchema = function (config) {
 exports.validator = function (req, res, next) {
   try {
     let schema = req.originalUrl
-    console.log({schema})
+    console.log({schema, body: req.body})
     let options = {
       stripUnknown: true,
     }

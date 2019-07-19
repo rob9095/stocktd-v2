@@ -381,16 +381,17 @@ exports.updatePurchaseOrder = async (req, res, next) => {
 exports.removePurchaseOrder = async (req, res, next) => {
   try {
     let { data, company } = req.body
-    if (data.length > 3000) {
-      return next({
-        status: 400,
-        message: ['Request to large'],
-      })
-    }
     if (!data || data.length === 0) {
       return ({
         status: 400,
         message: ['No removals found']
+      })
+    }
+    
+    if (data.length > 3000) {
+      return next({
+        status: 400,
+        message: ['Request to large'],
       })
     }
     
