@@ -75,6 +75,7 @@ const validSchemas = {
   }).error(err => err.toString()),
 
   //product routes
+  
   '/api/products/import-csv': Joi.object().keys({
     company: Joi.string().required(),
     data: Joi.array().max(7000).items(Joi.object().keys({
@@ -91,8 +92,33 @@ const validSchemas = {
       asin: Joi.string().empty(''),
       weight: Joi.number().empty('').precision(2),
       price: Joi.number().empty('').precision(2),
+      action: Joi.string().lowercase().allow(['delete']),
     })),
   }).error(err => err.toString()),
+
+  '/api/products/update': Joi.object().keys({
+    company: Joi.string().required(),
+    updates: Joi.array().max(7000).items(Joi.object().keys({
+      id: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid id provided`),
+      companyId: Joi.string().regex(/^[a-f\d]{24}$/i).error(() => `Invalid Company ID provided`),
+      defaultBox: Joi.string().regex(/^[a-f\d]{24}$/i).error(() => `Invalid Default Box ID provided`),
+      defaultLocation: Joi.string().regex(/^[a-f\d]{24}$/i).error(() => `Invalid Default Location ID provided`),
+      quantity: Joi.number().integer(),
+      barcode: Joi.string(),
+      sku: Joi.string(),
+      title: Joi.string().empty(''),
+      supplier: Joi.string().empty(''),
+      brand: Joi.string().empty(''),
+      asin: Joi.string().empty(''),
+      weight: Joi.number().empty('').precision(2),
+      price: Joi.number().empty('').precision(2),
+    }))
+  }).error(err=>err.toString()),
+
+  '/api/products/delete': Joi.object().keys({
+    company: Joi.string().required(),
+    products: Joi.array().max(7000).items(Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid id provided`)),
+  }).error(err=>err.toString()),
   
   //purchase order routes
   '/api/purchase-orders/import-csv': Joi.object().keys({

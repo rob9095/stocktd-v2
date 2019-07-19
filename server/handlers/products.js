@@ -1,6 +1,6 @@
 const db = require('../models');
-const { createImportStatus } = require('../handlers/importStatus');
-const upsertBarcode = require('./barcode')
+// const { createImportStatus } = require('../handlers/importStatus');
+// const upsertBarcode = require('./barcode')
 const { validateSchema } = require('../middleware/validator');
 
 exports.processProductImport = async (req, res, next) => {
@@ -103,54 +103,54 @@ exports.processProductImport = async (req, res, next) => {
 		return next(err);
 	}
 };
-
-exports.getProducts = async (req, res, next) => {
-	try {
-		let query = {
-			company: req.body.company,
-		}
-		for (let val of req.body.query){
-			if ((Number.isInteger(parseInt(val[1])))) {
-				console.log(val[2])
-				query = val[2] === undefined ?
-					{
-						...query,
-						[val[0]]: val[1],
-					}
-				 :
-				 {
-					 ...query,
-					 [val[0]]: {[`$${val[2]}`]: val[1]},
-				 }
-			} else {
-				query = {
-					...query,
-					[val[0]]: { $regex : new RegExp(val[1], "i") },
-				}
-			}
-		}
-		let count = await db.Product.count(query)
-		const limit = req.body.rowsPerPage
-		const skip = (req.body.activePage * req.body.rowsPerPage) - req.body.rowsPerPage
-		const totalPages = Math.floor(count / req.body.rowsPerPage)
-		let products = await db.Product.find(query).skip(skip).limit(limit).sort({[req.body.sortBy]: req.body.sortDirection})
-		return res.status(200).json({
-			products,
-			totalPages,
-			skip,
-			activePage: req.body.activePage,
-			rowsPerPage: req.body.rowsPerPage,
-		})
-	} catch(err) {
-		return next(err);
-	}
-}
+//depreciated
+// exports.getProducts = async (req, res, next) => {
+// 	try {
+// 		let query = {
+// 			company: req.body.company,
+// 		}
+// 		for (let val of req.body.query){
+// 			if ((Number.isInteger(parseInt(val[1])))) {
+// 				console.log(val[2])
+// 				query = val[2] === undefined ?
+// 					{
+// 						...query,
+// 						[val[0]]: val[1],
+// 					}
+// 				 :
+// 				 {
+// 					 ...query,
+// 					 [val[0]]: {[`$${val[2]}`]: val[1]},
+// 				 }
+// 			} else {
+// 				query = {
+// 					...query,
+// 					[val[0]]: { $regex : new RegExp(val[1], "i") },
+// 				}
+// 			}
+// 		}
+// 		let count = await db.Product.count(query)
+// 		const limit = req.body.rowsPerPage
+// 		const skip = (req.body.activePage * req.body.rowsPerPage) - req.body.rowsPerPage
+// 		const totalPages = Math.floor(count / req.body.rowsPerPage)
+// 		let products = await db.Product.find(query).skip(skip).limit(limit).sort({[req.body.sortBy]: req.body.sortDirection})
+// 		return res.status(200).json({
+// 			products,
+// 			totalPages,
+// 			skip,
+// 			activePage: req.body.activePage,
+// 			rowsPerPage: req.body.rowsPerPage,
+// 		})
+// 	} catch(err) {
+// 		return next(err);
+// 	}
+// }
 
 exports.updateProducts = async (req,res,next) => {
 	try {
 		if (!Array.isArray(req.body.updates) || req.body.updates.filter(u=>u.id).length === 0) {
 			return next({
-				status: 404,
+				status: 400,
 				message: ['Please provide update array with id']
 			})
 		}

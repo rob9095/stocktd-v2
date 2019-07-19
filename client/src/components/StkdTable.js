@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchAllProducts, updateProducts, importProducts } from '../store/actions/products';
 import { queryModelData, deleteModelDocuments } from '../store/actions/models';
 import { upsertModelDocuments } from '../store/actions/models';
 import { addBoxScan } from '../store/actions/boxScans';
-import { Button, Pagination, Select, Icon, Spin, Form, Dropdown, Menu, Modal, message, Empty, Skeleton, Input, Layout, PageHeader, Cascader } from 'antd';
+import { Button, Pagination, Select, Icon, Dropdown, Menu, Modal, message, Empty, Skeleton, Input, Layout, PageHeader } from 'antd';
 import { addNotification, removeNotification } from '../store/actions/notifications';
 import WrappedFilterForm from './FilterForm';
 import SearchForm from './SearchForm';
@@ -320,35 +319,6 @@ class ProductTable extends Component {
         direction: direction === 'ascending' ? 'descending' : 'ascending',
       })
       this.handleDataFetch()
-    }
-
-    handleProductUpdate = (updates, id) => {
-      return new Promise((resolve,reject) => {
-        let data = this.state.data.map(p=>{
-          let update = updates.find(u=>u.id === p._id)
-          if (update) {
-            return {
-              ...p,
-              ...update,
-            }
-          } else {
-            return {
-              ...p,
-            }
-          }
-        })
-        this.props.updateProducts(updates, this.props.currentUser)
-        .then((res)=>{
-          this.setState({
-            data,
-            itemDrawerProduct: id ? {...data.find(i=>i._id === id)} : this.state.itemDrawerProduct,
-          })
-          resolve(res)
-        })
-        .catch(error=>{
-          reject(error)
-        })
-      })
     }
 
     handleRowEditSave = (updates,id) => {
@@ -760,47 +730,6 @@ class ProductTable extends Component {
               onClose={() => this.setState({insertDataModal: null})}
             />
           )}
-          {this.state.showEditItemDrawer && (
-            <EditItemDrawer
-              inputs={[
-                {id: 'sku', text: 'SKU', span: 8, className: 'no-wrap', required: true, type: 'text', message: 'SKU cannot be blank'},
-                {id: 'title', text: 'Title', span: 16, className: 'lg-field', type: 'text', required: false},
-                {id: 'quantity', text: 'Quantity', type: 'number', span: 8, className: 'no-wrap', type: 'text', required: false},
-                {id: 'quantityToShip', text: 'To Ship', type: 'number', span: 8, className: 'no-wrap', required: false},
-                {id: 'price', text: 'Price', type: 'number', span: 8, className: 'no-wrap', required: false},
-                {id: 'weight', text: 'Weight', type: 'number', span: 8, className: 'no-wrap', required: false},
-                {id: 'brand', text: 'Brand', span: 8, type: 'text', required: false},
-                {id: 'supplier', text: 'Supplier', span: 8, type: 'text', required: false},
-                {id: 'barcode', text: 'Barcode', span: 8, type: 'text', required: false},
-                {id: 'description', text: 'Description', span: 24, type: 'textarea', required: false, textRows: 4},
-              ]}
-              item={this.state.itemDrawerProduct}
-              title={'Edit Product'}
-              onClose={this.toggle('showEditItemDrawer')}
-              onSave={this.handleProductUpdate}
-              create={false}
-            />
-          )}
-          {this.state.showCreateItemDrawer && (
-            <EditItemDrawer
-              inputs={[
-                {id: 'sku', text: 'SKU', span: 8, className: 'no-wrap', required: true, type: 'text', message: 'SKU cannot be blank'},
-                {id: 'title', text: 'Title', span: 16, className: 'lg-field', type: 'text', required: false},
-                {id: 'quantity', text: 'Quantity', type: 'number', span: 8, className: 'no-wrap', type: 'text', required: false},
-                {id: 'quantityToShip', text: 'To Ship', type: 'number', span: 8, className: 'no-wrap', required: false},
-                {id: 'price', text: 'Price', type: 'number', span: 8, className: 'no-wrap', required: false},
-                {id: 'weight', text: 'Weight', type: 'number', span: 8, className: 'no-wrap', required: false},
-                {id: 'brand', text: 'Brand', span: 8, type: 'text', required: false},
-                {id: 'supplier', text: 'Supplier', span: 8, type: 'text', required: false},
-                {id: 'description', text: 'Description', span: 24, type: 'textarea', required: false, textRows: 4},
-              ]}
-              item={{}}
-              title={'Create Product'}
-              onClose={this.toggle('showCreateItemDrawer')}
-              onSave={this.handleProductImport}
-              create={true}
-            />
-          )}
           {this.state.showImportModal && (
             <ImportModal
               title="Import File"
@@ -932,4 +861,4 @@ class ProductTable extends Component {
    };
   }
 
-export default connect(mapStateToProps, { fetchAllProducts, updateProducts, importProducts, queryModelData, deleteModelDocuments, addBoxScan, addNotification, removeNotification})(ProductTable);
+export default connect(mapStateToProps, { queryModelData, deleteModelDocuments, addBoxScan, addNotification, removeNotification})(ProductTable);
