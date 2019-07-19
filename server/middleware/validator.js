@@ -57,7 +57,7 @@ const validSchemas = {
     regex: Joi.boolean().default(false),
     populateArray: Joi.array().max(1000).default([]),
     model: Joi.string().allow(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']).required(),
-  }).error(err=>err.toString()),
+  }),
 
   '/api/models/upsert': Joi.object().keys({
     company: Joi.string().required(),
@@ -72,20 +72,63 @@ const validSchemas = {
     company: Joi.string().required(),
     model: Joi.string().allow(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']).required(),
     data: Joi.array().max(7000).items(Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid id provided`)).required(),
-  }).error(err => err.toString()),
+  }),
 
   //boxscan routes
-  // '/api/scans': {},
-  // '/api/scans/delete': {},
-  // '/api/scans/update': {},
-  // '/api/scans/import': {},
+  '/api/scans': Joi.object().keys({
+    company: Joi.string().required(),
+    scan: Joi.object().keys({
+      barcode: Joi.string().required(),
+      sku: Joi.string(),
+      scanToPo: Joi.boolean().allow([true,false]).required(),
+      currentPOs: Joi.array().items(Joi.object().keys({
+        poRef: Joi.string().required(),
+        _id: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid user id provided`),
+      })),
+      name: Joi.string().required(),
+      prefix: Joi.string(),
+      quantity: Joi.number().integer().required(),
+      user: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid user id provided`),
+      locations: Joi.array().max(7000).items(Joi.string().required()),
+    }),
+  }),
+
+  '/api/scans/delete': Joi.object().keys({
+    company: Joi.string().required(),
+    data: Joi.array().max(7000).items(Joi.string().regex(/^[a-f\d]{24}$/i).required()),
+    user: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid user id provided`),
+  }),
+
+  '/api/scans/update': Joi.object().keys({
+    company: Joi.string().required(),
+    data: Joi.array().max(7000).items(Joi.object().keys({
+      _id: Joi.string().regex(/^[a-f\d]{24}$/i).required(),
+    }).required()),
+    user: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid user id provided`),
+  }),
+
+  '/api/scans/import': Joi.object().keys({
+    company: Joi.string().required(),
+    data: Joi.array().max(7000).items(Joi.object().keys({
+      sku: Joi.string().required(),
+      name: Joi.string().required(),
+      quantity: Joi.number().integer().required(),
+      locations: Joi.array().max(7000).items(Joi.string().required()),
+      barcode: Joi.string(),
+      prefix: Joi.string(),
+      'scan from': Joi.string().lowercase().allow('yes','no'),
+      'po name': Joi.string(),
+      'po type': Joi.string(),
+    }).required()),
+    user: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid user id provided`),
+  }),
 
   //location routes
   '/api/locations': Joi.object().keys({
     company: Joi.string().required(),
-    locations: Joi.array().max(7000).items(Joi.string().required(),),
+    locations: Joi.array().max(7000).items(Joi.string().required()),
     filterRef: Joi.string(),
-  }).error(err=>err.toString()),
+  }),
 
   //product routes
   '/api/products/import-csv': Joi.object().keys({
@@ -106,7 +149,7 @@ const validSchemas = {
       price: Joi.number().empty('').precision(2),
       action: Joi.string().lowercase().allow(['delete']),
     })),
-  }).error(err => err.toString()),
+  }),
 
   '/api/products/update': Joi.object().keys({
     company: Joi.string().required(),
@@ -125,12 +168,12 @@ const validSchemas = {
       weight: Joi.number().empty('').precision(2),
       price: Joi.number().empty('').precision(2),
     }))
-  }).error(err=>err.toString()),
+  }),
 
   '/api/products/delete': Joi.object().keys({
     company: Joi.string().required(),
     products: Joi.array().max(7000).items(Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid id provided`)),
-  }).error(err=>err.toString()),
+  }),
   
   //purchase order routes
   '/api/purchase-orders/import-csv': Joi.object().keys({
@@ -161,7 +204,7 @@ const validSchemas = {
     data: Joi.array().max(3000).items(Joi.object().keys({
       id: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid id provided`),
     })),
-  }).error(err=>err.toString()),
+  }),
 }
 
 exports.validateSchema = function (config) {

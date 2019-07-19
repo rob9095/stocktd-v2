@@ -326,20 +326,20 @@ const updateBoxScans = (config) => {
   let { boxes, company, user } = config
   return new Promise( async (resolve, reject) => {
     try {
-      if (!Array.isArray(boxes) || boxes.filter(box => typeof box.id !== 'string').length > 0) {
+      if (!Array.isArray(boxes) || boxes.filter(box => typeof box._id !== 'string').length > 0) {
         reject({
           message: ['Please provide array of box ids in string format']
         })
       }
       //find the boxes to update
-      let foundBoxes = await db.BoxScan.find({ company, $and: [{ $or: boxes.map(box => ({ _id: box.id })) }] })
+      let foundBoxes = await db.BoxScan.find({ company, $and: [{ $or: boxes.map(box => ({ _id: box._id })) }] })
       //update/remove the boxes
       let boxUpdates = []
       let productUpdates = []
       let poUpdates = []
       let poProductUpdates = []
       for (let box of foundBoxes) {
-        let update = boxes.find(b=>b.id == box._id)
+        let update = boxes.find(b=>b._id == box._id)
         let quantity = parseInt(update.quantity)
         let boxQty = parseInt(box.quantity)
         if (update.deleteDoc) {
@@ -659,7 +659,6 @@ exports.importBoxScans = async (req, res, next) => {
         company: req.body.company,
       })
     })
-    //validate inputs will go here
 
     //upsert the pos, also upserts poProducts & products
     let upsertData = {

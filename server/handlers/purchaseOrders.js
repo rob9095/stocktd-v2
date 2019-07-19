@@ -328,7 +328,7 @@ exports.updatePurchaseOrder = async (req, res, next) => {
     let poProductUpdates = []
     let productUpdates = []
     //andQuery to grab all products on pos beings in updates
-    let andQuery = updates.map(({id})=>({po: id}))
+    let andQuery = updates.map(({_id})=>({po: _id}))
     let poProducts = await db.PoProduct.find({company, $and: [{ $or: andQuery }]}).populate('po')
     //loop each po and find poProducts for 
     if (poProducts.length > 0) {
