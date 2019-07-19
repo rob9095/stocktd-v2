@@ -3,35 +3,19 @@ const { validateHeaders, validateInputs } = require('../services/validateArray')
 const { upsertPurchaseOrders } = require('./purchaseOrders')
 const { validateSchema } = require('../middleware/validator');
 
-const boxImportHeaders = [
-  { value: 'sku', required: true },
-  { value: 'box name', required: true },
-  { value: 'locations'},
-  { value: 'barcode' },
-  { value: 'quantity', required: true },
-  { value: 'scan from', type: 'controlled', validValues: ['yes']},
-  { value: 'prefix' },
-];
-const boxValidInputs = [
-  { value: 'sku', required: true },
-  { value: 'name', required: true },
-  { value: 'locations', type: 'array' },
-  { value: 'barcode', },
-  { value: 'quantity', required: true, type: 'number' },
-  { value: 'prefix' },
-];
-
 
 //accepts string array and upserts locations based on filterRef which is name by default 
-const upsertScanLocation = (upsertData) => {
-  let { company, locations, filterRef } = upsertData
+const upsertScanLocation = (upsertData) => { 
   return new Promise( async (resolve,reject) => {
     try {
-      locations = Array.isArray(locations) ? locations : [locations]
-      if (locations.filter(l => typeof l !== 'string').length > 0) {
-        throw 'Invalid locations array, please provide string array'
+      let { company, locations, filterRef } = upsertData
+      upsertData.locations = Array.isArray(locations) ? locations : [locations]
+      //validate
+      let result = validateSchema({data: upsertData, schema: '/api/locations'})
+      if (result.error) {
+        throw result.error.details.map(d=>d.message)
       }
-      let updates = locations.map(name => ({
+      let updates = result.value.locations.map(name => ({
         updateOne: {
           filter: { 
             [filterRef || 'name']: name,

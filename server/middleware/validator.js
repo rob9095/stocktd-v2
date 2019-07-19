@@ -74,8 +74,20 @@ const validSchemas = {
     data: Joi.array().max(7000).items(Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid id provided`)).required(),
   }).error(err => err.toString()),
 
+  //boxscan routes
+  // '/api/scans': {},
+  // '/api/scans/delete': {},
+  // '/api/scans/update': {},
+  // '/api/scans/import': {},
+
+  //location routes
+  '/api/locations': Joi.object().keys({
+    company: Joi.string().required(),
+    locations: Joi.array().max(7000).items(Joi.string().required(),),
+    filterRef: Joi.string(),
+  }).error(err=>err.toString()),
+
   //product routes
-  
   '/api/products/import-csv': Joi.object().keys({
     company: Joi.string().required(),
     data: Joi.array().max(7000).items(Joi.object().keys({
