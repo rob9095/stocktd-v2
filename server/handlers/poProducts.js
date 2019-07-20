@@ -11,13 +11,13 @@ exports.updatePoProducts = async (req, res, next) => {
   try {
     if (req.body.updates.length > 7000) {
       return next({
-        status: 404,
+        status: 400,
         message: ['Request to large'],
       })      
     }
     if (!Array.isArray(req.body.updates) || req.body.updates.filter(p=>!p.id).length > 0) {
       return next({
-        status: 404,
+        status: 400,
         message: ['Please provide update array with id']
       })
     }
@@ -37,8 +37,8 @@ exports.updatePoProducts = async (req, res, next) => {
         ...update.quantity && {quantity: parseInt(update.quantity) - parseInt(doc.quantity)},
         ...update.scannedQuantity && {scannedQuantity: parseInt(update.scannedQuantity) - parseInt(doc.scannedQuantity)},
         name: doc.name,
-        name: doc.name,
         type: doc.type,
+        status: doc.status,
         poRef: doc.poRef,
         sku: doc.sku,
       })
@@ -47,10 +47,16 @@ exports.updatePoProducts = async (req, res, next) => {
     //upsert the pos, also upserts poProducts & products
     let schemaData = {
       company: req.body.company,
-      data,
+      json: data,
     }
     let validData = validateSchema({data: schemaData, schema: '/api/purchase-orders/import-csv'})
-    let poResult = await upsertPurchaseOrders(validData.value)
+    if (validData.error) {
+      return next({
+        status: 400,
+        message: validData.error.details.map(d => d.message),
+      })
+    }
+    let poResult = await upsertPurchaseOrders({data:validData.value.json, company: req.body.company,})
 
     //old update approach
     // let poProductUpdates = req.body.updates.map(p=>{

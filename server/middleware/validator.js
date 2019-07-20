@@ -10,7 +10,7 @@ const validSchemas = {
     lastName: Joi.string().empty(""),
     profileImageUrl: Joi.string().empty(""),
     remember: Joi.boolean(),
-  }).error(err => err.toString()),
+  }),
 
   //po product routes
   '/api/po-products/update': Joi.object().keys({
@@ -21,17 +21,14 @@ const validSchemas = {
       barcode: Joi.string(),
       scannedQuantity: Joi.number().integer(),
     })),
-  }).error(err => err.toString()),
+  }),
 
   '/api/po-products/delete': Joi.object().keys({
     company: Joi.string().required(),
     updates: Joi.array().max(7000).items(Joi.object().keys({
       id: Joi.string().regex(/^[a-f\d]{24}$/i).required(),
-      quantity: Joi.number().integer(),
-      barcode: Joi.string(),
-      scannedQuantity: Joi.number().integer(),
     })),
-  }).error(err => err.toString()),
+  }),
 
   //model routes
   '/api/models/query': Joi.object().keys({
@@ -48,7 +45,7 @@ const validSchemas = {
       Joi.array().items(Joi.string().empty(""),Joi.boolean(),Joi.array()),
     ).max(1000).default([]),
     populateArray: Joi.array().max(1000).default([]),
-  }).error(err => err.toString()),
+  }),
 
   '/api/models/get-all': Joi.object().keys({
     company: Joi.string().required(),
@@ -66,7 +63,7 @@ const validSchemas = {
     refModel: Joi.string().allow(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']),
     refUpdates: Joi.array().max(7000),
     data: Joi.array().max(7000).default([]).items(Joi.object()).required(),
-  }).error(err => err.toString()),
+  }),
 
   '/api/models/delete': Joi.object().keys({
     company: Joi.string().required(),
@@ -185,7 +182,7 @@ const validSchemas = {
       quantity: Joi.number().integer(),
       scannedQuantity: Joi.number().integer(),
     })),
-  }).error(err => err.toString()),
+  }),
 
   '/api/purchase-orders/update': Joi.object().keys({
     company: Joi.string().required(),
@@ -196,7 +193,7 @@ const validSchemas = {
       status: Joi.string().lowercase().allow(['complete', 'processing']),
       createdOn: Joi.date().max('now'),      
     })),
-  }).error(err => err.toString()),
+  }),
 
   '/api/purchase-orders/delete': Joi.object().keys({
     company: Joi.string().required(),
@@ -217,20 +214,20 @@ exports.validateSchema = function (config) {
       throw 'Invalid Schema'
     }
     return validSchemas[schema].validate(data,options)
-    switch(schema) {
-      case 'user':
-        return userSchema.validate(data,options);
-      case 'updatePoProduct':
-        return updatePoProductSchema.validate(data,{stripUnknown: true})
-      case 'productUpdate':
-        return productUpdateSchema.validate(data,{stripUnknown: true})
-      case 'poUpdate':
-        return poUpdateSchema.validate(data,{stripUnknown: true})
-      case 'modelQuery':
-        return modelQuerySchema.validate()
-      default :
-        throw 'Invalid Schema'
-    }
+    // switch(schema) {
+    //   case 'user':
+    //     return userSchema.validate(data,options);
+    //   case 'updatePoProduct':
+    //     return updatePoProductSchema.validate(data,{stripUnknown: true})
+    //   case 'productUpdate':
+    //     return productUpdateSchema.validate(data,{stripUnknown: true})
+    //   case 'poUpdate':
+    //     return poUpdateSchema.validate(data,{stripUnknown: true})
+    //   case 'modelQuery':
+    //     return modelQuerySchema.validate()
+    //   default :
+    //     throw 'Invalid Schema'
+    // }
   } catch (message) {
     message = message || 'Invalid Schema'
     return {

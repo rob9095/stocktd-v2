@@ -16,6 +16,7 @@ const upsertPurchaseOrders = (config) => {
   let {data, company, user } = config
   return new Promise( async (resolve,reject) => {
     try {
+      //add check here for correct config...
       if (data.length > 7000) {
         reject({
           status: 400,
