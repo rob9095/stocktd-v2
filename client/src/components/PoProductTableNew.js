@@ -379,7 +379,7 @@ class PoProductTableNew extends Component {
             { id: 'scannedQuantity', text: 'Scanned', width: 175, type: 'number', span: 8, className: 'no-wrap', render: (pop={})=> pop.scannedQuantity || 0, },
             { id: 'po', nestedKey: 'name', text: 'PO Name', width: 400, span: 8, className: 'no-wrap', noEdit: true },
             { id: 'po', nestedKey: 'type', text: 'PO Type', width: 250, span: 8, className: 'no-wrap', options: [{ id: 'Inbound' }, { id: 'Outbound' }], type: 'select', noEdit: true},
-            { id: 'status', text: 'PO Status', width: 250, span: 8, className: 'no-wrap', options: [{ id: 'Complete' }, { id: 'Processing' }], type: 'select', noEdit: true},
+            { id: 'po', nestedKey: 'status', text: 'PO Status', width: 250, span: 8, className: 'no-wrap', options: [{ id: 'Complete' }, { id: 'Processing' }], type: 'select', noEdit: true},
             { id: 'createdOn', text: 'Date Created', width: 100, type: 'date', span: 8, className: 'no-wrap', noEdit: true },
             { id: 'actions', text: 'Actions', width: 100, noSort: true, actionOptions: [{ name: 'Edit', key: 'edit' }, { name: 'Add to Order', key: 'add-to-order', }, { name: 'Add to PO', key: 'add-to-po', },{ name: 'Print Labels', key: 'print-label' },{ name: 'Delete', key: 'delete', }] },
           ]}

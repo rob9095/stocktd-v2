@@ -272,7 +272,7 @@ class DrawerForm extends Component {
         return (
           <Col xs={i.span*3} sm={i.span} key={id}>
             <FormItem label={`${i.text}`}>
-              {getFieldDecorator(id, { initialValue: i.render ? i.render(initialValue,'edit') : initialValue }, {
+              {getFieldDecorator(id, { initialValue: i.render ? i.render(item,'edit') : initialValue }, {
                  rules: [{
                    required: i.required,
                    message: i.message,

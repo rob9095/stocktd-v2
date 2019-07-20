@@ -258,7 +258,7 @@ class PoTableNew extends Component {
               id: 'name', text: 'Name', width: 400, span: 6, className: 'no-wrap',
               render: (po={},action) =>
                 action === 'edit' ? 
-                  po
+                  po.name
                 :
                   <Link to={{
                     pathname: '/app/po-products/'+po._id,

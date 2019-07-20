@@ -39,7 +39,7 @@ exports.updatePoProducts = async (req, res, next) => {
         name: doc.name,
         type: doc.type,
         status: doc.status,
-        poRef: doc.poRef,
+        //poRef: doc.poRef,
         sku: doc.sku,
       })
     })
