@@ -98,7 +98,12 @@ const validSchemas = {
   '/api/scans/update': Joi.object().keys({
     company: Joi.string().required(),
     data: Joi.array().max(7000).items(Joi.object().keys({
-      _id: Joi.string().regex(/^[a-f\d]{24}$/i).required(),
+      id: Joi.string().regex(/^[a-f\d]{24}$/i).required(),
+      quantity: Joi.number().integer(),
+      deleteDoc: Joi.boolean().allow(true,false),
+      locations: Joi.array().max(7000).items(Joi.string()),
+      name: Joi.string(),
+      prefix: Joi.string(),
     }).required()),
     user: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid user id provided`),
   }),

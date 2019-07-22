@@ -72,8 +72,17 @@ class DrawerForm extends Component {
       for (let input of this.props.inputs) {
         console.log(inputs[input.id + input.nestedKey])
         if (inputs[input.id + input.nestedKey] !== undefined) {
+          input.simpleRef ?
+          //overwrite the id in inputs with data
           inputs[input.id] = inputs[input.id+input.nestedKey]
-          delete inputs[input.id + input.nestedKey]
+          :
+          //add to object with nestedKeys
+          inputs[input.id] = {
+            ...inputs[input.id],
+            [input.nestedKey]: inputs[input.id + input.nestedKey],
+          }
+          //remove the old key
+          //delete inputs[input.id + input.nestedKey]
         }
       }
       // fitler out any empty entries or values that are the same
