@@ -95,7 +95,7 @@ exports.processProductImport = async (req, res, next) => {
 			let sku = err.errmsg.includes('skuCompany_1 dup key')
 			let message = barcode ? 'Duplicate barcode found' : sku ? 'Duplicate sku found' : 'Duplicate barcode or sku found'
 			return next({
-				status: 404,
+				status: 400,
 				//message: ['Duplicate SKUs or barcodes found.'],
 				message,
 			})

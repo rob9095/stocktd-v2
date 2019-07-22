@@ -18,7 +18,7 @@ const validSchemas = {
     updates: Joi.array().max(7000).items(Joi.object().keys({
       id: Joi.string().regex(/^[a-f\d]{24}$/i).required(),
       quantity: Joi.number().integer(),
-      barcode: Joi.string(),
+      productbarcode: Joi.string(),
       scannedQuantity: Joi.number().integer(),
     })),
   }),
@@ -185,6 +185,7 @@ const validSchemas = {
       status: Joi.string().lowercase().allow(['complete', 'processing']).required(),
       sku: Joi.string().required(),
       quantity: Joi.number().integer(),
+      barcode: Joi.string(),
       scannedQuantity: Joi.number().integer(),
     })),
   }),

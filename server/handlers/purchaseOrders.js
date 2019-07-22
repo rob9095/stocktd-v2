@@ -31,18 +31,11 @@ const upsertPurchaseOrders = (config) => {
         sku: po['sku'],
         quantity: po['quantity'] || 0,
         ...po.scannedQuantity && {scannedQuantity: po.scannedQuantity},
+        ...po.barcode && {barcode: po.barcode, barcodeCompany: po.barcode+"-"+company},
         company,
         skuCompany: `${po['sku']}-${company}`,
         ...po.poRef ? {poRef: po.poRef} : {poRef: `${company}-${po['name']}-${po['type']}`},
       }))
-      // let validPoData = validateSchema({data: poData, schema: 'poUpdate'})
-      // if (validPoData.error) {
-      //   reject({
-      //     status: 400,
-      //     message: validPoData.error.details.map(d => d.message),
-      //   })
-      //   return
-      // }
       let groupedPOs = groupBy(poData, 'poRef');
       let poUpdates = [];
       let poProductUpdates = [];
@@ -98,7 +91,7 @@ const upsertPurchaseOrders = (config) => {
                 update: {
                   company,
                   sku: product.sku,
-                  ...product.barcode && { barcodeCompany: product.barcode + "-" + company },
+                  ...product.barcode && { barcode: product.barcode, barcodeCompany: product.barcode + "-" + company },
                   skuCompany: currentSku,
                   $setOnInsert: {
                     createdOn: new Date(),
@@ -122,6 +115,9 @@ const upsertPurchaseOrders = (config) => {
           }
         }
       }
+      console.log({
+        productUpdates: productUpdates[0].updateOne.update
+      })
       let updatedPOs = poUpdates.length > 0 && await db.PurchaseOrder.bulkWrite(poUpdates)
       let updatedPoProducts = poProductUpdates.length > 0 && await db.PoProduct.bulkWrite(poProductUpdates)
       let updatedProducts = productUpdates.length > 0 && await db.Product.bulkWrite(productUpdates)
@@ -154,9 +150,19 @@ const upsertPurchaseOrders = (config) => {
       })
 
     } catch(err) {
-      console.log(err)
+      if (err.code === 11000) {
+        let barcode = err.errmsg.includes('barcodeCompany_1 dup key')
+        let sku = err.errmsg.includes('skuCompany_1 dup key')
+        let message = barcode ? 'Duplicate barcode found' : sku ? 'Duplicate sku found' : 'Duplicate barcode or sku found'
+        reject({
+          status: 400,
+          //message: ['Duplicate SKUs or barcodes found.'],
+          message,
+        })
+        return
+      }
       reject({
-        status: 404,
+        status: 400,
         message: err.toString(),
       })
     }

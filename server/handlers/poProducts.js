@@ -21,14 +21,6 @@ exports.updatePoProducts = async (req, res, next) => {
         message: ['Please provide update array with id']
       })
     }
-    //validate updates
-    // let validUpdates = validateSchema({data: req.body.updates, schema: 'updatePoProduct'})
-    // if (validUpdates.error) {
-    //   return next({
-    //     status: 404,
-    //     message: validUpdates.error.details.map(d=>d.message),
-    //   })
-    // }
     let data = await db.PoProduct.find({ company: req.body.company, $and: [{ $or: req.body.updates.map(p => ({ _id: p.id })) }]})
     data = data.map(doc=>{
       let update = req.body.updates.find(u=>u.id == doc._id)
@@ -36,6 +28,8 @@ exports.updatePoProducts = async (req, res, next) => {
         ...doc,
         ...update.quantity && {quantity: parseInt(update.quantity) - parseInt(doc.quantity)},
         ...update.scannedQuantity && {scannedQuantity: parseInt(update.scannedQuantity) - parseInt(doc.scannedQuantity)},
+        //allow nested updates for product barcode
+        ...update.productbarcode && { barcode: update.productbarcode },
         name: doc.name,
         type: doc.type,
         status: doc.status,
