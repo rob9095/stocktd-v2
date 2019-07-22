@@ -27,9 +27,14 @@ class PoProductTableNew extends Component {
   updateAndFilter = async (key,andQuery=[]) => {
     let filters = this.state.filters || []
     filters = [...andQuery, ...filters.filter(f => f[0] !== key)]
+    console.log({ filters, andQuery })
     await this.setState({filters})
-    this.fetchCurrentPOs()
-    console.log({filters, andQuery})
+    //only fetch currentPOs if we have them in the filters (i.e in the url params)
+    if (filters.filter(q => q[0] === 'po').length) {
+      this.fetchCurrentPOs()
+    } else {
+      this.setState({currentPOs: []})
+    }
   }
 
   fetchCurrentPOs = () => {
