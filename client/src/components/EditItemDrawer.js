@@ -131,8 +131,14 @@ class DrawerForm extends Component {
     });
   }
 
-  handleAutoUpdate = (clicked, id) => {
-    console.log(clicked)
+  handleAutoUpdate = (clicked, id, input) => {
+    console.log({clicked})
+    if (Array.isArray(input.linkedFields)) {
+      //only update if feild is empty
+      for (let {formRef, dataRef, type} of input.linkedFields) {
+        this.props.form.setFieldsValue({ [formRef]: type === 'date' ? moment(new Date(clicked.data[dataRef])) : clicked.data[dataRef] })
+      }
+    }
     this.props.form.setFieldsValue({ [id]: Array.isArray(clicked.id) && clicked.id.map(c =>c.id) || [] })
   }
 
@@ -154,8 +160,10 @@ class DrawerForm extends Component {
     const { getFieldDecorator } = this.props.form;
     let { item, inputs } = this.props
     let formInputs = inputs.map(i=>{
+      i = this.props.create && i.createInputConfig ? i = {...i,...i.createInputConfig} : i
       let initialValue = i.nestedKey && item[i.id] ? item[i.id][i.nestedKey] : item[i.id]
       let id = i.nestedKey ? i.id+i.nestedKey : i.id
+      i.noEdit = this.props.create ? i.noEdit = false : i.noEdit
       if (i.type === 'textarea') {
         return (
           <Col xs={i.span*3} sm={i.span} key={id}>
@@ -218,15 +226,16 @@ class DrawerForm extends Component {
                 }],
               })(
                 <AutoCompleteInput
-                  domRef={`${item._id || ''}-${i.id}edit-auto-select`}
+                  domRef={`${item._id || 'create'}-${i.id}edit-auto-select`}
                   queryModel={i.queryModel}
                   searchKey={i.nestedKey}
                   placeholder={i.text}
                   mode={i.autoCompleteMode}
-                  onUpdate={(clicked) => this.handleAutoUpdate(clicked, i.id)}
+                  onUpdate={(clicked) => this.handleAutoUpdate(clicked, id, i)}
                   skipSelectedCallback={true}
                   selected={Array.isArray(item[i.id]) ? item[i.id] : []}
-                >
+                  showAddOption={i.showAddOption}
+            >
                   <Input style={{ display: "none" }} />
                 </AutoCompleteInput>
               )}
@@ -243,7 +252,7 @@ class DrawerForm extends Component {
                    message: i.message,
                  }],
                })(
-                 <DatePicker locale={{dateFormat: "M-D-YY"}} disabledDate={(current) => current > moment().endOf('day')} onChange={this.handleDateChange} className={i.className} disabled={i.noEdit} />
+                 <DatePicker style={{minWidth: 252}} locale={{dateFormat: "M-D-YY"}} disabledDate={(current) => current > moment().endOf('day')} onChange={this.handleDateChange} className={i.className} disabled={i.noEdit} />
                )}
             </FormItem>
           </Col>
@@ -293,7 +302,7 @@ class DrawerForm extends Component {
         <Drawer
           className="stkd-drawer"
           title={this.props.title}
-          width={document.documentElement.clientWidth < 620 ? '100%' : 620}
+          width={document.documentElement.clientWidth < 300 ? '100%' : 300}
           placement="right"
           onClose={this.toggle}
           maskClosable={false}

@@ -270,7 +270,7 @@ class PoTableNew extends Component {
             },
             { id: 'type', text: 'Type', type: 'select', options: [{id: 'Inbound'},{id: 'Outbound'}], width: 250, span: 6, className: 'no-wrap' },
             { id: 'status', text: 'Status', width: 250, span: 6, className: 'no-wrap', options: [{ id: 'Complete' }, { id: 'Processing' }], type: 'select', },
-            { id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 6, className: 'no-wrap' },
+            { id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 6, className: 'no-wrap', render: ((p={})=>p.quantity || 0) },
             { id: 'createdOn', text: 'Date Created', width: 100, type: 'date', span: 8, className: 'no-wrap' },
             { id: 'actions', width: 100, noSort: true, actionOptions: [{ name: 'Edit', key: 'edit' }, { name: 'View', key: 'view', }, { name: 'Scan', key: 'scan', }, { name: 'Copy', key: 'copy', }, { name: 'Print Labels', key: 'print-label' }, { name: 'Delete', key: 'delete', }] },
           ]}

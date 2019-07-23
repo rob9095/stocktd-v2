@@ -703,7 +703,7 @@ class ProductTable extends Component {
           /> */}
           {(drawerItem === true || drawerItem._id) && (
             <EditItemDrawer
-              inputs={this.props.headers.filter(h => !h.noSort && h.noEdit !== 'hide').sort((a,b)=>a.editOrder > b.editOrder)}
+              inputs={this.props.headers.map(h=>({...h,span:24})).filter(h => !h.noSort && h.noEdit !== 'hide').sort((a,b)=>a.editOrder > b.editOrder)}
               item={drawerItem === true ? {} : drawerItem}
               title={`${drawerItem._id ? 'Edit' : 'Create'} ${this.props.editTitle || ''}`}
               onClose={() => this.setState({ drawerItem: null })}

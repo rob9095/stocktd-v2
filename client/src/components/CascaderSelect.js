@@ -9,11 +9,11 @@ class CascaderSelect extends Component {
     this.state = {
       searchValue: '',
       data: [],
-      emptyOption: { label: (<div style={{minWidth: 176}}><Empty imageStyle={{ height: 20 }} /></div>), value: 'empty', key: 'empty', disabled: true, text: '' },
+      emptyOption: { label: (<div style={{minWidth: 176}}><Empty imageStyle={{maxHeight: 20}} /></div>), value: 'empty', key: 'empty', disabled: true, text: '' },
       addNewOption: {
         label: (
-          <div style={{width: '100%', padding: '5px 10px'}}>
-            <Divider className="no-margin" />
+          <div style={{width: '100%'}}>
+            <div style={{height: 1, background: '#dee3f2',}} />
             <div className="flex align-items-center justify-content-center">
               <Button onClick={() => this.props.onAddNewItem() || this.close()} block className="no-border no-margin no-bg">
                 <Icon type="plus" style={{ marginRight: 5, }} /> {this.props.addOptionText || 'Add'}

@@ -163,6 +163,7 @@ class AutoCompleteInputForm extends Component {
         <Skeleton paragraph={false} loading={this.state.transition} active>
           {this.state.addItem ?
             <Input
+              autoFocus
               onChange={(e) => this.props.onAddItemInputChange(e.target.value)}
               suffix={
                 <Tooltip title="Cancel">
