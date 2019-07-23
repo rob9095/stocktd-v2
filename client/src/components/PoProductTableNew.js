@@ -7,7 +7,6 @@ import { updatePoProducts, removePoProducts } from '../store/actions/poProducts'
 import { importPurchaseOrder } from '../store/actions/purchaseOrders';
 import { queryModelData } from '../store/actions/models';
 import { addBoxScan } from '../store/actions/boxScans';
-import * as scanHandlers from "../store/actions/boxScans";
 import { addNotification, removeNotification } from '../store/actions/notifications';
 import AutoCompleteInput from './AutoCompleteInput';
 
@@ -80,7 +79,7 @@ class PoProductTableNew extends Component {
 
   handleDelete = ({data}) => {
     return new Promise(async (resolve, reject) => {
-      await scanHandlers.deleteBoxScans(data, this.props.currentUser.user.company)
+      await this.props.removePoProducts(data, this.props.currentUser)
         .then(res => {
           console.log(res)
           resolve(res)

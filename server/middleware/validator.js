@@ -20,14 +20,12 @@ const validSchemas = {
       quantity: Joi.number().integer(),
       productbarcode: Joi.string(),
       scannedQuantity: Joi.number().integer(),
-    })),
+    })).required(),
   }),
 
   '/api/po-products/delete': Joi.object().keys({
     company: Joi.string().required(),
-    updates: Joi.array().max(7000).items(Joi.object().keys({
-      id: Joi.string().regex(/^[a-f\d]{24}$/i).required(),
-    })),
+    data: Joi.array().max(7000).items(Joi.string().regex(/^[a-f\d]{24}$/i).required()).required(),
   }),
 
   //model routes

@@ -120,15 +120,23 @@ exports.updatePoProducts = async (req, res, next) => {
 */
 exports.removePoProducts = async (req, res, next) => {
   try {
-    let { data, company } = req.body 
-    let poProductRemovals = data.map(p=>{
+    let { data, company } = req.body
+    //find the poProducts
+    let poProducts = await db.PoProduct.find({company, $and: [{$or: data.map(_id=>({_id}))}]})
+    if (!poProducts.length){
+      return next({
+        status: 400,
+        message: 'No purchase order products found',
+      })
+    }
+    let poProductRemovals = poProducts.map(p=>{
       return ({
         deleteOne: {
           filter: {_id: p._id},
         }
       })
     })
-    let productUpdates = data.map(p => {
+    let productUpdates = poProducts.map(p => {
       return({
         updateOne: {
           filter: {_id: p.product},
@@ -141,7 +149,7 @@ exports.removePoProducts = async (req, res, next) => {
         }
       })
     })
-    let poUpdates = data.map(p => {
+    let poUpdates = poProducts.map(p => {
       return ({
         updateOne: {
           filter: {_id: p.po, company},
@@ -153,7 +161,7 @@ exports.removePoProducts = async (req, res, next) => {
     })
     // need to either delete boxes scannedTo and scannedFrom this po or move to generic pos
     // just delete boxes for now..
-    let boxRemovals = data.map(p => {
+    let boxRemovals = poProducts.map(p => {
       return({
         deleteOne: {
           filter: {po: p.po, poProduct: p._id},
