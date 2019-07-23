@@ -13,14 +13,14 @@ function groupBy(objectArray, property) {
 }
 
 const upsertPurchaseOrders = (config) => {
-  let {data, company, user } = config
+  let {data, company, user, assignGenerics } = config
   return new Promise( async (resolve,reject) => {
     try {
       //add check here for correct config...
-      if (data.length > 7000) {
+      if (!data || !company) {
         reject({
           status: 400,
-          message: ['Request to large']
+          message: ['Invalid Request']
         })
         return
       }
@@ -74,6 +74,7 @@ const upsertPurchaseOrders = (config) => {
                 filter: { skuCompany: currentSku, poRef },
                 update: {
                   ...product,
+                  poRef,
                   //if scannedSkuSum is defined update scannedQuantity otherwise update quantity
                   $inc: { ...scannedSkuSum ? { scannedQuantity: parseInt(scannedSkuSum) } : {quantity: parseInt(skuSum)} },
                   $setOnInsert: {
@@ -82,7 +83,7 @@ const upsertPurchaseOrders = (config) => {
                     ...!scannedSkuSum ? { scannedQuantity: 0 } : { quantity: parseInt(skuSum)},
                   }
                 },
-                upsert: true
+                upsert: true,
               }
             });
             productUpdates.push({
@@ -125,17 +126,26 @@ const upsertPurchaseOrders = (config) => {
         //need to add refs for products and pos if we upserted any PoProducts
         let andQuery = Object.values(updatedPoProducts.upsertedIds).map(val => ({ "_id": val }))
         let poProducts = await db.PoProduct.find({ company, $and: [{ $or: andQuery }] })
-        let productAndQuery = poProducts.map(doc => ({ skuCompany: doc.skuCompany, company }))
+        let productAndQuery = poProducts.map(doc => ({ sku: doc.sku, company }))
         let products = await db.Product.find({ company, $and: [{ $or: productAndQuery }] })
         let poAndQuery = poProducts.map(doc => ({ company, poRef: doc.poRef }))
         let pos = await db.PurchaseOrder.find({ company, $and: [{ $or: poAndQuery }] })
+        console.log({
+          poProducts,
+          products,
+          pos,
+        })
         poProductUpdates = []
         for (let poProduct of poProducts) {
+          console.group({
+            foundProduct: products.find(p => p.sku === poProduct.sku),
+            foundPO: pos.find(po => po.poRef === poProduct.poRef),
+          })
           poProductUpdates.push({
             updateOne: {
               filter: { _id: poProduct._id },
               update: {
-                product: products.find(p => p.skuCompany === poProduct.skuCompany)._id,
+                product: products.find(p => p.sku === poProduct.sku)._id,
                 po: pos.find(po => po.poRef === poProduct.poRef)._id,
               },
             }

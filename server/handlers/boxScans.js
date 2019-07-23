@@ -331,7 +331,7 @@ const updateBoxScans = (config) => {
   let { boxes, company, user } = config
   return new Promise( async (resolve, reject) => {
     try {
-      if (!Array.isArray(boxes) || boxes.filter(id => typeof id !== 'string').length > 0) {
+      if (!Array.isArray(boxes) || boxes.filter(box => typeof box.id !== 'string').length > 0) {
         reject({
           message: ['Please provide array of box ids in string format']
         })
@@ -540,7 +540,7 @@ exports.upsertBoxScan = async (req, res, next) => {
 exports.deleteBoxScans = async (req, res, next) => {
   try {
     let result = await updateBoxScans({
-      boxes: req.body.data.map(id => ({ _id: id, deleteDoc: true })),
+      boxes: req.body.data.map(id => ({ id: id, deleteDoc: true })),
       company: req.body.company,
       user: req.body.user,
     })
@@ -569,10 +569,9 @@ const bulkUpsertBoxScans = (config) => {
   return new Promise(async (resolve,reject) =>{
     try {
       //get existing values
-
-      let purchaseOrders = await db.PurchaseOrder.find({ $and: [{ $or: data.map(row => ({ company: row.company, ...row.poRef ? {poRef: row.poRef} : {defaultInbound: true} })) }] })
-      let poProducts = await db.PoProduct.find({ $and: [{ $or: purchaseOrders.map(po => ({ company: row.company, po: po._id, sku: row.sku })) }] })
-      let products = await db.Product.find({ $and: [{ $or: data.map(row => ({ company: row.company, sku: row.sku })) }] })
+      let purchaseOrders = await db.PurchaseOrder.find({ company, $and: [{ $or: data.map(row => ({ poRef: row.poRef })) }] })
+      let poProducts = await db.PoProduct.find({ company, $and: [{ $or: purchaseOrders.map(po => ({ po: po._id })) }] })
+      let products = await db.Product.find({ company, $and: [{ $or: data.map(row => ({ sku: row.sku })) }] })
       //get the first user's prefix for now
       let [prefix, ...others] = await db.BoxPrefix.find(({user: user}))
       //upsert the locations with unique set
@@ -581,7 +580,7 @@ const bulkUpsertBoxScans = (config) => {
         locations = await upsertScanLocation({ locations, company, filterRef: 'name' })
       }
       let boxUpserts = data.map(box => {
-        let po = box.poRef ? purchaseOrders.find(po => po.poRef === box.poRef) : purchaseOrders.find(po=>po.defaultInbound === true)
+        let po = purchaseOrders.find(po => po.poRef === box.poRef)
         let poProduct = poProducts.find(p => p.poRef === box.poRef && p.sku === box.sku)
         let product = products.find(p => p.sku === box.sku)
         if (!po || !poProduct || !product) {
@@ -653,23 +652,29 @@ exports.importBoxScans = async (req, res, next) => {
       })
     }
     let data = req.body.data.map(row => {
-      const inputs = { sku, name, quantity, locations, barcode, prefix } = row
+      const inputs = { sku, quantity, locations, barcode, prefix } = row
       return({
         ...inputs,
+        name: row['box name'],
         //if scan from value in row is yes use quantity as scannedQuantity and set scanToPo to false
         ...row['scan from'] === 'yes' ? {scannedQuantity: quantity, scanToPo: false} : {scanToPo: true},
         // if we got a po name and po type set the poRef
-        ...row['po name'] && row['po type'] &&
-          { poRef: req.body.company + "-" + row['po name'] + "-" + row['po type'], poName: row['po name'], poType: row['po type'] },
-        //name: row['box name'],
+        ...row['po name'] && row['po type'] ?
+          { poRef: req.body.company + "-" + row['po name'] + "-" + row['po type']}
+          :
+          { poRef: req.body.company + "-" + `Generic` + "-" + `${row['po type'] || 'inbound'}`},
+        poName: row['po name'],
+        poType: row['po type'],
         company: req.body.company,
       })
     })
 
+    console.log({data})
+
     //upsert the pos, also upserts poProducts & products
     let upsertData = {
       company: req.body.company,
-      data: data.map(row => ({
+      json: data.map(row => ({
         name: row.poName,
         type: row.poType,
         ...row.poRef && { poRef: row.poRef },
@@ -685,7 +690,8 @@ exports.importBoxScans = async (req, res, next) => {
         message: validData.error.details.map(d=>d.message),
       })
     }
-    let poResult = await upsertPurchaseOrders(validData.value)
+    console.log({validData: validData.value.json})
+    let poResult = await upsertPurchaseOrders({data:validData.value.json, company: validData.value.company, assignGenerics: true})
     
     //upsert the boxScans
     let boxScanResult = await bulkUpsertBoxScans({
