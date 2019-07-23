@@ -16,9 +16,9 @@ class ProductTableNew extends Component {
     }
   }
 
-  handleDelete = (ids) => {
+  handleDelete = ({data}) => {
     return new Promise((resolve,reject) => {
-      const updates = ids.map(id=>({id, action: 'delete'}))
+      const updates = data.map(id=>({id, action: 'delete'}))
       return this.handleImport(updates)
       .then(res=>{
         console.log(res)

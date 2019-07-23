@@ -331,7 +331,7 @@ const updateBoxScans = (config) => {
   let { boxes, company, user } = config
   return new Promise( async (resolve, reject) => {
     try {
-      if (!Array.isArray(boxes) || boxes.filter(box => typeof box.id !== 'string').length > 0) {
+      if (!Array.isArray(boxes) || boxes.filter(id => typeof id !== 'string').length > 0) {
         reject({
           message: ['Please provide array of box ids in string format']
         })

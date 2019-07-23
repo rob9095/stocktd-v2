@@ -213,15 +213,12 @@ class ProductTable extends Component {
     }
 
     handleBulkMenuClick = async ({ item, key, keyPath }) => {
-      let foundOption = this.props.bulkMenuOptions.find(o => o.handler && o.key === key)
+      let foundOption = this.props.bulkMenuOptions.find(o => o.handler && o.key === key) || {}
       switch(key) {
         case 'delete':
           let items = await this.showConfirm(null,'Delete',this.state.selected)
           if (items !== 'cancel') {
-            let result = foundOption ? await foundOption.handler(items) : this.handleRowDelete(items);
-            if (foundOption) {
-              result.error ? console.log(result) : this.handleRowDelete(items)
-            }
+            foundOption.handler ? this.handleRowDelete(items,foundOption.handler) : this.handleRowDelete(items)
           }
           break;
         case 'bulk-edit':
@@ -237,7 +234,7 @@ class ProductTable extends Component {
           })
           break;
         default:
-          foundOption && foundOption.handler && foundOption.handler(({item, key, keyPath, selected: this.state.selected}))
+          foundOption.handler && foundOption.handler(({item, key, keyPath, selected: this.state.selected}))
       }
     }
 
@@ -269,7 +266,7 @@ class ProductTable extends Component {
       message[type](text)
     }
 
-    handleRowDelete = async (ids, ignore) => {
+    handleRowDelete = async (ids, handler, ignore) => {
       this.setState({
         loadingRows: [...this.state.loadingRows, ...ids]
       })
@@ -277,7 +274,8 @@ class ProductTable extends Component {
       let selected = this.state.selected.filter(id => ids.indexOf(id) === -1)
       const end = ids.length > 1 ? 's' : ''
       if (ignore !== true) {
-        await this.props.deleteModelDocuments(this.props.queryModel, ids, this.props.currentUser)
+        let fn = handler || this.props.deleteModelDocuments
+        await fn({model: this.props.queryModel, data: ids, currentUser: this.props.currentUser})
           .then(res => {
             this.handleMessage('success', `${ids.length} record${end} deleted`)
             this.setState({
@@ -287,7 +285,7 @@ class ProductTable extends Component {
           })
           .catch(err => {
             console.log(err)
-            this.handleMessage('error', err)
+            this.handleMessage('error', err.message)
           })
       } else {
         this.handleMessage('success', `${ids.length} record${end} deleted`)

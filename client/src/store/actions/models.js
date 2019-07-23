@@ -16,7 +16,7 @@ export function queryModelData(model, query, sortBy, sortDirection, activePage, 
 	}
 }
 
-export function deleteModelDocuments(model, data, currentUser){
+export function deleteModelDocuments({model, data, currentUser}){
   return dispatch => {
 		return new Promise((resolve,reject) => {
 			return apiCall('post', '/api/models/delete', {model, data, company: currentUser.user.company})

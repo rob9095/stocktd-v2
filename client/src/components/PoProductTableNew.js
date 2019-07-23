@@ -78,9 +78,9 @@ class PoProductTableNew extends Component {
     }
   }
 
-  handleDelete = (ids) => {
+  handleDelete = ({data}) => {
     return new Promise(async (resolve, reject) => {
-      await scanHandlers.deleteBoxScans(ids, this.props.currentUser.user.company)
+      await scanHandlers.deleteBoxScans(data, this.props.currentUser.user.company)
         .then(res => {
           console.log(res)
           resolve(res)

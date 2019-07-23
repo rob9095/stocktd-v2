@@ -16,9 +16,9 @@ class PoTableNew extends Component {
     }
   }
 
-  handleDelete = (ids) => {
+  handleDelete = ({data}) => {
     return new Promise((resolve, reject) => {
-      let updates = ids.map(id=>({id}))
+      let updates = data.map(id=>({id}))
       return this.props.removePurchaseOrders(updates, this.props.currentUser)
         .then(res => {
           console.log(res)
