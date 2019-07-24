@@ -377,9 +377,9 @@ class PoProductTableNew extends Component {
           ]}
           headers={[
             { id: 'select-all', text: '', width: 75, noSort: true },
-            { id: 'sku', text: 'SKU', width: 175, span: 8, className: 'no-wrap', noEdit: true, createInputConfig: { type: 'autoComplete', queryModel: 'Product', nestedKey: 'sku', linkedFields: [{formRef:'productbarcode',dataRef: 'barcode'}], showAddOption: true, }, },
+            { id: 'sku', text: 'SKU', width: 175, span: 8, className: 'no-wrap', noEdit: true, createInputConfig: { type: 'autoComplete', queryModel: 'Product', nestedKey: 'sku', linkedFields: [{formRef:'productbarcode',dataRef: 'barcode'}], showAddOption: true, required: true }, },
             { id: 'product', nestedKey: 'barcode', text: 'Barcode', width: 175, span: 8, className: 'no-wrap', noBulkEdit: true},
-            { id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 8, className: 'no-wrap', render: (pop={})=> pop.quantity || 0, },
+            { id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 8, className: 'no-wrap', render: (pop = {}) => pop.quantity || 0, createInputConfig: { required: true } },
             { id: 'scannedQuantity', text: 'Scanned', width: 175, type: 'number', span: 8, className: 'no-wrap', render: (pop={})=> pop.scannedQuantity || 0, },
             { id: 'po', nestedKey: 'name', text: 'PO Name', width: 400, span: 8, className: 'no-wrap', noEdit: true, createInputConfig: { type: 'autoComplete', queryModel: 'PurchaseOrder', nestedKey: 'name', linkedFields: [{ formRef: 'potype', dataRef: 'type' }, {formRef: 'postatus', dataRef: 'status'}, {formRef:'pocreatedOn', dataRef: 'createdOn', type: 'date'}], }, },
             { id: 'po', nestedKey: 'type', text: 'PO Type', width: 250, span: 8, className: 'no-wrap', options: [{ id: 'Inbound' }, { id: 'Outbound' }], type: 'select', noEdit: true},

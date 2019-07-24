@@ -139,7 +139,7 @@ class DrawerForm extends Component {
         this.props.form.setFieldsValue({ [formRef]: type === 'date' ? moment(new Date(clicked.data[dataRef])) : clicked.data[dataRef] })
       }
     }
-    this.props.form.setFieldsValue({ [id]: Array.isArray(clicked.id) && clicked.id.map(c =>c.id) || [] })
+    this.props.form.setFieldsValue({ [id]: Array.isArray(clicked.id) ? clicked.id.map(c =>c.id) : clicked.data[input.nestedKey || input.id] })
   }
 
   handlerCascaderUpdate = (value, options, i) => {
@@ -160,9 +160,9 @@ class DrawerForm extends Component {
     const { getFieldDecorator } = this.props.form;
     let { item, inputs } = this.props
     let formInputs = inputs.map(i=>{
-      i = this.props.create && i.createInputConfig ? i = {...i,...i.createInputConfig} : i
       let initialValue = i.nestedKey && item[i.id] ? item[i.id][i.nestedKey] : item[i.id]
       let id = i.nestedKey ? i.id+i.nestedKey : i.id
+      i = this.props.create && i.createInputConfig ? i = { ...i, ...i.createInputConfig } : i
       i.noEdit = this.props.create ? i.noEdit = false : i.noEdit
       if (i.type === 'textarea') {
         return (
@@ -219,10 +219,10 @@ class DrawerForm extends Component {
         return (
           <Col xs={i.span * 3} sm={i.span} key={id}>
             <FormItem label={`${i.text}`}>
-              {getFieldDecorator(i.id, { initialValue }, {
+              {getFieldDecorator(id, { initialValue }, {
                 rules: [{
                   required: i.required,
-                  message: i.message,
+                  message: i.message || i.text+' is required',
                 }],
               })(
                 <AutoCompleteInput
