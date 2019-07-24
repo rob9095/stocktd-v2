@@ -127,7 +127,7 @@ class ProductTable extends Component {
         nType: 'notification',
         id: 'fetch-error',
         icon: <Icon type="close-circle" style={{color: 'red'}} />,
-        message: err ? err.message || 'Something went wrong' : 'Something went wrong',
+        message: err || 'Something went wrong',
         onClose: () => this.props.removeNotification({ id: 'fetch-error', })
       })
       this.setState({

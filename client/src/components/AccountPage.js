@@ -37,9 +37,16 @@ class AccountPage extends Component {
     .then(res=>{
       const [account, ...rest] = res.data
       this._isMounted && this.setState({account, loading: false})
-    }).catch(error=>{
-      console.log(error)
-      this._isMounted && this.setState({error, loading: false})
+    }).catch(err=>{
+      console.log(err)
+      this._isMounted && this.setState({error:err, loading: false})
+      this.props.addNotification({
+        nType: 'notification',
+        id: 'fetch-error',
+        icon: <Icon type="close-circle" style={{ color: 'red' }} />,
+        message: err || 'Something went wrong',
+        onClose: () => this.props.removeNotification({ id: 'fetch-error', })
+      })
     })
   }
 

@@ -30,10 +30,10 @@ const validSchemas = {
 
   //model routes
   '/api/models/query': Joi.object().keys({
-    model: Joi.string().allow(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']).required(),
+    model: Joi.string().valid(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']).required(),
     company: Joi.string().required(),
     sortBy: Joi.string(),
-    sortDirection: Joi.string().lowercase().allow(['asc', 'desc', 'ascending', 'descending', '1', '-1']).default('asc'),
+    sortDirection: Joi.string().lowercase().valid(['asc', 'desc', 'ascending', 'descending', '1', '-1']).default('asc'),
     activePage: Joi.number().integer().default(1),
     rowsPerPage: Joi.number().integer().default(10),
     query: Joi.array().items(
@@ -51,21 +51,21 @@ const validSchemas = {
     documentRef: Joi.object(),
     regex: Joi.boolean().default(false),
     populateArray: Joi.array().max(1000).default([]),
-    model: Joi.string().allow(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']).required(),
+    model: Joi.string().valid(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']).required(),
   }),
 
   '/api/models/upsert': Joi.object().keys({
     company: Joi.string().required(),
-    model: Joi.string().allow(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']).required(),
+    model: Joi.string().valid(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']).required(),
     filterRef: Joi.string().required(),
-    refModel: Joi.string().allow(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']),
+    refModel: Joi.string().valid(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']),
     refUpdates: Joi.array().max(7000),
     data: Joi.array().max(7000).default([]).items(Joi.object()).required(),
   }),
 
   '/api/models/delete': Joi.object().keys({
     company: Joi.string().required(),
-    model: Joi.string().allow(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']).required(),
+    model: Joi.string().valid(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']).required(),
     data: Joi.array().max(7000).items(Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid id provided`)).required(),
   }),
 
@@ -75,7 +75,7 @@ const validSchemas = {
     scan: Joi.object().keys({
       barcode: Joi.string().required(),
       sku: Joi.string(),
-      scanToPo: Joi.boolean().allow([true,false]).required(),
+      scanToPo: Joi.boolean().valid([true,false]).required(),
       currentPOs: Joi.array().items(Joi.object().keys({
         poRef: Joi.string().required(),
         _id: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid user id provided`),
@@ -98,7 +98,7 @@ const validSchemas = {
     data: Joi.array().max(7000).items(Joi.object().keys({
       id: Joi.string().regex(/^[a-f\d]{24}$/i).required(),
       quantity: Joi.number().integer(),
-      deleteDoc: Joi.boolean().allow(true,false),
+      deleteDoc: Joi.boolean().valid(true,false),
       locations: Joi.array().max(7000).items(Joi.string()),
       name: Joi.string(),
       prefix: Joi.string(),
@@ -115,9 +115,9 @@ const validSchemas = {
       locations: Joi.alternatives().try(Joi.array().max(7000).items(Joi.string().allow('').required()),Joi.string().allow('')),
       barcode: Joi.string(),
       prefix: Joi.string(),
-      'scan from': Joi.string().lowercase().allow('yes','no',''),
+      'scan from': Joi.string().lowercase().valid('yes','no',''),
       'po name': Joi.string().allow(''),
-      'po type': Joi.string().allow('inbound','outbound',''),
+      'po type': Joi.string().valid('inbound','outbound',''),
     }).required()),
     user: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid user id provided`),
   }),
@@ -137,7 +137,7 @@ const validSchemas = {
       companyId: Joi.string().regex(/^[a-f\d]{24}$/i).error(() => `Invalid Company ID provided`),
       defaultBox: Joi.string().regex(/^[a-f\d]{24}$/i).error(() => `Invalid Default Box ID provided`),
       defaultLocation: Joi.string().regex(/^[a-f\d]{24}$/i).error(() => `Invalid Default Location ID provided`),
-      quantity: Joi.number().integer(),
+      quantity: Joi.number().integer().default(0),
       barcode: Joi.string(),
       sku: Joi.string(),
       title: Joi.string().empty(''),
@@ -145,9 +145,9 @@ const validSchemas = {
       brand: Joi.string().empty(''),
       asin: Joi.string().empty(''),
       weight: Joi.number().empty('').precision(2),
-      price: Joi.number().empty('').precision(2),
-      action: Joi.string().lowercase().allow(['delete']),
-    })),
+      price: Joi.number().empty('').precision(2).default(0),
+      action: Joi.string().lowercase().valid(['delete']),
+    }).or('sku','id')),
   }),
 
   '/api/products/update': Joi.object().keys({
@@ -179,8 +179,8 @@ const validSchemas = {
     company: Joi.string().required(),
     json: Joi.array().max(7000).items(Joi.object().keys({
       name: Joi.string().empty("").default('Generic'),
-      type: Joi.string().lowercase().allow(['inbound', 'outbound',]).empty("").default('inbound'),
-      status: Joi.string().lowercase().allow(['complete', 'processing',]).empty("").default('processing'),
+      type: Joi.string().lowercase().valid(['inbound', 'outbound',]).empty("").default('inbound'),
+      status: Joi.string().lowercase().valid(['complete', 'processing',]).empty("").default('processing'),
       sku: Joi.string().required(),
       quantity: Joi.number().integer(),
       barcode: Joi.string(),
@@ -194,8 +194,8 @@ const validSchemas = {
     updates: Joi.array().max(3000).items(Joi.object().keys({
       id: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid id provided`),
       name: Joi.string(),
-      type: Joi.string().lowercase().allow(['inbound', 'outbound']),
-      status: Joi.string().lowercase().allow(['complete', 'processing']),
+      type: Joi.string().lowercase().valid(['inbound', 'outbound']),
+      status: Joi.string().lowercase().valid(['complete', 'processing']),
       createdOn: Joi.date().max('now'),      
     })),
   }),
