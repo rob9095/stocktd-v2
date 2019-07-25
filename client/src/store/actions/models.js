@@ -1,5 +1,8 @@
+import React from 'react';
 import { apiCall } from '../../services/api';
 import { addError } from './errors';
+import { addNotification, removeNotification } from './notifications';
+import { Icon } from 'antd';
 
 export function queryModelData(model, query, sortBy, sortDirection, activePage, rowsPerPage, company, populateArray){
   return dispatch => {
@@ -9,6 +12,13 @@ export function queryModelData(model, query, sortBy, sortDirection, activePage, 
 				resolve(res);
 			})
 			.catch(err => {
+				dispatch(addNotification({
+					nType: 'notification',
+					id: 'fetch-error',
+					icon: <Icon type="close-circle" style={{ color: 'red' }} />,
+					message: err && err.message || 'Something went wrong',
+					onClose: () => dispatch(removeNotification({ id: 'fetch-error', }))
+				}))
 				dispatch(addError(err.message));
 				reject(err.message);
 			})

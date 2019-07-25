@@ -135,8 +135,9 @@ class DrawerForm extends Component {
     console.log({clicked})
     if (Array.isArray(input.linkedFields)) {
       //only update if feild is empty
-      for (let {formRef, dataRef, type} of input.linkedFields) {
-        this.props.form.setFieldsValue({ [formRef]: type === 'date' ? moment(new Date(clicked.data[dataRef])) : clicked.data[dataRef] })
+      for (let {formRef, dataRef, type, render } of input.linkedFields) {
+        let value = type === 'date' ? moment(new Date(clicked.data[dataRef])) : render ? render(clicked.data) : clicked.data[dataRef]
+        this.props.form.getFieldValue(formRef) ? this.props.form.setFieldsValue({ [formRef]: value }) : null
       }
     }
     this.props.form.setFieldsValue({ [id]: Array.isArray(clicked.id) ? clicked.id.map(c =>c.id) : clicked.data[input.nestedKey || input.id] })
@@ -158,7 +159,7 @@ class DrawerForm extends Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    let { item, inputs } = this.props
+    let { item, inputs, } = this.props
     let formInputs = inputs.map(i=>{
       let initialValue = i.nestedKey && item[i.id] ? item[i.id][i.nestedKey] : item[i.id]
       let id = i.nestedKey ? i.id+i.nestedKey : i.id
@@ -258,7 +259,7 @@ class DrawerForm extends Component {
           </Col>
         )
       } else if (i.type === 'select') {
-        let foundOption = initialValue ? i.options.find(({id}) => id.toLowerCase() === initialValue.toLowerCase()) : i.options[0]
+        let foundOption = initialValue !== undefined ? i.options.find(({id}) => id.toString().toLowerCase() === initialValue.toString().toLowerCase() ) : i.options[0]
         return (
           <Col xs={i.span*3} sm={i.span} key={id}>
             <FormItem label={`${i.text}`}>

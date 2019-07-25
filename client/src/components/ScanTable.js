@@ -118,16 +118,17 @@ class ScanTable extends Component {
           ]}
           tableMenuOptions={[
             { name: 'Import', key: 'import', },
+            { name: 'Add One', key: 'add', },
             { name: 'Display Options', key: 'display-options' },
           ]}
           headers={[
             { id: 'select-all', text: '', width: 75, noSort: true },
-            { id: 'sku', text: 'SKU', width: 175, span: 8, className: 'no-wrap', noEdit: true },
+            { id: 'sku', text: 'SKU', width: 175, span: 8, className: 'no-wrap', noEdit: true, createInputConfig: { type: 'autoComplete', queryModel: 'Product', nestedKey: 'sku', linkedFields: [{ formRef: 'productbarcode', dataRef: 'barcode' }], showAddOption: true, required: true }, },
             { id: 'name', text: 'Box Name', width: 175, span: 8, className: 'no-wrap', required: true },
             { id: 'prefix', text: 'Box Prefix', width: 175, span: 8, className: 'no-wrap', required: true, },
             { id: 'quantity', text: 'Quantity', width: 175, type: 'number', span: 8, className: 'no-wrap', required: true },
-            { id: 'scanToPo', text: 'Scan Type', width: 175, span: 8, className: 'no-wrap', noEdit: true, render: (val)=>(val === true ? 'Scan To' : 'Scan From'), noFilter: true,},
-            { id: 'po', nestedKey: 'name', text: 'PO Name', width: 175, span: 8, className: 'no-wrap', noEdit: true },
+            { id: 'scanToPo', text: 'Scan Type', width: 175, span: 8, className: 'no-wrap', noEdit: true, render: (po={}) => (po.scanToPo === true ? 'Scan To' : 'Scan From'), options: [{ id: 'true', text: 'Scan To' }, { id: 'false', text: 'Scan From' }], type: 'select', noFilter: true,},
+            { id: 'po', nestedKey: 'name', text: 'PO Name', width: 175, span: 8, className: 'no-wrap', noEdit: true, createInputConfig: { type: 'autoComplete', queryModel: 'PurchaseOrder', nestedKey: 'name', showAddOption: true, linkedFields: [{ formRef: 'potype', dataRef: 'type', render: (po = {}) => po.type && po.type.charAt(0).toUpperCase() + po.type.slice(1), }, { formRef: 'postatus', dataRef: 'status', render: (po = {}) => po.status && po.status.charAt(0).toUpperCase() + po.status.slice(1), }, { formRef: 'pocreatedOn', dataRef: 'createdOn', type: 'date' }], }, },
             { id: 'po', nestedKey: 'type', text: 'PO Type', width: 175, span: 8, className: 'no-wrap', options: [{ id: 'Inbound' }, { id: 'Outbound' }], type: 'select', noEdit: true },
             { id: 'po', nestedKey: 'status', text: 'PO Status', width: 175, span: 8, className: 'no-wrap', options: [{ id: 'Complete' }, { id: 'Processing' }], type: 'select', noEdit: true },
             { id: 'locations', nestedKey: 'name', type: 'autoComplete', autoCompleteMode: 'tags', refModel: 'BoxScan', queryModel: 'Location', upsertOnChange: true,text: 'Location', width: 175, span: 8, className: 'no-wrap', },
