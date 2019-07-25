@@ -9,7 +9,7 @@ export function verifyUserEmail(token_id, user){
   return dispatch => {
 		return new Promise(async (resolve,reject) => {
 			try {
-				let res = await apiCall('post', `/api/account/verify/${token_id}`)
+				let res = await apiCall('post', `/api/account/verify`, {token_id})
 				user.id ? await dispatch(authUser('signin', { ...user, silentAuth: true })) : dispatch(addError({ message: 'Email Verified', status: 'success' }))
 				dispatch(removeNotification({ id: 'verify-email' }))
 				dispatch(addNotification({ closable: true, onClose: () => dispatch(removeNotification({ id: 'verify-email-confirm' })), banner: true, type: 'success', message: 'Thanks for confirming your email.', id: 'verify-email-confirm' }));
@@ -57,7 +57,7 @@ export function updateAccount(config) {
 	return dispatch => {
 		return new Promise((resolve, reject) => {
 			const { user, update } = config
-			return apiCall('post', `/api/account/update-account`, { user, update })
+			return apiCall('post', `/api/account/update`, { user, update })
 				.then((res) => {
 					update.email && dispatch(authUser('signin', { ...user, email: update.email, silentAuth: true })) && dispatch(addNotification({ banner: true, type: 'warning', message: (<Link to="/app/account" style={{ color: 'rgb(47, 41, 54)', borderBottom: '1px dotted black' }}>You're almost there! Please verify your email address.</Link>), id: 'verify-email' }))
 					resolve(res);

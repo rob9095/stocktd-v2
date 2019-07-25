@@ -1,15 +1,33 @@
 const db = require('../models');
 const { emailStyles, sendEmail } = require('../services/sendEmail');
 
+exports.getAccountDetails = async function(req, res, next) {
+	try {
+		let foundUser = await db.User.findOne({_id: req.user._id})
+		if (!foundUser) {
+			return next({
+				status: 400,
+				message: 'User not found',
+			})
+		}
+		let user = { firstName, lastName, email, profileImgUrl, company, emailVerified, } = foundUser
+		return res.status(200).json({
+			user
+		})
+	} catch(err) {
+		return next(err)
+	}
+}
+
 exports.verifySignUpToken = async function(req, res, next) {
 	try {
-    if (!req.params.token_id.match(/^[0-9a-fA-F]{24}$/)) {
+    if (!req.body.token_id.match(/^[0-9a-fA-F]{24}$/)) {
       return next({
         status: 400,
-				message: 'Invalid request'
+				message: 'Invalid token'
       })
     }
-    let token = await db.UserToken.findOne({_id: req.params.token_id})
+    let token = await db.UserToken.findOne({_id: req.body.token_id})
     if (token) {
       // update user and remove token
       let user = await db.User.findOne({_id: token.user})
@@ -24,7 +42,7 @@ exports.verifySignUpToken = async function(req, res, next) {
     } else {
       return next({
         status: 400,
-        message: 'Invalid request',
+        message: 'Invalid token',
       })
     }
 	} catch(err) {
