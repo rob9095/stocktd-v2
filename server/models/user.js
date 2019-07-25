@@ -86,7 +86,7 @@ userSchema.methods.comparePassword = async function(candidatePassword, next) {
 		let isMatch = await bcrypt.compareSync(candidatePassword, this.password);
 		return isMatch;
 	} catch(err){
-		return next(err);
+		return err;
 	}
 };
 

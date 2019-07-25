@@ -24,6 +24,7 @@ const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 
 class DashboardNew extends Component {
+  _isMounted = false
   constructor(props) {
     super(props)
     this.state = {
@@ -78,8 +79,10 @@ class DashboardNew extends Component {
   }
 
   checkAuth = () => {
-    if (!this.props.currentUser.isAuthenticated) {
-      this._isMounted && this.setState({
+    if (!this.props.currentUser.isAuthenticated && this._isMounted) {
+      console.log('check auth failed!')
+      console.log({currentUser: this.props.currentUser})
+      this.setState({
         loginRedirect: true,
         redirectPath: '/signin',
       })

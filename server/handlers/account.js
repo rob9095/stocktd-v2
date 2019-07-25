@@ -226,7 +226,9 @@ exports.resetPassword = async (req, res, next) => {
 			...result,
 		})
 	} catch(err) {
-		return next(err)
+		//return next(err)
+		console.log(err)
+		return res.status(400).json({message:err})
 	}
 }
 

@@ -43,10 +43,6 @@ class AuthForm extends Component {
     this._isMounted = false
   }
 
-  clearErrors = () => {
-    this.props.removeError();
-  }
-
   render() {
     const { getFieldDecorator } = this.props.form;
     const { signUp, heading, buttonText, errors, history, removeError } = this.props;

@@ -64,12 +64,12 @@ const validSchemas = {
   }),
 
   '/api/models/get-all': Joi.object().keys({
-    company: Joi.string().required(),
+    company: Joi.string(),
     limit: Joi.number().integer().default(10).max(100),
     documentRef: Joi.object(),
     regex: Joi.boolean().default(false),
     populateArray: Joi.array().max(1000).default([]),
-    model: Joi.string().valid(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix']).required(),
+    model: Joi.string().valid(['Product', 'PoProduct', 'PurchaseOrder', 'Location', 'BoxScan', 'BoxPrefix', 'UserToken']).required(),
   }),
 
   '/api/models/upsert': Joi.object().keys({
@@ -226,7 +226,6 @@ const validSchemas = {
   }),
 
   //account routes
-  
   '/api/account/email-verification': Joi.object().keys({
     user: Joi.object().keys({
       id: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid id provided`),
@@ -237,7 +236,7 @@ const validSchemas = {
     token: Joi.object().keys({
       _id: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid token provided`),
       user: Joi.object().keys({
-        _id: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid _id provided`),
+        _id: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid user _id provided in token`),
       }),
     }),
     update: simpleSchemas.accountUpdate,

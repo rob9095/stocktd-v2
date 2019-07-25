@@ -1,6 +1,7 @@
 import { apiCall, setTokenHeader } from '../../services/api';
 import { SET_CURRENT_USER } from '../actionTypes';
 import { addError, removeError} from './errors';
+import { message } from 'antd';
  
 export function setCurrentUser(user) {
 	return{
@@ -33,8 +34,8 @@ export function authUser(type, data) {
 				resolve();
 			})
 			.catch(err => {
-				dispatch(addError(err.message));
-				reject();
+				dispatch(addError({...err, status: 'error'}));
+				reject(err);
 			})
 		});
 	}

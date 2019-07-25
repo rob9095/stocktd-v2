@@ -162,7 +162,7 @@ exports.signup = async function(req, res, next) {
 			company: req.body.company,
 			user: user._id,
 		})
-		let { token, signature } = await refreshUserToken({user,create:true})
+		let { token, ...signature } = await refreshUserToken({user,create:true})
 
 		//send email verification
 		await sendUserEmailVerification({id: user._id})
