@@ -234,31 +234,31 @@ const validSchemas = {
   }),
 
   '/api/account/reset-password': Joi.object().keys({
-    body: Joi.object().keys({
-      token: Joi.object().keys({
-        _id: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid token provided`),
-        user: Joi.object().keys({
-          _id: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid _id provided`),
-        }),
+    token: Joi.object().keys({
+      _id: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid token provided`),
+      user: Joi.object().keys({
+        _id: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid _id provided`),
       }),
-      update: simpleSchemas.accountUpdate,
-      email: Joi.string().email(),
-    })
+    }),
+    update: simpleSchemas.accountUpdate,
+    email: Joi.string().email(),
   }),
 
   '/api/account/update': Joi.object().keys({
-    body: Joi.object().keys({
-      user: Joi.object().keys({
-        id: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid id provided`),
-      }),
-      update: simpleSchemas.accountUpdate,
+    user: Joi.object().keys({
+      id: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid id provided`),
+    }),
+    update: simpleSchemas.accountUpdate,
+  }),
+
+  '/api/account': Joi.object().keys({
+    user: Joi.object().keys({
+      id: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid id provided`),
     }),
   }),
 
   '/api/account/verify': Joi.object().keys({
-    body: Joi.object().keys({
-      token_id: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid token provided`),
-    })
+    token_id: Joi.string().regex(/^[a-f\d]{24}$/i).required().error(() => `Invalid token provided`),
   }),
 }
 

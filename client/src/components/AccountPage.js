@@ -2,8 +2,7 @@ import React, { Component } from 'react'
 import BasicNavigation from './BasicNavigation'
 import BasicWidget from './BasicWidget';
 import { connect } from "react-redux";
-import { getAllModelDocuments } from '../store/actions/models';
-import { updateAccount, sendVerficationEmail } from '../store/actions/account';
+import { updateAccount, sendVerficationEmail, getAccountDetails } from '../store/actions/account';
 import { addNotification, removeNotification } from '../store/actions/notifications';
 import BasicForm from './BasicForm';
 import CircularProgress from './CircularProgress';
@@ -33,18 +32,18 @@ class AccountPage extends Component {
       console.log('error!')
       return
     }
-    await getAllModelDocuments({ model: 'User', documentRef: { _id: id, }, company, populateArray: [{ path: 'companyId', populate: [{path: 'users'}] }], })
+    await this.props.getAccountDetails({ user: {id}, company })
     .then(res=>{
-      const [account, ...rest] = res.data
+      let account = res.user || {}
       this._isMounted && this.setState({account, loading: false})
-    }).catch(err=>{
-      console.log(err)
-      this._isMounted && this.setState({error:err, loading: false})
+    }).catch(({message = 'Somthing went wrong'})=>{
+      console.log({error: message})
+      this._isMounted && this.setState({error:message, loading: false})
       this.props.addNotification({
         nType: 'notification',
         id: 'fetch-error',
         icon: <Icon type="close-circle" style={{ color: 'red' }} />,
-        message: err || 'Something went wrong',
+        message,
         onClose: () => this.props.removeNotification({ id: 'fetch-error', })
       })
     })
@@ -228,4 +227,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, { updateAccount, addNotification, removeNotification })(AccountPage);
+export default connect(mapStateToProps, { getAccountDetails, updateAccount, addNotification, removeNotification })(AccountPage);

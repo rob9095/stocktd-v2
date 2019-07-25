@@ -68,3 +68,18 @@ export function updateAccount(config) {
 		});
 	}
 }
+
+export function getAccountDetails(config) {
+	return dispatch => {
+		return new Promise((resolve, reject) => {
+			const { user } = config
+			return apiCall('post', `/api/account`, { user })
+				.then((res) => {
+					resolve(res);
+				})
+				.catch(err => {
+					reject(err);
+				})
+		});
+	}
+}

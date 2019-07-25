@@ -3,7 +3,7 @@ const { emailStyles, sendEmail } = require('../services/sendEmail');
 
 exports.getAccountDetails = async function(req, res, next) {
 	try {
-		let foundUser = await db.User.findOne({_id: req.user._id})
+		let foundUser = await db.User.findOne({_id: req.body.user.id})
 		if (!foundUser) {
 			return next({
 				status: 400,
