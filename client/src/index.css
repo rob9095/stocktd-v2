@@ -905,6 +905,7 @@ ul.ant-menu.stkd-menu.ant-menu-light.ant-menu-root.ant-menu-horizontal {
   padding: 12px 0px;
   -webkit-box-shadow: -1px -1px 0 #dee3f2;
   box-shadow: 0px -1px 0 #dee3f2;
+  min-width: 257px;
 }
 
 

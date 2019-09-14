@@ -64,7 +64,7 @@ const scanToPO = (boxScan,scanQty) => {
       //define the current po, first array item if array, otherwise set to generic inbound po if currentPOs is falsy
       const currentPO = Array.isArray(boxScan.currentPOs) ? boxScan.currentPOs[0] : boxScan.currentPOs || genericInboundPo
       // find the po, otherwise set it to generic inbound defaults above to upsert
-      let foundPo = await db.PurchaseOrder.findOne({ poRef: currentPO.poRef })
+      let foundPo = await db.PurchaseOrder.findOne({ poRef: currentPO.poRef }) || genericInboundPo
       //upsert poProduct, update Product, upsert Purchase Order, upsert boxScan
       await db.PoProduct.update({ poRef: foundPo.poRef, skuCompany: boxScan.skuCompany }, {
         $setOnInsert: {
