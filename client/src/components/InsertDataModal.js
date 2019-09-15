@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Alert, Modal, Form, Row, Col, Input, Skeleton } from 'antd';
+import { Alert, Modal, Form, Row, Col, Input, Skeleton, Checkbox } from 'antd';
 import AutoCompleteInput from './AutoCompleteInput';
 
 const FormItem = Form.Item;
@@ -101,6 +101,21 @@ class ModalForm extends Component {
             </FormItem>
           </Col>
         )
+      } else if (i.type === 'checkbox') {
+        return (
+          <Col xs={i.span * 3} key={id}>
+            <FormItem key={id}>
+              {getFieldDecorator(id, { initialValue: i.checked, valuePropName: 'checked'}, {
+                rules: [{
+                  required: i.required,
+                  message: i.message,
+                }],
+              })(
+                <Checkbox>{i.text}</Checkbox>
+              )}
+            </FormItem>
+          </Col> 
+        )       
       } else {
         return (
           <Col xs={i.span*3} key={id}>
@@ -141,6 +156,9 @@ class ModalForm extends Component {
                 type={this.state.alertType}
                 showIcon
               />
+            )}
+            {this.props.beforeContent && (
+              this.props.beforeContent()
             )}
             <Row gutter={24}>{inputs}</Row>
           </Form>

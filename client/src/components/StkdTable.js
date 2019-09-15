@@ -257,6 +257,27 @@ class ProductTable extends Component {
         case 'scan':
           this.setState({scannerClosed: false})
           break;
+        case 'display-options':
+          let insertDataModal = {
+            title: 'Display Options',
+            beforeContent: ()=><h4>Active Columns</h4>,
+            inputs: this.props.headers.filter(h=>!h.noSort).map(h=>({...h, span: '24', type: 'checkbox', checked: !this.state.hiddenCols.includes(h.id),})),
+            onSave: (data)=>{
+              console.log({data})
+              return new Promise(async(resolve,reject)=>{
+                let hiddenCols = Object.entries(data).filter(([key, value])=> value === false).map(([key, value])=>key)
+                console.log({hiddenCols})
+                await this.setState({
+                  hiddenCols,
+                })
+                resolve({status:'success',text:'Success'})
+              })
+            },
+            okText: 'Save',
+            cancelText: 'Cancel',
+          }
+          this.setState({ insertDataModal })
+          break;  
         default:
           console.log('unknown menu option');
       }
@@ -679,7 +700,7 @@ class ProductTable extends Component {
     })
       return(
         <Layout style={{height: '100%', background: 'transparent',}}>
-        <div className="flex flex-col full-pad" style={{height: '100%', overflow: 'auto'}}>
+        <div className="flex flex-col full-pad" style={{height: '100%', width: '100%', overflow: 'auto'}}>
           <div className="flex align-items-center space-between border-bottom" style={{paddingBottom: 16}}>
             <h1 className="no-margin">{this.props.title}</h1>
             <div>
