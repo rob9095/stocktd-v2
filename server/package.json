@@ -21,7 +21,7 @@
     "joi": "^14.3.1",
     "jsonpack": "^1.1.5",
     "jsonwebtoken": "^8.2.0",
-    "mongoose": "^5.0.10",
+    "mongoose": "^5.7.5",
     "nodemailer": "^4.6.8"
   },
   "devDependencies": {
