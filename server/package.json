@@ -22,7 +22,7 @@
     "jsonpack": "^1.1.5",
     "jsonwebtoken": "^8.2.0",
     "mongoose": "^5.7.5",
-    "nodemailer": "^4.6.8"
+    "nodemailer": "^6.4.16"
   },
   "devDependencies": {
     "locus": "^2.0.1"
