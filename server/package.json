@@ -17,7 +17,7 @@
     "csvtojson": "^2.0.8",
     "dotenv": "^5.0.1",
     "express": "^4.16.3",
-    "express-fileupload": "^0.4.0",
+    "express-fileupload": "^1.1.10",
     "joi": "^14.3.1",
     "jsonpack": "^1.1.5",
     "jsonwebtoken": "^8.2.0",
